@@ -1,0 +1,8 @@
+﻿<Window x:Class="KineSis.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="KineSis - Settings" Height="600" Width="800" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico">
+    <Grid>
+        <Border BorderBrush="Silver" BorderThickness="1" Height="218" HorizontalAlignment="Left" Margin="12,12,0,0" Name="border1" VerticalAlignment="Top" Width="754" />
+    </Grid>
+</Window>
