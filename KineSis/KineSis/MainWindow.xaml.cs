@@ -30,23 +30,41 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Research.Kinect.Nui;
 using KineSis.Utils;
+using mshtml;
 
 namespace KineSis {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
+        public CanvasWindow userCanvasWindow = new CanvasWindow();
+        public CanvasWindow infoCanvasWindow = new CanvasWindow();
+        public CanvasWindow presentationCanvasWindow = new CanvasWindow();
+        public BrowserForm userBrowserForm = new BrowserForm();
+        public BrowserForm presentationBrowserForm = new BrowserForm();
+        public Console console = new Console();
+
+        public static int USER_SCREEN_NUMBER = 0;
+
+        public static int PRESENTATION_SCREEN_NUMBER = 1;
+
+        public static Brush skeleton_brush = System.Windows.Media.Brushes.Black;
+
+        public static String NAME = "MainWindow";
+
         public MainWindow() {
             InitializeComponent();
+            console.log(NAME, "init successfull" );
+            presentationCanvasWindow.Show();
+            presentationBrowserForm.Show();
+            userCanvasWindow.Show();
+            infoCanvasWindow.Show();
+            userBrowserForm.Show();
+
+            console.log(NAME, "windows shown");
+            
         }
         Runtime nui;
-        int totalFrames = 0;
-        int lastFrames = 0;
-        Boolean fullscreen = false;
-        Double originalWidth;
-        Double originalHeight;
-        Double originalLeft;
-        Double originalTop;
         DateTime lastTime = DateTime.MaxValue;
         SettingsWindow settingsWindow = new SettingsWindow();
 
@@ -83,6 +101,8 @@ namespace KineSis {
         };
 
         private void Window_Loaded(object sender, EventArgs e) {
+
+            goFullScreen();
             nui = new Runtime();
 
             try {
@@ -138,7 +158,7 @@ namespace KineSis {
             foreach (SkeletonData data in skeletonFrame.Skeletons) {
                 if (SkeletonTrackingState.Tracked == data.TrackingState) {
                     // Draw bones
-                    Brush brush = brushes[iSkeleton % brushes.Length];
+                    Brush brush = skeleton_brush; //brushes[iSkeleton % brushes.Length];
                     userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.Spine, JointID.ShoulderCenter, JointID.Head));
                     userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderLeft, JointID.ElbowLeft, JointID.WristLeft, JointID.HandLeft));
                     userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderRight, JointID.ElbowRight, JointID.WristRight, JointID.HandRight));
@@ -166,33 +186,102 @@ namespace KineSis {
             Environment.Exit(0);
         }
 
-        private void UserCanvas_CM_FullScreen_Click(object sender, RoutedEventArgs e) {
-            if (!fullscreen) {
-                originalWidth = this.Width;
-                originalHeight = this.Height;
-                originalLeft = this.Left;
-                originalTop = this.Top;
-                userCanvas.Height = WindowUtils.Screens[WindowUtils.DetectScreen(this)].Bounds.Height;
-                userCanvas.Width = ( userCanvas.Height * 4 ) / 3;
-                Double marginLeft = ( WindowUtils.Screens[WindowUtils.DetectScreen(this)].Bounds.Width - userCanvas.Width ) / 2;
-                userCanvas.Margin = new Thickness(marginLeft, 0, 0, 0);
-                ( (System.Windows.Controls.MenuItem)userCanvas.ContextMenu.Items.GetItemAt(2) ).Header = "Exit Full Screen";
+        private void goFullScreen() {
+
+            console.log(NAME, "gone fullscreen");
+
+            if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width <= 0.75) {
+                userCanvas.Height = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height;
+                userCanvas.Width = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height * 4 / 3;
             } else {
-                userCanvas.Height = 600;
-                userCanvas.Width = 800;
-                userCanvas.Margin = new Thickness(0, 0, 0, 0);
-                ( (System.Windows.Controls.MenuItem)userCanvas.ContextMenu.Items.GetItemAt(2) ).Header = "Full Screen";
+                userCanvas.Height = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width * 3 / 4;
+                userCanvas.Width = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width;
             }
-            WindowUtils.FullScreen(this, fullscreen, originalWidth, originalHeight, originalLeft, originalTop);
-            fullscreen = !fullscreen;
+
+            userBrowserForm.webBrowser1.Height = (int)( userCanvas.Height * 3 ) / 4;
+            userBrowserForm.webBrowser1.Width = (int)( userCanvas.Width * 3 ) / 4;
+
+            userCanvasWindow.Height = (int)( userCanvas.Height * 3 ) / 4;
+            userCanvasWindow.canvas.Height = (int)( userCanvas.Height * 3 ) / 4;
+            userCanvasWindow.Width = (int)( userCanvas.Width * 3 ) / 4;
+            userCanvasWindow.canvas.Width = (int)( userCanvas.Width * 3 ) / 4;
+
+            infoCanvasWindow.Width = userCanvas.Width;
+            infoCanvasWindow.canvas.Width = userCanvas.Width;
+            infoCanvasWindow.Height = ( userCanvas.Height - userCanvas.Height * 3 / 4 ) / 2;
+            infoCanvasWindow.canvas.Height = ( userCanvas.Height - userCanvas.Height * 3 / 4 ) / 2;
+            
+
+            Double marginLeft = ( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width - userCanvas.Width ) / 2;
+            Double marginTop = ( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height - userCanvas.Height ) / 2;
+            userCanvas.Margin = new Thickness(marginLeft, marginTop, 0, 0);
+
+            //( (System.Windows.Controls.MenuItem)userCanvas.ContextMenu.Items.GetItemAt(2) ).Header = "Exit Full Screen";
+
+            WindowUtils.FullScreen(presentationBrowserForm, PRESENTATION_SCREEN_NUMBER);
+            WindowUtils.FullScreen(presentationCanvasWindow, PRESENTATION_SCREEN_NUMBER);
+
+            WindowUtils.FullScreen(this, USER_SCREEN_NUMBER);
+            WindowUtils.FullScreen(userCanvasWindow, USER_SCREEN_NUMBER);
+            
+            WindowUtils.FullScreen(userBrowserForm, USER_SCREEN_NUMBER);
+            WindowUtils.FullScreen(infoCanvasWindow, USER_SCREEN_NUMBER);
+
+            if ((double) WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width <= 0.75) {
+                presentationBrowserForm.webBrowser1.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height;
+                presentationBrowserForm.webBrowser1.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height * 4 / 3;
+            } else {
+                presentationBrowserForm.webBrowser1.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width * 3 / 4;
+                presentationBrowserForm.webBrowser1.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width;
+            }
+
+
+            presentationCanvasWindow.Height = presentationBrowserForm.webBrowser1.Height;
+            presentationCanvasWindow.canvas.Height = presentationBrowserForm.webBrowser1.Height;
+            presentationCanvasWindow.Width = presentationBrowserForm.webBrowser1.Width;
+            presentationCanvasWindow.canvas.Width = presentationBrowserForm.webBrowser1.Width;
+
+            infoCanvasWindow.canvas.Children.Clear();
+            infoCanvasWindow.canvas.Background = System.Windows.Media.Brushes.Transparent;
+           
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = "zoom: " + (( (double)userBrowserForm.webBrowser1.Width / (double)presentationBrowserForm.webBrowser1.Width ) * 100) + "%\npresentation ratio = " + ((double)WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width) +
+                 "\nuser ratio = " + ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width) + 
+                "\npresentation width = " + presentationBrowserForm.webBrowser1.Width + 
+                "\npresentation height = " + presentationBrowserForm.webBrowser1.Height;
+            textBlock.Foreground = System.Windows.Media.Brushes.Red;
+            textBlock.FontSize = 20;
+            infoCanvasWindow.canvas.Children.Add(textBlock);
+
+            presentationBrowserForm.webBrowser1.Left = (int)( WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width - presentationBrowserForm.webBrowser1.Width) / 2;
+            presentationBrowserForm.webBrowser1.Top = (int)( WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height - presentationBrowserForm.webBrowser1.Height ) / 2;
+
+            presentationCanvasWindow.Left = presentationBrowserForm.webBrowser1.Left + presentationBrowserForm.Left;
+            presentationCanvasWindow.Top = presentationBrowserForm.webBrowser1.Top;
+
+            userBrowserForm.webBrowser1.Left = (int)( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width - userBrowserForm.webBrowser1.Width ) / 2;
+            userBrowserForm.webBrowser1.Top = (int)( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height - userBrowserForm.webBrowser1.Height ) / 2;
+
+
+            userBrowserForm.SetZoom((( (double)userBrowserForm.webBrowser1.Width / (double)presentationBrowserForm.webBrowser1.Width ) * 100));
+
+            infoCanvasWindow.Top = userCanvas.Height / 2 - infoCanvasWindow.canvas.Height/2;
+        }
+
+        private void UserCanvas_CM_SwitchScreens_Click(object sender, RoutedEventArgs e) {
+            console.log(NAME, "switched screens");
+            int x = USER_SCREEN_NUMBER;
+            USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
+            PRESENTATION_SCREEN_NUMBER = x;
+            goFullScreen();
         }
 
         private void UserCanvas_CM_Open_Click(object sender, RoutedEventArgs e) {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.FileName = "Document"; // Default file name
-            dlg.DefaultExt = ".txt"; // Default file extension
-            dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
+            dlg.DefaultExt = ".*"; // Default file extension
+            dlg.Filter = "Any (.*)|*.*"; // Filter files by extension
 
             // Show open file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -201,12 +290,26 @@ namespace KineSis {
             if (result == true) {
                 // Open document
                 string filename = dlg.FileName;
+                userBrowserForm.open(filename);
+                presentationBrowserForm.open(filename);
             }
+
         }
 
         private void UserCanvas_CM_Settings_Click(object sender, RoutedEventArgs e) {
-                settingsWindow = new SettingsWindow();
+            //bf.SetZoom(20);
+                //settingsWindow = new SettingsWindow();
+                settingsWindow.Topmost = true;
                 settingsWindow.Show();
+        }
+
+        private void UserCanvas_CM_Show_Console_Click(object sender, RoutedEventArgs e) {
+            //userBrowserForm.ScrollDown(10);
+            //presentationBrowserForm.ScrollDown(10);
+            console.Hide();
+            console.Topmost = true;
+            console.Show();
+            console.WindowState = WindowState.Normal;
         }
     }
 }

@@ -27,6 +27,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using KineSis.Utils;
 
 namespace KineSis {
     /// <summary>
@@ -35,10 +36,23 @@ namespace KineSis {
     public partial class SettingsWindow : Window {
         public SettingsWindow() {
             InitializeComponent();
+            for (int i = 0; i < WindowUtils.Screens.Length; i++) {
+                String device = "Display " + i + " ";
+                device += WindowUtils.Screens[i].Primary ? "[Primary] " : "";
+                device += "(" + WindowUtils.Screens[i].Bounds.Width + "x" + WindowUtils.Screens[i].Bounds.Height + ") " + WindowUtils.Screens[i].BitsPerPixel + " bpp";
+                comboBox1.Items.Add(device);
+                comboBox2.Items.Add(device);
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e) {
             this.Hide();
+        }
+
+        private void comboBox1_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+        }
+
+        private void comboBox2_SelectionChanged(object sender, SelectionChangedEventArgs e) {
         }
     }
 }

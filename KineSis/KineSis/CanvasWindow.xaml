@@ -1,0 +1,12 @@
+﻿<Window x:Class="KineSis.CanvasWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CanvasWindow" AllowsTransparency="True" Opacity="1" WindowStyle="None" Topmost="True" ShowInTaskbar="False">
+    <Window.Background >
+        <SolidColorBrush x:Name="BackgroundBrush" Color="WhiteSmoke" Opacity="0" ></SolidColorBrush>
+    </Window.Background>
+
+    <Grid>
+        <Canvas Name="canvas" Background="#00000000" Margin="0,0,0,0" />
+    </Grid>
+</Window>
