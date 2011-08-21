@@ -49,6 +49,20 @@ namespace KineSis.Utils {
             return screen;
         }
 
+        public static int DetectScreen(System.Windows.Forms.Form form) {
+            int screen = 0;
+
+            double right = form.Left + form.Width;
+            double left = form.Left;
+            double center = ( left + right ) / 2;
+            if (Screens[0].Bounds.Left <= center && center <= Screens[0].Bounds.Right) {
+                screen = 0;
+            } else {
+                screen = 1;
+            }
+            return screen;
+        }
+
         /// <summary>
         /// Switch a window to full screen state on the screen where currently is
         /// </summary>
@@ -58,9 +72,7 @@ namespace KineSis.Utils {
         /// <param name="originalHeight">original height of the window before full screen</param>
         /// <param name="originalLeft">original left of the window before full screen</param>
         /// <param name="originalTop">original top of the window before full screen</param>
-        public static void FullScreen(Window window, Boolean fullscreen, Double originalWidth, Double originalHeight, Double originalLeft, Double originalTop) {
-            int screen = DetectScreen(window);
-            if (fullscreen == false) {
+        public static void FullScreen(Window window, int screen) {
                 window.Topmost = true;
                 window.Left = Screens[screen].Bounds.Left;
                 window.Top = Screens[screen].Bounds.Top;
@@ -68,16 +80,15 @@ namespace KineSis.Utils {
                 window.Width = Screens[screen].Bounds.Width;
                 window.Height = Screens[screen].Bounds.Height;
                 window.ResizeMode = ResizeMode.NoResize;
-                fullscreen = true;
-            } else {
-                window.Topmost = false;
-                window.Left = originalLeft;
-                window.Top = originalTop;
-                window.WindowStyle = WindowStyle.SingleBorderWindow;
-                window.Width = originalWidth;
-                window.Height = originalHeight;
-                fullscreen = false;
-            }
+        }
+
+        public static void FullScreen(System.Windows.Forms.Form window, int screen) {
+                //window.Topmost = true;
+                window.Left = Screens[screen].Bounds.Left;
+                window.Top = Screens[screen].Bounds.Top;
+                window.Width = Screens[screen].Bounds.Width;
+                window.Height = Screens[screen].Bounds.Height;
+                window.FormBorderStyle = FormBorderStyle.None;
         }
     }
 }

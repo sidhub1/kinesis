@@ -1,0 +1,6 @@
+﻿<Window x:Class="KineSis.Console"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Console" Height="600" Width="800" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico" WindowStyle="SingleBorderWindow" Topmost="False" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+    <RichTextBox Height="563" Name="richTextBox1" Width="779" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="0" FontFamily="Lucida Console" FontSize="12" Foreground="White" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Background="Black"></RichTextBox>
+</Window>

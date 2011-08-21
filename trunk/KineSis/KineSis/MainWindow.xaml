@@ -1,12 +1,12 @@
 ﻿<Window x:Class="KineSis.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KineSis - User View" Width="806" Height="628" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico">
+        Title="KineSis - User View" Width="800" Height="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico" AllowsTransparency="True" Opacity="1" WindowStyle="None" Topmost="True" Background="#83818181">
     <StackPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel>
-                <Canvas Width="800" Height="600" Name="userCanvas" Margin="0 0 0 0" Background="Black" ClipToBounds="True">
+                <Canvas Width="800" Height="600" Name="userCanvas" Margin="0 0 0 0" Background="#50000000" ClipToBounds="True">
                     <Canvas.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Open" ToolTip="Open a Presentation" Click="UserCanvas_CM_Open_Click" Background="#FF532B8D" Foreground="White" FontSize="12" Width="Auto" Height="Auto" MaxWidth="Infinity" Focusable="True">
@@ -19,12 +19,12 @@
                                     <Image Source="/KineSis;component/Images/settings.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Full Screen" ToolTip="Go Full Screen" Click="UserCanvas_CM_FullScreen_Click" Background="#FFFF7200" Foreground="White">
+                            <MenuItem Header="Switch Screens" ToolTip="Switch Screens" Click="UserCanvas_CM_SwitchScreens_Click" Background="#FFFF7200" Foreground="White">
                                 <MenuItem.Icon>
-                                    <Image Source="/KineSis;component/Images/fullscreen.png" />
+                                    <Image Source="/KineSis;component/Images/switch.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Help" ToolTip="Learn how to use KineSis" Background="#FF77BA00" Foreground="White">
+                            <MenuItem Header="Show Console" ToolTip="Show Console" Click="UserCanvas_CM_Show_Console_Click" Background="#FF77BA00" Foreground="White">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/help.png" />
                                 </MenuItem.Icon>
@@ -40,12 +40,4 @@
             </StackPanel>
         </StackPanel>
     </StackPanel>
-    <Window.Background>
-        <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
-            <GradientStop Color="#FFECEDE5" Offset="0.787" />
-            <GradientStop Color="#FF462A84" Offset="1" />
-            <GradientStop Offset="0.008" Color="#FF8CC640" />
-            <GradientStop Color="#FFECEDE5" Offset="0.238" />
-        </LinearGradientBrush>
-    </Window.Background>
 </Window>
