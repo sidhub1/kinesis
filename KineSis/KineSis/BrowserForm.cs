@@ -6,13 +6,17 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using mshtml;
+using System.IO;
+using System.Threading;
 
 namespace KineSis {
     public partial class BrowserForm : Form {
         private double zoom = 100;
         public BrowserForm() {
             InitializeComponent();
-            webBrowser1.Navigate(new Uri("file:///C:/Users/sandu/Desktop/Book1.htm"));
+            String startupPage = Directory.GetCurrentDirectory() + "\\Startup\\startup.html";
+            webBrowser1.Navigate(startupPage);
             webBrowser1.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(webBrowser1_DocumentCompleted);
         }
 
@@ -36,19 +40,29 @@ namespace KineSis {
             this.zoom = zoom;
             try {
                 webBrowser1.Document.Body.Style = "zoom: " + this.zoom + "%";
-            } catch (Exception ex) {
+            } catch (Exception) {
 
             }
         }
 
-        public void open(String path) {
+        public void GoTo(Object obj) {
+            String path = obj as String;
             webBrowser1.Navigate(new Uri("file:///" + path));
+        }
+
+        public void open(String path) {
+            Thread thread = new Thread(new ParameterizedThreadStart(GoTo));
+            thread.Start(path);
+            //thread.Join();
         }
 
         public void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e) {
             try {
                 webBrowser1.Document.Body.Style = "zoom: " + this.zoom + "%";
-            } catch (Exception ex) {
+
+                this.Update();
+                this.Refresh();
+            } catch (Exception) {
 
             }
         }

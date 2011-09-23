@@ -22,6 +22,7 @@ namespace KineSis {
 
             canvas.Background = System.Windows.Media.Brushes.Transparent;
             //canvas.Background.Opacity = 50;
+            /*
             Line myLine = new Line();
             myLine.Stroke = System.Windows.Media.Brushes.Red;
             myLine.Opacity = 0.2;
@@ -32,7 +33,7 @@ namespace KineSis {
             myLine.HorizontalAlignment = HorizontalAlignment.Left;
             myLine.VerticalAlignment = VerticalAlignment.Center;
             myLine.StrokeThickness = 2;
-            canvas.Children.Add(myLine);
+            canvas.Children.Add(myLine);*/
         }
     }
 }

@@ -1,0 +1,266 @@
+<!--
+This document contain configurations for text highlighting used by kinesis.
+Read carefully the description and the rules, and if you want to change something, do it on your own responsability.
+
+You can modify existing values, or add new ones, but you have to respect several rules. Else, the application will not work properly.
+
+Kinesis make use of SyntaxHighlighter 3.0.83, created by Alex Gorbatchev (http://alexgorbatchev.com/SyntaxHighlighter). In this versions, the following brushes are supported:
+
+_____________________________________________________________________________
+Brush name			Brush aliases 						JsName			
+_____________________________________________________________________________
+ActionScript3   as3, actionscript3        AS3
+Bash/shell      bash, shell               Bash
+ColdFusion      cf, coldfusion            ColdFusion
+C#              c-sharp, csharp           CSharp
+C++             cpp, c                    Cpp
+CSS             css                       Css
+Delphi          delphi, pas, pascal       Delphi
+Diff            diff, patch               Diff
+Erlang          erl, erlang               Erlang
+Groovy          groovy                    Groovy
+JavaScript      js, jscript, javascript   JScript
+Java            java                      Java
+JavaFX          jfx, javafx               JavaFX
+Perl            perl, pl                  Perl
+PHP             php                       Php
+Plain Text      plain, text               Plain
+PowerShell      ps, powershell            PowerShell
+Python          py, python                Python
+Ruby            rails, ror, ruby          Ruby
+Scala           scala                     Scala
+SQL             sql                       Sql
+Visual Basic    vb, vbnet                 Vb
+XML             xml, xhtml, xslt, html    Xml
+_____________________________________________________________________________
+
+The available themes are:
+_________________________
+XmlName
+_________________________
+Default
+Django
+Eclipse
+Emacs
+FadeToGrey
+MDUltra
+Midnight
+RDark
+_________________________
+
+
+And now, the rules:
+
+The structure of this xml is the following:
+
+<sourceCodeFormatterConf>
+	<conf>
+		<filenameExtension>$extension</filenameExtension>
+		<brushAlias>$brushAlias</brushAlias>
+		<jsName>$jsName</jsName>
+		<theme>$theme</theme>
+	</conf>
+	...
+	<conf>
+		<filenameExtension>$extension</filenameExtension>
+		<brushAlias>$brushAlias</brushAlias>
+		<jsName>$jsName</jsName>
+		<theme>$theme</theme>
+	</conf>
+</sourceCodeFormatterConf>
+
+All fields are mandatory.
+
+$extension 
+		must be a windows os filename extension, such as .html, .xml, .cpp, .java. The extension must start with .
+		
+$brushAlias 
+		is one from the second column of the table shown above. Make sure you are using only one alias for a <conf> element
+		
+$jsName 
+		is a javascript filename from the third column. Use toghether with a $brushAlias from the same row (category). For example, you cannot hightlight a css with a Java brush.
+
+$theme 
+		is the name of the theme, one specified in the second table
+
+If you have read all of this and still have no idea what you need to do, then, just leave this file as it is.
+You have to change this only if you want to present a source code of a programming language out of this list, and you don't want to show it as plain text.
+
+All text files extensions not found in this configuration will be brushed as plain text.
+Incorrect values will be ignored.
+If the file does not respect the rules, the entire configuration will be ignored and and sources will be highlighted by default, as plain text.
+
+If something goes wrong, please check the log file for errors.
+
+-->
+
+<sourceCodeFormatterConf>
+	<conf>
+		<filenameExtension>.as</filenameExtension>
+		<brushAlias>as3</brushAlias>
+		<jsName>AS3</jsName>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>bash</brushAlias>
+		<jsName>Bash</jsName>
+		<filenameExtension>.sh</filenameExtension>
+		<theme>Django</theme>
+	</conf>
+	<conf>
+		<brushAlias>cf</brushAlias>
+		<jsName>ColdFusion</jsName>
+		<filenameExtension>.cfm</filenameExtension>
+		<theme>MDUltra</theme>
+	</conf>
+	<conf>
+		<brushAlias>csharp</brushAlias>
+		<jsName>CSharp</jsName>
+		<filenameExtension>.cs</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>c</brushAlias>
+		<jsName>Cpp</jsName>
+		<filenameExtension>.c</filenameExtension>
+		<theme>Emacs</theme>
+	</conf>
+	<conf>
+		<brushAlias>c</brushAlias>
+		<jsName>Cpp</jsName>
+		<filenameExtension>.h</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>cpp</brushAlias>
+		<jsName>Cpp</jsName>
+		<filenameExtension>.cpp</filenameExtension>
+		<theme>Eclipse</theme>
+	</conf>
+	<conf>
+		<brushAlias>cpp</brushAlias>
+		<jsName>Cpp</jsName>
+		<filenameExtension>.cxx</filenameExtension>
+		<theme>Eclipse</theme>
+	</conf>
+	<conf>
+		<brushAlias>css</brushAlias>
+		<jsName>Css</jsName>
+		<filenameExtension>.css</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>delphi</brushAlias>
+		<jsName>Delphi</jsName>
+		<filenameExtension>.pas</filenameExtension>
+		<theme>FadeToGrey</theme>
+	</conf>
+	<conf>
+		<brushAlias>diff</brushAlias>
+		<jsName>Diff</jsName>
+		<filenameExtension>.diff</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>erl</brushAlias>
+		<jsName>Erlang</jsName>
+		<filenameExtension>.erl</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>groovy</brushAlias>
+		<jsName>Groovy</jsName>
+		<filenameExtension>.groovy</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>js</brushAlias>
+		<jsName>JScript</jsName>
+		<filenameExtension>.js</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>java</brushAlias>
+		<jsName>Java</jsName>
+		<filenameExtension>.java</filenameExtension>
+		<theme>Eclipse</theme>
+	</conf>
+	<conf>
+		<brushAlias>jfx</brushAlias>
+		<jsName>JavaFX</jsName>
+		<filenameExtension>.fx</filenameExtension>
+		<theme>Eclipse</theme>
+	</conf>
+	<conf>
+		<brushAlias>pl</brushAlias>
+		<jsName>Perl</jsName>
+		<filenameExtension>.pl</filenameExtension>
+		<theme>Midnight</theme>
+	</conf>
+	<conf>
+		<brushAlias>php</brushAlias>
+		<jsName>Php</jsName>
+		<filenameExtension>.php</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>ps</brushAlias>
+		<jsName>PowerShell</jsName>
+		<filenameExtension>.ps1</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>py</brushAlias>
+		<jsName>Python</jsName>
+		<filenameExtension>.py</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>ruby</brushAlias>
+		<jsName>Ruby</jsName>
+		<filenameExtension>.rb</filenameExtension>
+		<theme>RDark</theme>
+	</conf>
+	<conf>
+		<brushAlias>scala</brushAlias>
+		<jsName>Scala</jsName>
+		<filenameExtension>.scala</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>sql</brushAlias>
+		<jsName>Sql</jsName>
+		<filenameExtension>.sql</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>vb</brushAlias>
+		<jsName>Vb</jsName>
+		<filenameExtension>.vb</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>xml</brushAlias>
+		<jsName>Xml</jsName>
+		<filenameExtension>.xml</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>xhtml</brushAlias>
+		<jsName>Xml</jsName>
+		<filenameExtension>.xhtml</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>html</brushAlias>
+		<jsName>Xml</jsName>
+		<filenameExtension>.html</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+	<conf>
+		<brushAlias>xslt</brushAlias>
+		<jsName>Xml</jsName>
+		<filenameExtension>.xslt</filenameExtension>
+		<theme>Default</theme>
+	</conf>
+</sourceCodeFormatterConf>

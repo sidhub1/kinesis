@@ -31,6 +31,19 @@ using System.Windows.Shapes;
 using Microsoft.Research.Kinect.Nui;
 using KineSis.Utils;
 using mshtml;
+using KineSis.ContentManagement.Model;
+using KineSis.ContentManagement.Service;
+using System.Threading;
+using System.Windows.Threading;
+using KineSis.ContentManagement.Progress;
+using System.ComponentModel;
+using System.Windows.Xps.Packaging;
+using System.IO.Packaging;
+using System.IO;
+using KineSis.Profiles;
+using KineSis.UserInterface;
+using KineSis.UserInterface.Entities;
+using KineSis.UserInterface.Entities.Groups;
 
 namespace KineSis {
     /// <summary>
@@ -43,30 +56,373 @@ namespace KineSis {
         public BrowserForm userBrowserForm = new BrowserForm();
         public BrowserForm presentationBrowserForm = new BrowserForm();
         public Console console = new Console();
+        public SettingsWindow settings = new SettingsWindow();
+
+        private BackgroundWorker documentProcessingWorker = new BackgroundWorker();
+        private BackgroundWorker documentChartProcessingWorker = new BackgroundWorker();
+
+        Document document = null;
 
         public static int USER_SCREEN_NUMBER = 0;
 
         public static int PRESENTATION_SCREEN_NUMBER = 1;
 
-        public static Brush skeleton_brush = System.Windows.Media.Brushes.Black;
+        public static Brush skeleton_brush;
 
         public static String NAME = "MainWindow";
 
+        public static int currentPage = 0;
+        public static double presentationZoom = 100;
+
+        public String currentFilename;
+
+        private Boolean leftHandSelected = false;
+        private Boolean rightHandSelected = false;
+        private int leftHandCounter = 0;
+        private int rightHandCounter = 0;
+
+        private Chart currentChart = null;
+        private int chartNumber = 0;
+
         public MainWindow() {
             InitializeComponent();
+            
+
+            documentProcessingWorker.WorkerReportsProgress = true;
+            documentProcessingWorker.WorkerSupportsCancellation = false;
+            documentProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentProcessingWorker_ProgressChanged);
+            documentProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentProcessingWorker_RunWorkerCompleted);
+            documentProcessingWorker.DoWork += new DoWorkEventHandler(documentProcessingWorker_DoWork);
+
+            documentChartProcessingWorker.WorkerReportsProgress = true;
+            documentChartProcessingWorker.WorkerSupportsCancellation = false;
+            documentChartProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentChartProcessingWorker_ProgressChanged);
+            documentChartProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentChartProcessingWorker_RunWorkerCompleted);
+            documentChartProcessingWorker.DoWork += new DoWorkEventHandler(documentChartProcessingWorker_DoWork);
+
             console.log(NAME, "init successfull" );
             presentationCanvasWindow.Show();
             presentationBrowserForm.Show();
             userCanvasWindow.Show();
             infoCanvasWindow.Show();
             userBrowserForm.Show();
+            settings.mw = this;
+
+            ApplyProfile();
 
             console.log(NAME, "windows shown");
+
+        }
+
+        public void ApplyProfile() {
+            Profile profile = ProfileManager.ActiveProfile;
+            userBrowserForm.BackColor = ColorUtil.DrawingColorFromHTML(profile.BackgroundColor.ToString());
+            presentationBrowserForm.BackColor = ColorUtil.DrawingColorFromHTML(profile.BackgroundColor.ToString());
+            skeleton_brush = ColorUtil.FromHTML(profile.SkeletonColor.ToString());
+            if (PRESENTATION_SCREEN_NUMBER != profile.PresentationScreen) {
+                SwitchScreens();
+            }
+        }
+
+
+        public void documentProcessingWorker_DoWork(object sender, DoWorkEventArgs e) {
+            //working here
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            String filename = (String)e.Argument;
+            document = DocumentService.CreateNewDocument(filename, worker);
             
         }
+
+        public void documentChartProcessingWorker_DoWork(object sender, DoWorkEventArgs e) {
+            //working here
+            BackgroundWorker worker = sender as BackgroundWorker;
+            String filename = (String)e.Argument;
+            DocumentService.CreateNewDocumentCharts(filename, worker, document);
+        }
+
+        public void documentProcessingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            try {
+                ProcessingProgress pp = (ProcessingProgress)e.UserState;
+
+                CanvasUtil.DrawProgress(infoCanvasWindow.canvas, pp);
+            } catch (Exception) {
+
+            }
+        }
+
+        public void documentChartProcessingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            try {
+                ProcessingProgress pp = (ProcessingProgress)e.UserState;
+               
+                CanvasUtil.DrawProgress(infoCanvasWindow.canvas, pp);
+            } catch (Exception) {
+
+            }
+        }
+
+        public void ToNextPage() {
+            if (document != null && currentPage < document.Pages.Count - 1) {
+                currentPage++;
+                UpdateShapes();    
+
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                }
+            }
+        }
+
+        public void UpdateShapes() {
+            Shapes.Elements = new List<Element>();
+            foreach (KineSis.ContentManagement.Model.Chart chart in document.Pages[currentPage].Charts) {
+                Element element = new Element();
+                element.Name = chart.Title;
+                element.Thumbnail = chart.Thumbnail;
+                Shapes.Elements.Add(element);
+            }
+        }
+
+        public void ToPreviousPage() {
+            if (document != null && currentPage > 0) {
+                currentPage--;
+                UpdateShapes();
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                }
+            }
+        }
+
+        public void GoToPage(int pageNumber) {
+            if (document != null && pageNumber < document.Pages.Count) {
+                currentPage = pageNumber;
+                UpdateShapes();
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                }
+            }
+        }
+
+        public void GoToChart(int chartNumber) {
+            this.chartNumber = chartNumber;
+            currentChart = document.Pages[currentPage].Charts[chartNumber];
+            CanvasUtil.DrawImage(presentationCanvasWindow, userCanvasWindow, currentChart.GetImageUrl());
+        }
+
+        public void RefreshCharts() {
+            if (currentChart != null) {
+                GoToChart(this.chartNumber);
+            }
+        }
+
+        public void CloseChart() {
+            currentChart = null;
+            userCanvasWindow.image.Source = null;
+            presentationCanvasWindow.image.Source = null;
+
+            userCanvasWindow.image.Width = 0;
+            userCanvasWindow.image.Height = 0;
+            presentationCanvasWindow.image.Width = 0;
+            presentationCanvasWindow.image.Height = 0;
+
+            userCanvasWindow.Background = System.Windows.Media.Brushes.Transparent;
+            presentationCanvasWindow.Background = System.Windows.Media.Brushes.Transparent;
+        }
+
+        public void RotateRight() {
+            if (document != null && currentChart != null) {
+                if (currentChart.HasRightImage()) {
+                    String chartImage = currentChart.GetRightImageUrl();
+                    CanvasUtil.DrawImage(presentationCanvasWindow, userCanvasWindow, chartImage);
+                }
+            }
+        }
+
+        public void RotateLeft() {
+            if (document != null && currentChart != null) {
+                if (currentChart.HasLeftImage()) {
+                    String chartImage = currentChart.GetLeftImageUrl();
+                    CanvasUtil.DrawImage(presentationCanvasWindow, userCanvasWindow, chartImage);
+                }
+            }
+        }
+
+        public void RotateUp() {
+            if (document != null && currentChart != null) {
+                if (currentChart.HasUpImage()) {
+                    String chartImage = currentChart.GetUpImageUrl();
+                    CanvasUtil.DrawImage(presentationCanvasWindow, userCanvasWindow, chartImage);
+                }
+            }
+        }
+
+        public void RotateDown() {
+            if (document != null && currentChart != null) {
+                if (currentChart.HasDownImage()) {
+                    String chartImage = currentChart.GetDownImageUrl();
+                    CanvasUtil.DrawImage(presentationCanvasWindow, userCanvasWindow, chartImage);
+                }
+            }
+        }
+
+        public void ScrollRight() {
+            if (document != null) {
+                userBrowserForm.ScrollRight(10);
+                presentationBrowserForm.ScrollRight(10);
+            }
+        }
+
+        public void ScrollLeft() {
+            if (document != null) {
+                userBrowserForm.ScrollLeft(10);
+                presentationBrowserForm.ScrollLeft(10);
+            }
+        }
+
+        public void ScrollUp() {
+            if (document != null) {
+                userBrowserForm.ScrollUp(10);
+                presentationBrowserForm.ScrollUp(10);
+            }
+        }
+
+        public void ScrollDown() {
+            if (document != null) {
+                userBrowserForm.ScrollDown(10);
+                presentationBrowserForm.ScrollDown(10);
+            }
+        }
+
+        private void ApplyZoom() {
+            presentationBrowserForm.SetZoom(presentationZoom);
+            userBrowserForm.SetZoom(( ( (double)( userBrowserForm.webBrowser1.Height ) * ( presentationZoom + presentationZoom * 0.005) / (double)presentationBrowserForm.webBrowser1.Height ) ));
+        }
+
+        public void ZoomIn() {
+            if (document != null) {
+                presentationZoom += 1;
+                ApplyZoom();
+            }
+        }
+
+        public void ZoomOut() {
+            if (document != null) {
+                presentationZoom -= 1;
+                ApplyZoom();
+            }
+        }
+
+        public void ZoomFit() {
+            if (document != null && currentPage < document.Pages.Count) {
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationZoom = 100;
+                    ApplyZoom();
+                }
+            }
+        }
+
+        public void documentProcessingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            //show the page and reset parameters
+            if (document != null) {
+
+                if (document.Pages.Count > 1) {
+                    Pages.Elements = new List<Element>();
+                    foreach (KineSis.ContentManagement.Model.Page page in document.Pages) {
+                        Element element = new Element();
+                        element.Name = page.Name;
+                        element.Thumbnail = page.Thumbnail;
+                        Pages.Elements.Add(element);
+                    }
+                }
+                presentationZoom = 100;
+
+                currentPage = 0;
+
+                UpdateShapes();
+
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                }
+
+                ApplyZoom();
+
+                infoCanvasWindow.canvas.Children.Clear();
+                documentChartProcessingWorker.RunWorkerAsync(currentFilename);
+            }
+        }
+
+        public void OpenDocument(Document doc) {
+            document = doc;
+            if (document != null) {
+
+                if (document.Pages.Count > 1) {
+                    Pages.Elements = new List<Element>();
+                    foreach (KineSis.ContentManagement.Model.Page page in document.Pages) {
+                        Element element = new Element();
+                        element.Name = page.Name;
+                        element.Thumbnail = page.Thumbnail;
+                        Pages.Elements.Add(element);
+                    }
+                }
+                presentationZoom = 100;
+
+                currentPage = 0;
+
+                UpdateShapes();
+
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                }
+
+                ApplyZoom();
+
+                infoCanvasWindow.canvas.Children.Clear();
+
+                TextBlock textBlock = new TextBlock();
+
+                textBlock.Text = "Ready";
+                textBlock.Foreground = System.Windows.Media.Brushes.Red;
+                textBlock.FontSize = 20;
+                infoCanvasWindow.canvas.Children.Add(textBlock);
+                infoCanvasWindow.canvas.UpdateLayout();
+                infoCanvasWindow.canvas.Refresh();
+            }
+        }
+
+        public void documentChartProcessingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            //everything is done now
+            if (document != null) {
+                UpdateShapes();
+                infoCanvasWindow.canvas.Children.Clear();
+            }
+        }
+
         Runtime nui;
         DateTime lastTime = DateTime.MaxValue;
-        SettingsWindow settingsWindow = new SettingsWindow();
 
         // We want to control how depth data gets converted into false-color data
         // for more intuitive visualization, so we keep 32-bit color frame buffer versions of
@@ -139,7 +495,7 @@ namespace KineSis {
             Polyline polyline = new Polyline();
             polyline.Points = points;
             polyline.Stroke = brush;
-            polyline.StrokeThickness = 5;
+            polyline.StrokeThickness = 20;
             return polyline;
         }
 
@@ -159,36 +515,195 @@ namespace KineSis {
                 if (SkeletonTrackingState.Tracked == data.TrackingState) {
                     // Draw bones
                     Brush brush = skeleton_brush; //brushes[iSkeleton % brushes.Length];
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.Spine, JointID.ShoulderCenter, JointID.Head));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderLeft, JointID.ElbowLeft, JointID.WristLeft, JointID.HandLeft));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderRight, JointID.ElbowRight, JointID.WristRight, JointID.HandRight));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.HipLeft, JointID.KneeLeft, JointID.AnkleLeft, JointID.FootLeft));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.HipRight, JointID.KneeRight, JointID.AnkleRight, JointID.FootRight));
+                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.ShoulderCenter));
+                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderLeft, JointID.ElbowLeft, JointID.WristLeft));
+                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderRight, JointID.ElbowRight, JointID.WristRight));
+                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.HipLeft, JointID.KneeLeft, JointID.AnkleLeft));
+                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.HipRight, JointID.KneeRight, JointID.AnkleRight));
+
+                    Joint leftShoulder = new Joint();
+                    Joint rightShoulder = new Joint();
+                    Joint leftWrist = new Joint();
+                    Joint rightWrist = new Joint();
+                    Joint centerShoulder = new Joint();
+                    Joint centerHip = new Joint();
 
                     // Draw joints
                     foreach (Joint joint in data.Joints) {
-                        Point jointPos = getDisplayPosition(joint);
-                        Line jointLine = new Line();
-                        jointLine.X1 = jointPos.X - 3;
-                        jointLine.X2 = jointLine.X1 + 6;
-                        jointLine.Y1 = jointLine.Y2 = jointPos.Y;
-                        jointLine.Stroke = jointColors[joint.ID];
-                        jointLine.StrokeThickness = 6;
-                        userCanvas.Children.Add(jointLine);
+                        if (joint.ID != JointID.HandLeft && joint.ID != JointID.HandRight && joint.ID != JointID.Spine && joint.ID != JointID.Head && joint.ID != JointID.FootRight && joint.ID != JointID.FootLeft) {
+                            Point jointPos = getDisplayPosition(joint);
+
+                            Ellipse ellipse = new Ellipse();
+                            ellipse.Width = 30;
+                            ellipse.Height = 30;
+                            ellipse.Stroke = brush;
+                            ellipse.StrokeThickness = 5;
+                            ellipse.Fill = jointColors[joint.ID];
+                            Canvas.SetTop(ellipse, jointPos.Y - 15);
+                            Canvas.SetLeft(ellipse, jointPos.X - 15);
+                            userCanvas.Children.Add(ellipse);
+
+                            if (joint.ID == JointID.ShoulderLeft) {
+                                leftShoulder = joint;
+                            } else if (joint.ID == JointID.ShoulderRight) {
+                                rightShoulder = joint;
+                            } else if (joint.ID == JointID.WristLeft) {
+                                leftWrist = joint;
+                            } else if (joint.ID == JointID.WristRight) {
+                                rightWrist = joint;
+                            } else if (joint.ID == JointID.ShoulderCenter) {
+                                centerShoulder = joint;
+                            } else if (joint.ID == JointID.HipCenter) {
+                                centerHip= joint;
+                            }
+                        } else if (joint.ID == JointID.Head) {
+                            Point jointPos = getDisplayPosition(joint);
+                            Ellipse ellipse = new Ellipse();
+                            ellipse.Width = 80;
+                            ellipse.Height = 80;
+                            ellipse.Stroke = brush;
+                            ellipse.StrokeThickness = 10;
+                            ellipse.Fill = Brushes.LightYellow;
+                            Canvas.SetTop(ellipse, jointPos.Y - 20 );
+                            Canvas.SetLeft(ellipse, jointPos.X - 40);
+                            userCanvas.Children.Add(ellipse);
+                        }
                     }
+
+                    Double lDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(leftWrist.Position.X, leftWrist.Position.Z),
+                                                                                    new KineSis.Geometry.Point2D(leftShoulder.Position.X, leftShoulder.Position.Z));
+                    Double rDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(rightWrist.Position.X, rightWrist.Position.Z),
+                                                                                new KineSis.Geometry.Point2D(rightShoulder.Position.X, rightShoulder.Position.Z));
+
+                    Double delta = Math.Sqrt(Math.Pow(getDisplayPosition(centerShoulder).X - getDisplayPosition(centerHip).X, 2) + Math.Pow(getDisplayPosition(centerShoulder).Y - getDisplayPosition(centerHip).Y, 2));
+
+                    Ellipse ellipse2 = new Ellipse();
+                    ellipse2.Width = 100;
+                    ellipse2.Height = 100;
+                    ellipse2.Stroke = brush;
+                    ellipse2.StrokeThickness = 10;
+                    ellipse2.Fill = jointColors[leftWrist.ID];
+                    Canvas.SetTop(ellipse2, 0);
+                    Canvas.SetLeft(ellipse2, 0);
+                    userCanvas.Children.Add(ellipse2);
+
+                    int ld = (int)( ( lDist / 0.4 ) * 10 ) ;
+                    String LD = ( ld < 10 ) ? ("0" + ld) : ld.ToString();
+
+                    TextBlock tb1 = new TextBlock();
+                    tb1.Text = LD;
+                    tb1.Foreground = brush;
+                    tb1.FontSize = 50;
+                    Canvas.SetTop(tb1, 15);
+                    Canvas.SetLeft(tb1, 25);
+                    userCanvas.Children.Add(tb1);
+
+                    Ellipse ellipse3 = new Ellipse();
+                    ellipse3.Width = 100;
+                    ellipse3.Height = 100;
+                    ellipse3.Stroke = brush;
+                    ellipse3.StrokeThickness = 10;
+                    ellipse3.Fill = jointColors[rightWrist.ID];
+                    Canvas.SetTop(ellipse3, 0);
+                    Canvas.SetRight(ellipse3, 0);
+                    userCanvas.Children.Add(ellipse3);
+
+                    int rd = (int)( ( rDist / 0.4 ) * 10 );
+                    String RD = ( rd < 10 ) ? ( "0" + rd ) : rd.ToString();
+
+                    TextBlock tb2 = new TextBlock();
+                    tb2.Text = RD;
+                    tb2.Foreground = brush;
+                    tb2.FontSize = 50;
+                    Canvas.SetTop(tb2, 15);
+                    Canvas.SetRight(tb2, 25);
+                    userCanvas.Children.Add(tb2);
+
+                    if (lDist > 0.4) {
+                        leftHandCounter++;
+                        //if (leftHandCounter >= 15) {
+                        //    leftHandCounter = 15;
+                            leftHandSelected = true;
+                        //}
+                    } else {
+                        leftHandSelected = false;
+                        leftHandCounter = 0;
+                    }
+
+                    if (leftHandSelected && !UIManager.InPaint) {
+                        Ellipse ellipse1 = new Ellipse();
+                        ellipse1.Width = 100;
+                        ellipse1.Height = 100;
+                        ellipse1.Stroke = brush;
+                        ellipse1.StrokeThickness = 10;
+                        ellipse1.Fill = jointColors[leftWrist.ID];
+                        Canvas.SetTop(ellipse1, getDisplayPosition(leftWrist).Y - 50);
+                        Canvas.SetLeft(ellipse1, getDisplayPosition(leftWrist).X - 50);
+                        userCanvas.Children.Add(ellipse1);
+                    } 
+
+                    if (rDist > 0.4) {
+                        rightHandCounter++;
+                        //if (rightHandCounter >= 15) {
+                        //    rightHandCounter = 15;
+                            rightHandSelected = true;
+                        //}
+                    } else {
+                        rightHandSelected = false;
+                        rightHandCounter = 0;
+                    }
+
+                    if (rightHandSelected && !UIManager.InPaint) {
+                        Ellipse ellipse1 = new Ellipse();
+                        ellipse1.Width = 100;
+                        ellipse1.Height = 100;
+                        ellipse1.Stroke = brush;
+                        ellipse1.StrokeThickness = 10;
+                        ellipse1.Fill = jointColors[rightWrist.ID];
+                        Canvas.SetTop(ellipse1, getDisplayPosition(rightWrist).Y - 50);
+                        Canvas.SetLeft(ellipse1, getDisplayPosition(rightWrist).X - 50);
+                        userCanvas.Children.Add(ellipse1);
+                    } 
+
+                    Hand leftHand = new Hand();
+                    leftHand.X = getDisplayPosition(leftWrist).X;
+                    leftHand.Y = getDisplayPosition(leftWrist).Y;
+                    leftHand.IsSelected = leftHandSelected;
+
+                    Hand rightHand = new Hand();
+                    rightHand.X = getDisplayPosition(rightWrist).X;
+                    rightHand.Y = getDisplayPosition(rightWrist).Y;
+                    rightHand.IsSelected = rightHandSelected;
+
+                    UIManager.LeftHand = leftHand;
+                    UIManager.RightHand = rightHand;
+                    UIManager.Delta = delta;
+                    UIManager.Process(this);
+
                 }
                 iSkeleton++;
             } // for each skeleton
+
+            userCanvas.Refresh();
         }
 
+        
+
         private void Window_Closed(object sender, EventArgs e) {
-            nui.Uninitialize();
+            try {
+                nui.Uninitialize();
+
+            } catch (Exception) {
+            }
             Environment.Exit(0);
         }
 
         private void goFullScreen() {
 
             console.log(NAME, "gone fullscreen");
+
+            int PS_WIDTH = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width; //4
+            int PS_HEIGHT = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height;  //3
 
             if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width <= 0.75) {
                 userCanvas.Height = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height;
@@ -198,13 +713,18 @@ namespace KineSis {
                 userCanvas.Width = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width;
             }
 
-            userBrowserForm.webBrowser1.Height = (int)( userCanvas.Height * 3 ) / 4;
-            userBrowserForm.webBrowser1.Width = (int)( userCanvas.Width * 3 ) / 4;
+            if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width <= 0.75) {
+                userBrowserForm.webBrowser1.Height = (int)userCanvas.Height;
+                userBrowserForm.webBrowser1.Width = (int) (userCanvas.Height * (double) PS_WIDTH / (double) PS_HEIGHT);
+            } else {
+                userBrowserForm.webBrowser1.Height = (int)( ( userCanvas.Width * (double) PS_HEIGHT ) / (double) PS_WIDTH );
+                userBrowserForm.webBrowser1.Width = (int) userCanvas.Width;
+            }
 
-            userCanvasWindow.Height = (int)( userCanvas.Height * 3 ) / 4;
-            userCanvasWindow.canvas.Height = (int)( userCanvas.Height * 3 ) / 4;
-            userCanvasWindow.Width = (int)( userCanvas.Width * 3 ) / 4;
-            userCanvasWindow.canvas.Width = (int)( userCanvas.Width * 3 ) / 4;
+            userCanvasWindow.Height = userBrowserForm.webBrowser1.Height;
+            userCanvasWindow.canvas.Height = userBrowserForm.webBrowser1.Height;
+            userCanvasWindow.Width = userBrowserForm.webBrowser1.Width;
+            userCanvasWindow.canvas.Width = userBrowserForm.webBrowser1.Width;
 
             infoCanvasWindow.Width = userCanvas.Width;
             infoCanvasWindow.canvas.Width = userCanvas.Width;
@@ -216,8 +736,6 @@ namespace KineSis {
             Double marginTop = ( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height - userCanvas.Height ) / 2;
             userCanvas.Margin = new Thickness(marginLeft, marginTop, 0, 0);
 
-            //( (System.Windows.Controls.MenuItem)userCanvas.ContextMenu.Items.GetItemAt(2) ).Header = "Exit Full Screen";
-
             WindowUtils.FullScreen(presentationBrowserForm, PRESENTATION_SCREEN_NUMBER);
             WindowUtils.FullScreen(presentationCanvasWindow, PRESENTATION_SCREEN_NUMBER);
 
@@ -227,13 +745,8 @@ namespace KineSis {
             WindowUtils.FullScreen(userBrowserForm, USER_SCREEN_NUMBER);
             WindowUtils.FullScreen(infoCanvasWindow, USER_SCREEN_NUMBER);
 
-            if ((double) WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width <= 0.75) {
-                presentationBrowserForm.webBrowser1.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height;
-                presentationBrowserForm.webBrowser1.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height * 4 / 3;
-            } else {
-                presentationBrowserForm.webBrowser1.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width * 3 / 4;
-                presentationBrowserForm.webBrowser1.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width;
-            }
+            presentationBrowserForm.webBrowser1.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height;
+            presentationBrowserForm.webBrowser1.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width;
 
 
             presentationCanvasWindow.Height = presentationBrowserForm.webBrowser1.Height;
@@ -243,15 +756,6 @@ namespace KineSis {
 
             infoCanvasWindow.canvas.Children.Clear();
             infoCanvasWindow.canvas.Background = System.Windows.Media.Brushes.Transparent;
-           
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = "zoom: " + (( (double)userBrowserForm.webBrowser1.Width / (double)presentationBrowserForm.webBrowser1.Width ) * 100) + "%\npresentation ratio = " + ((double)WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width) +
-                 "\nuser ratio = " + ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width) + 
-                "\npresentation width = " + presentationBrowserForm.webBrowser1.Width + 
-                "\npresentation height = " + presentationBrowserForm.webBrowser1.Height;
-            textBlock.Foreground = System.Windows.Media.Brushes.Red;
-            textBlock.FontSize = 20;
-            infoCanvasWindow.canvas.Children.Add(textBlock);
 
             presentationBrowserForm.webBrowser1.Left = (int)( WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width - presentationBrowserForm.webBrowser1.Width) / 2;
             presentationBrowserForm.webBrowser1.Top = (int)( WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height - presentationBrowserForm.webBrowser1.Height ) / 2;
@@ -262,13 +766,21 @@ namespace KineSis {
             userBrowserForm.webBrowser1.Left = (int)( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width - userBrowserForm.webBrowser1.Width ) / 2;
             userBrowserForm.webBrowser1.Top = (int)( WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height - userBrowserForm.webBrowser1.Height ) / 2;
 
-
-            userBrowserForm.SetZoom((( (double)userBrowserForm.webBrowser1.Width / (double)presentationBrowserForm.webBrowser1.Width ) * 100));
+            ApplyZoom();
 
             infoCanvasWindow.Top = userCanvas.Height / 2 - infoCanvasWindow.canvas.Height/2;
+
+            RefreshCharts();
+            UIManager.Clear();
         }
 
+
+
         private void UserCanvas_CM_SwitchScreens_Click(object sender, RoutedEventArgs e) {
+            SwitchScreens();
+        }
+
+        private void SwitchScreens() {
             console.log(NAME, "switched screens");
             int x = USER_SCREEN_NUMBER;
             USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
@@ -277,6 +789,7 @@ namespace KineSis {
         }
 
         private void UserCanvas_CM_Open_Click(object sender, RoutedEventArgs e) {
+
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.FileName = "Document"; // Default file name
@@ -290,26 +803,42 @@ namespace KineSis {
             if (result == true) {
                 // Open document
                 string filename = dlg.FileName;
-                userBrowserForm.open(filename);
-                presentationBrowserForm.open(filename);
+                currentFilename = filename;
+                documentProcessingWorker.RunWorkerAsync(filename);
+
             }
 
         }
 
         private void UserCanvas_CM_Settings_Click(object sender, RoutedEventArgs e) {
-            //bf.SetZoom(20);
-                //settingsWindow = new SettingsWindow();
-                settingsWindow.Topmost = true;
-                settingsWindow.Show();
+            settings.Hide();
+            settings.Topmost = true;
+            settings.Show();
+            settings.WindowState = WindowState.Normal;
+        }
+
+        private void UserCanvas_CM_Open_Existing_Click(object sender, RoutedEventArgs e) {
+            ArchiveWindow aw = new ArchiveWindow(this);
+            aw.Topmost = true;
+            aw.Show();
         }
 
         private void UserCanvas_CM_Show_Console_Click(object sender, RoutedEventArgs e) {
-            //userBrowserForm.ScrollDown(10);
-            //presentationBrowserForm.ScrollDown(10);
             console.Hide();
             console.Topmost = true;
             console.Show();
             console.WindowState = WindowState.Normal;
+        }
+
+
+    }
+
+    public static class ExtensionMethods {
+        private static Action EmptyDelegate = delegate() {
+        };
+
+        public static void Refresh(this UIElement uiElement) {
+            uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
         }
     }
 }

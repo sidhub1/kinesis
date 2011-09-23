@@ -38,6 +38,10 @@ namespace KineSis {
             String text = dt.ToString() + " [ " + sender + " ] : " + message;
             richTextBox1.Document.Blocks.Add(new Paragraph(new Run(text)));
         }
+
+        public static void WriteLine(String msg) {
+            //richTextBox1.Document.Blocks.Add(new Paragraph(new Run(msg)));
+        }
     }
 
     
