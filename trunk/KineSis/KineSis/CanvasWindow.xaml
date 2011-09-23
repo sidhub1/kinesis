@@ -7,6 +7,7 @@
     </Window.Background>
 
     <Grid>
-        <Canvas Name="canvas" Background="#00000000" Margin="0,0,0,0" />
+        <Image Height="0" HorizontalAlignment="Center" Margin="0,0,0,0" Name="image" Stretch="Fill" VerticalAlignment="Center" Width="0" Panel.ZIndex="1" />
+        <Canvas Name="canvas" Background="#00000000" Margin="0,0,0,0" Panel.ZIndex="2" />
     </Grid>
 </Window>
