@@ -705,7 +705,7 @@ namespace KineSis {
             int PS_WIDTH = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width; //4
             int PS_HEIGHT = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height;  //3
 
-            if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width <= 0.75) {
+            if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width < 0.75) {
                 userCanvas.Height = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height;
                 userCanvas.Width = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height * 4 / 3;
             } else {
@@ -713,7 +713,7 @@ namespace KineSis {
                 userCanvas.Width = WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width;
             }
 
-            if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width <= 0.75) {
+            if ((double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Height / (double)WindowUtils.Screens[USER_SCREEN_NUMBER].Bounds.Width < 0.75) {
                 userBrowserForm.webBrowser1.Height = (int)userCanvas.Height;
                 userBrowserForm.webBrowser1.Width = (int) (userCanvas.Height * (double) PS_WIDTH / (double) PS_HEIGHT);
             } else {
@@ -790,12 +790,17 @@ namespace KineSis {
 
         private void UserCanvas_CM_Open_Click(object sender, RoutedEventArgs e) {
 
+            String sources = "";
+
+            foreach (TextHighlight t in DocumentService.TextHighlightConfiguration.TextHighlights) {
+                sources += "*" + t.FilenameExtension + ";";
+            }
+
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.FileName = "Document"; // Default file name
-            dlg.DefaultExt = ".*"; // Default file extension
-            dlg.Filter = "Any (.*)|*.*"; // Filter files by extension
-
+            //dlg.DefaultExt = ".*"; // Default file extension
+            dlg.Filter = "Microsoft PowerPoint Presentation|*.pptx|Microsoft Word Document|*.docx|Microsoft Excel Workbook|*.xlsx|Pictures|*.jpeg;*.jpg;*.png;*.bmp;*.gif;*tiff;*.tif|Text Documents|"+sources; // Filter files by extension
             // Show open file dialog box
             Nullable<bool> result = dlg.ShowDialog();
 
@@ -803,8 +808,14 @@ namespace KineSis {
             if (result == true) {
                 // Open document
                 string filename = dlg.FileName;
-                currentFilename = filename;
-                documentProcessingWorker.RunWorkerAsync(filename);
+
+                if (DocumentService.IsFileSupported(filename)) {
+                    currentFilename = filename;
+                    documentProcessingWorker.RunWorkerAsync(filename);
+                } else {
+                    MessageBox.Show("This file is not supported. Choose another one");
+                    UserCanvas_CM_Open_Click(sender, e);
+                }
 
             }
 
@@ -813,20 +824,20 @@ namespace KineSis {
         private void UserCanvas_CM_Settings_Click(object sender, RoutedEventArgs e) {
             settings.Hide();
             settings.Topmost = true;
-            settings.Show();
+            settings.ShowDialog();
             settings.WindowState = WindowState.Normal;
         }
 
         private void UserCanvas_CM_Open_Existing_Click(object sender, RoutedEventArgs e) {
             ArchiveWindow aw = new ArchiveWindow(this);
             aw.Topmost = true;
-            aw.Show();
+            aw.ShowDialog();
         }
 
         private void UserCanvas_CM_Show_Console_Click(object sender, RoutedEventArgs e) {
             console.Hide();
             console.Topmost = true;
-            console.Show();
+            console.ShowDialog();
             console.WindowState = WindowState.Normal;
         }
 

@@ -141,11 +141,7 @@ namespace KineSis.ContentManagement.Utils {
         /// <returns></returns>
         public TextHighlight GetTextHighlightForTextFile(String path) {
             String extension = path.Substring(path.LastIndexOf("."));
-            TextHighlight th = new TextHighlight();
-            th.BrushAlias = "plain";
-            th.JsName = "Plain";
-            th.Theme = "Default";
-            th.FilenameExtension = extension;
+            TextHighlight th = null;
             foreach (TextHighlight t in textHighlights) {
                 if (t.FilenameExtension.Equals(extension)) {
                     th = t;

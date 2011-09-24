@@ -233,6 +233,12 @@ If something goes wrong, please check the log file for errors.
 		<filenameExtension>.sql</filenameExtension>
 		<theme>Default</theme>
 	</conf>
+  <conf>
+		<brushAlias>plain</brushAlias>
+		<jsName>Plain</jsName>
+		<filenameExtension>.txt</filenameExtension>
+		<theme>Default</theme>
+	</conf>
 	<conf>
 		<brushAlias>vb</brushAlias>
 		<jsName>Vb</jsName>

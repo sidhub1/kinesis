@@ -32,7 +32,7 @@ using KineSis.Profiles;
 
 namespace KineSis.ContentManagement.Service {
     class DocumentService {
-        public static String TEMP_DIRECTORY;
+        public static String TEMP_DIRECTORY = ProfileManager.ActiveProfile.TempFolder;
         public static int CHART_HORIZONTAL_FACES;
         public static int CHART_VERTICAL_FACES;
         public static int CHART_WIDTH;
@@ -195,75 +195,30 @@ namespace KineSis.ContentManagement.Service {
             } else if (ext.Equals("jpeg") || ext.Equals("jpg") || ext.Equals("png") || ext.Equals("bmp") || ext.Equals("gif") || ext.Equals("tiff")) {
                 helper = new PictureDocumentHelper();
             } else {
-                Encoding enc = Encoding.Default;
-                if (IsText(enc, path, 10)) {
+                if (TextHighlightConfiguration.GetTextHighlightForTextFile(path) != null) {
                     helper = new TextDocumentHelper();
                 }
             }
             return helper;
         }
 
-        /// <summary>
-        /// Detect if a file is text and detect the encoding.
-        /// </summary>
-        /// <param name="encoding">
-        /// The detected encoding.
-        /// </param>
-        /// <param name="fileName">
-        /// The file name.
-        /// </param>
-        /// <param name="windowSize">
-        /// The number of characters to use for testing.
-        /// </param>
-        /// <returns>
-        /// true if the file is text.
-        /// </returns>
-        public static bool IsText(Encoding encoding, string fileName, int windowSize) {
-            using (var fileStream = File.OpenRead(fileName)) {
-                var rawData = new byte[windowSize];
-                var text = new char[windowSize];
-                var isText = true;
+        public static Boolean IsFileSupported(String path) {
+            Boolean supported = false;
+            FileInfo fi = new FileInfo(path);
+            String ext = fi.Extension.Substring(1).ToLower();
 
-                // Read raw bytes
-                var rawLength = fileStream.Read(rawData, 0, rawData.Length);
-                fileStream.Seek(0, SeekOrigin.Begin);
-
-                // Detect encoding correctly (from Rick Strahl's blog)
-                // http://www.west-wind.com/weblog/posts/2007/Nov/28/Detecting-Text-Encoding-for-StreamReader
-                if (rawData[0] == 0xef && rawData[1] == 0xbb && rawData[2] == 0xbf) {
-                    encoding = Encoding.UTF8;
-                } else if (rawData[0] == 0xfe && rawData[1] == 0xff) {
-                    encoding = Encoding.Unicode;
-                } else if (rawData[0] == 0 && rawData[1] == 0 && rawData[2] == 0xfe && rawData[3] == 0xff) {
-                    encoding = Encoding.UTF32;
-                } else if (rawData[0] == 0x2b && rawData[1] == 0x2f && rawData[2] == 0x76) {
-                    encoding = Encoding.UTF7;
-                } else {
-                    encoding = Encoding.Default;
-                }
-
-                // Read text and detect the encoding
-                using (var streamReader = new StreamReader(fileStream)) {
-                    streamReader.Read(text, 0, text.Length);
-                }
-
-                using (var memoryStream = new MemoryStream()) {
-                    using (var streamWriter = new StreamWriter(memoryStream, encoding)) {
-                        // Write the text to a buffer
-                        streamWriter.Write(text);
-                        streamWriter.Flush();
-
-                        // Get the buffer from the memory stream for comparision
-                        var memoryBuffer = memoryStream.GetBuffer();
-
-                        // Compare only bytes read
-                        for (var i = 0; i < rawLength && isText; i++) {
-                            isText = rawData[i] == memoryBuffer[i];
-                        }
-                    }
-                }
-                return isText;
+            if (ext.Equals("docx")) {
+                supported = true;
+            } else if (ext.Equals("xlsx")) {
+                supported = true;
+            } else if (ext.Equals("pptx")) {
+                supported = true;
+            } else if (ext.Equals("jpeg") || ext.Equals("jpg") || ext.Equals("png") || ext.Equals("bmp") || ext.Equals("gif") || ext.Equals("tiff")) {
+                supported = true;
+            } else if (TextHighlightConfiguration.GetTextHighlightForTextFile(path) != null) {
+                supported = true;
             }
+            return supported;
         }
     }
 }
