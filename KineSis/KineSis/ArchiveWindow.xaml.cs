@@ -53,6 +53,7 @@ namespace KineSis {
                 Doc d = ProfileManager.ActiveProfile.Documents[documentsListBox.SelectedIndex];
                 Document doc = Document.deserialize(ProfileManager.ActiveProfile.TempFolder + "\\" + d.Location + ".kinesis");
                 mw.OpenDocument(doc);
+                this.Close();
             }
         }
     }
