@@ -245,7 +245,6 @@ namespace KineSis.ContentManagement.Service.Helper {
             //create a new page
             KineSis.ContentManagement.Model.Page page = document.Pages[0];
 
-            try {
 
                 //check if chart generation is wanted
                 if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
@@ -457,9 +456,6 @@ namespace KineSis.ContentManagement.Service.Helper {
                     //close presentation
                     presentation.Close();
                 }
-            } catch (Exception ex) {
-                pp.OverallOperationName = "Exception occured: " + ex.Message;
-            }
 
             wdoc.Close(SaveChanges: false);
 
@@ -662,6 +658,23 @@ namespace KineSis.ContentManagement.Service.Helper {
                 ( chart.ChartType == XlChartType.xlConeColClustered ) ||
                 ( chart.ChartType == XlChartType.xlConeColStacked ) ||
                 ( chart.ChartType == XlChartType.xlConeColStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlConeBarClustered ) ||
+                ( chart.ChartType == XlChartType.xlConeBarStacked ) ||
+                ( chart.ChartType == XlChartType.xlConeBarStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlCylinderCol ) ||
+                ( chart.ChartType == XlChartType.xlCylinderColClustered ) ||
+                ( chart.ChartType == XlChartType.xlCylinderColStacked ) ||
+                ( chart.ChartType == XlChartType.xlCylinderColStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlCylinderBarClustered ) ||
+                ( chart.ChartType == XlChartType.xlCylinderBarStacked ) ||
+                ( chart.ChartType == XlChartType.xlCylinderBarStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlPyramidCol ) ||
+                ( chart.ChartType == XlChartType.xlPyramidColClustered ) ||
+                ( chart.ChartType == XlChartType.xlPyramidColStacked ) ||
+                ( chart.ChartType == XlChartType.xlPyramidColStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlPyramidBarClustered ) ||
+                ( chart.ChartType == XlChartType.xlPyramidBarStacked ) ||
+                ( chart.ChartType == XlChartType.xlPyramidBarStacked100 ) ||
                 ( chart.ChartType == XlChartType.xlSurface ) ||
                 ( chart.ChartType == XlChartType.xlSurfaceTopView ) ||
                 ( chart.ChartType == XlChartType.xlSurfaceTopViewWireframe ) ||

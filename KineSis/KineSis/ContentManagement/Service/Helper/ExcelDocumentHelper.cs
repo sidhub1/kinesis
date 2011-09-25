@@ -538,6 +538,27 @@ namespace KineSis.ContentManagement.Service.Helper {
                 ( chart.ChartType == XlChartType.xl3DLine ) ||
                 ( chart.ChartType == XlChartType.xl3DPie ) ||
                 ( chart.ChartType == XlChartType.xl3DPieExploded ) ||
+                ( chart.ChartType == XlChartType.xlConeCol ) ||
+                ( chart.ChartType == XlChartType.xlConeColClustered ) ||
+                ( chart.ChartType == XlChartType.xlConeColStacked ) ||
+                ( chart.ChartType == XlChartType.xlConeColStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlConeBarClustered ) ||
+                ( chart.ChartType == XlChartType.xlConeBarStacked ) ||
+                ( chart.ChartType == XlChartType.xlConeBarStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlCylinderCol ) ||
+                ( chart.ChartType == XlChartType.xlCylinderColClustered ) ||
+                ( chart.ChartType == XlChartType.xlCylinderColStacked ) ||
+                ( chart.ChartType == XlChartType.xlCylinderColStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlCylinderBarClustered ) ||
+                ( chart.ChartType == XlChartType.xlCylinderBarStacked ) ||
+                ( chart.ChartType == XlChartType.xlCylinderBarStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlPyramidCol ) ||
+                ( chart.ChartType == XlChartType.xlPyramidColClustered ) ||
+                ( chart.ChartType == XlChartType.xlPyramidColStacked ) ||
+                ( chart.ChartType == XlChartType.xlPyramidColStacked100 ) ||
+                ( chart.ChartType == XlChartType.xlPyramidBarClustered ) ||
+                ( chart.ChartType == XlChartType.xlPyramidBarStacked ) ||
+                ( chart.ChartType == XlChartType.xlPyramidBarStacked100 ) ||
                 ( chart.ChartType == XlChartType.xlSurface ) ||
                 ( chart.ChartType == XlChartType.xlSurfaceTopView ) ||
                 ( chart.ChartType == XlChartType.xlSurfaceTopViewWireframe ) ||

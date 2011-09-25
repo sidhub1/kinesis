@@ -3,27 +3,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="KineSis - Settings" Height="725" Width="800" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico" ShowInTaskbar="False">
     <Grid>
-        <GroupBox Header="Screens" Height="59" HorizontalAlignment="Left" Margin="12,115,0,0" Name="groupBox1" VerticalAlignment="Top" Width="754" ToolTip="Choose the user's screen and Presentation screen">
+        <GroupBox Header="Screens" Height="93" HorizontalAlignment="Left" Margin="12,106,0,0" Name="groupBox1" VerticalAlignment="Top" Width="754" ToolTip="Choose the user's screen and Presentation screen">
             <Grid>
                 <Label Content="Default Presentation Screen" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label1" VerticalAlignment="Top" Width="181" />
                 <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,6,0,0" Name="screensCB" VerticalAlignment="Top" Width="549" SelectionChanged="screensCB_SelectionChanged" />
+                <Label Content="Default User Screen" Height="28" HorizontalAlignment="Left" Margin="6,36,0,0" Name="label6" VerticalAlignment="Top" />
+                <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,41,0,0" Name="userScreensCB" VerticalAlignment="Top" Width="549" SelectionChanged="userScreensCB_SelectionChanged" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Profiles" Height="103" HorizontalAlignment="Left" Margin="12,6,0,0" Name="groupBox2" VerticalAlignment="Top" Width="754"></GroupBox>
-        <Grid Margin="18,24,18,585">
+        <GroupBox Header="Profiles" Height="94" HorizontalAlignment="Left" Margin="12,6,0,0" Name="groupBox2" VerticalAlignment="Top" Width="754"></GroupBox>
+        <Grid Margin="18,24,18,592">
             <Label Content="Load profile" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label3" VerticalAlignment="Top" />
             <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,6,0,0" Name="profilesCB" VerticalAlignment="Top" Width="543" SelectionChanged="profilesCB_SelectionChanged" />
             <Label Content="Save New Profile As .." Height="28" HorizontalAlignment="Left" Margin="6,40,0,0" Name="label4" VerticalAlignment="Top" />
             <TextBox Height="23" HorizontalAlignment="Left" Margin="187,40,0,0" Name="saveAsTextBox" VerticalAlignment="Top" Width="396" />
             <Button Content="Save" Height="23" HorizontalAlignment="Left" Margin="589,39,0,0" Name="saveButton" VerticalAlignment="Top" Width="141" Click="saveButton_Click" />
         </Grid>
-        <GroupBox Header="Location" Height="90" HorizontalAlignment="Left" Margin="12,180,0,0" Name="groupBox3" VerticalAlignment="Top" Width="754">
+        <GroupBox Header="Location" Height="65" HorizontalAlignment="Left" Margin="12,205,0,0" Name="groupBox3" VerticalAlignment="Top" Width="754">
             <Grid>
                 <Label Content="Temp folder" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label5" VerticalAlignment="Top" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="187,11,0,0" Name="tempFolderTextBox" VerticalAlignment="Top" Width="396" IsEnabled="False" />
                 <Button Content="Change" Height="23" HorizontalAlignment="Left" Margin="589,10,0,0" Name="button2" VerticalAlignment="Top" Width="141" Click="button2_Click" />
-                <Label Content="Delete after presentation" Height="28" HorizontalAlignment="Left" Margin="6,40,0,0" Name="label6" VerticalAlignment="Top" />
-                <CheckBox Content="Empty Temp content after closing presentation" Height="16" HorizontalAlignment="Left" Margin="187,45,0,0" Name="deleteCheckBox" VerticalAlignment="Top" Width="272" />
             </Grid>
         </GroupBox>
         <GroupBox Header="Theme" Height="199" HorizontalAlignment="Left" Margin="12,449,0,0" Name="groupBox4" VerticalAlignment="Top" Width="754">

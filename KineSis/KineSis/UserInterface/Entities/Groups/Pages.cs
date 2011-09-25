@@ -57,7 +57,22 @@ namespace KineSis.UserInterface.Entities.Groups {
                     Group main = UIManager.MainGroup;
                     groups.Add(main);
                 }
-                return groups;
+
+                List<Group> activeGroups = new List<Group>();
+
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocument.Pages.Count > 1) {
+                    activeGroups.Add(groups[0]);
+                }
+
+                activeGroups.Add(groups[1]);
+
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocument.Pages.Count > 1) {
+                    activeGroups.Add(groups[2]);
+                }
+
+                activeGroups.Add(groups[3]);
+
+                return activeGroups;
             }
         }
 

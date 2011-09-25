@@ -44,8 +44,6 @@ namespace KineSis.UserInterface.Entities.Groups {
         public static List<Group> Groups {
             get {
                 if (groups.Count == 0) {
-                    //Group select = new Select(Shapes.Instance);
-                    //groups.Add(select);
                     Group zoom = new Zoom(Main.Instance);
                     groups.Add(zoom);
                     Group pages = Pages.Instance;
@@ -55,7 +53,24 @@ namespace KineSis.UserInterface.Entities.Groups {
                     Group paint = Paint.Instance;
                     groups.Add(paint);
                 }
-                return groups;
+
+                List<Group> activeGroups = new List<Group>();
+
+                if (UIManager.ActiveDocument != null) {
+                    activeGroups.Add(groups[0]);
+                }
+
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocument.Pages.Count > 0) {
+                    activeGroups.Add(groups[1]);
+                }
+
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocument.Pages[UIManager.ActiveDocumentPage].Charts.Count > 0) {
+                    activeGroups.Add(groups[2]);
+                }
+
+                activeGroups.Add(groups[3]);
+
+                return activeGroups;
             }
         }
 

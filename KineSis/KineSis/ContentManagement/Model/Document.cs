@@ -87,25 +87,21 @@ namespace KineSis.ContentManagement.Model {
         }
 
         public static void serialize(Document document, String path) {
-            Stream a = File.OpenWrite(path);
-            Stream b = File.OpenWrite(path.Replace(".kinesis", ".xml"));
-            BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(a, document);
-            a.Close();
-
+            Stream b = File.OpenWrite(path);
             System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(document.GetType());
             x.Serialize(b, document);
-
+            b.Close();
         }
 
         public static Document deserialize(String path) {
-            FileStream file = new FileStream(path, FileMode.Open);
+            Document doc = new Document();
 
-            BinaryFormatter bf = new BinaryFormatter();
-            Document doc = bf.Deserialize(file) as Document;
+            Stream b = File.OpenRead(path);
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(doc.GetType());
+            doc = x.Deserialize(b) as Document;
+            b.Close();
 
             return doc;
         }
-
     }
 }

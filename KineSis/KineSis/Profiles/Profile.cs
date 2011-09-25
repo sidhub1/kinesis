@@ -32,9 +32,8 @@ namespace KineSis.Profiles {
     public class Profile {
         private String name;
         private String tempFolder;
-        private Boolean deleteTempAfterPresentation;
         private int presentationScreen;
-        //private int userScreen;
+        private int userScreen;
         private String primaryColor;
         private String secondaryColor;
         private String backgroundColor;
@@ -75,16 +74,6 @@ namespace KineSis.Profiles {
             }
         }
 
-        public Boolean DeleteTempAfterPresentation {
-            get {
-                return deleteTempAfterPresentation;
-            }
-
-            set {
-                deleteTempAfterPresentation = value;
-            }
-        }
-
         public int PresentationScreen {
             get {
                 return presentationScreen;
@@ -94,7 +83,7 @@ namespace KineSis.Profiles {
                 presentationScreen = value;
             }
         }
-        /*
+        
         public int UserScreen {
             get {
                 return userScreen;
@@ -104,7 +93,7 @@ namespace KineSis.Profiles {
                 userScreen = value;
             }
         }
-        */
+        
         public Brush PrimaryColor {
             get {
                 return ColorUtil.FromHTML(primaryColor);

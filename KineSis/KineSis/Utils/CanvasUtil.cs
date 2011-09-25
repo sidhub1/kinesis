@@ -106,6 +106,30 @@ namespace KineSis.Utils {
             canvas.Refresh();
         }
 
+        public static void DrawException(Canvas canvas, String exception) {
+            canvas.Background = ProfileManager.ActiveProfile.BackgroundColor;
+
+            double sixth = canvas.Height / 6;
+            double tenth = canvas.Width / 10;
+
+            canvas.Children.Clear();
+
+            TextBlock overallOperationTextBlock = new TextBlock();
+            overallOperationTextBlock.Text = exception;
+            overallOperationTextBlock.Foreground = ProfileManager.ActiveProfile.PrimaryColor;
+            overallOperationTextBlock.FontSize = sixth / 1.5;
+            overallOperationTextBlock.Width = canvas.Width;
+            overallOperationTextBlock.Margin = new Thickness(0, 3 * sixth, 0, 0);
+            overallOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
+
+            overallOperationTextBlock.TextAlignment = TextAlignment.Center;
+
+            canvas.Children.Add(overallOperationTextBlock);
+            canvas.UpdateLayout();
+
+            canvas.Refresh();
+        }
+
         /// <summary>
         /// Draw an ellipse or circle
         /// </summary>

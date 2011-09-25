@@ -90,7 +90,14 @@ namespace KineSis.ContentManagement.Service {
             ProcessingProgress pp = new ProcessingProgress(worker);
 
             //start parsing
-            Document document = helper.ParseNewDocument(path, pp);
+            Document document = null;
+            try {
+                document = helper.ParseNewDocument(path, pp);
+            } catch (Exception ex) {
+                pp.OverallOperationName = "[Exception] " + ex.Message;
+            //    pp.OverallOperationTotalElements = 1;
+            //    MessageBox.Show(ex.Message);
+            }
             return document;
         }
 
@@ -107,18 +114,24 @@ namespace KineSis.ContentManagement.Service {
 
             if (helper != null) {
                 ProcessingProgress pp = new ProcessingProgress(worker);
-                if (helper is PowerPointDocumentHelper) {
-                    PowerPointDocumentHelper h = (PowerPointDocumentHelper)helper;
-                    h.ParseNewDocumentCharts(path, pp, document);
-                } else if (helper is ExcelDocumentHelper) {
-                    ExcelDocumentHelper h = (ExcelDocumentHelper)helper;
-                    h.ParseNewDocumentCharts(path, pp, document);
-                } else if (helper is WordDocumentHelper) {
-                    WordDocumentHelper h = (WordDocumentHelper)helper;
-                    h.ParseNewDocumentCharts(path, pp, document);
+                try {
+                    if (helper is PowerPointDocumentHelper) {
+                        PowerPointDocumentHelper h = (PowerPointDocumentHelper)helper;
+                        h.ParseNewDocumentCharts(path, pp, document);
+                    } else if (helper is ExcelDocumentHelper) {
+                        ExcelDocumentHelper h = (ExcelDocumentHelper)helper;
+                        h.ParseNewDocumentCharts(path, pp, document);
+                    } else if (helper is WordDocumentHelper) {
+                        WordDocumentHelper h = (WordDocumentHelper)helper;
+                        h.ParseNewDocumentCharts(path, pp, document);
+                    }
+                } catch (Exception ex) {
+                    pp.OverallOperationName = "[Exception] " + ex.Message;
+                    //    pp.OverallOperationTotalElements = 1;
+                    //    MessageBox.Show(ex.Message);
                 }
 
-                Document.serialize(document, TEMP_DIRECTORY + "\\" + document.Location + ".kinesis");
+                Document.serialize(document, TEMP_DIRECTORY + "\\" + document.Location + ".xml");
 
                 ProfileManager.AddDocumentToActive(document.Name, document.Location);
                 ProfileManager.Serialize();

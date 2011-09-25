@@ -12,6 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using KineSis.Profiles;
 using KineSis.ContentManagement.Model;
+using KineSis.Utils;
+using System.IO;
 
 namespace KineSis {
     /// <summary>
@@ -34,8 +36,34 @@ namespace KineSis {
 
         private void documentsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if (documentsListBox.SelectedIndex >= 0) {
+                deleteButton.IsEnabled = true;
+                openButton.IsEnabled = true;
                 Doc d = ProfileManager.ActiveProfile.Documents[documentsListBox.SelectedIndex];
                 nameLabel.Content = d.Name;
+
+                String extension = d.Name.Substring(d.Name.LastIndexOf("."));
+                String type = "Text Document";
+                String image = "text";
+
+                if (extension.Equals(".docx")) {
+                    type = "Word Document";
+                    image = "docx";
+                } else if (extension.Equals(".xlsx")) {
+                    type = "Excel Workbook";
+                    image = "xlsx";
+                } else if (extension.Equals(".pptx")) {
+                    type = "PowerPoint Presentation";
+                    image = "pptx";
+                } else if (extension.Equals(".bmp") || extension.Equals(".jpg") || extension.Equals(".jpeg") || extension.Equals(".png") || extension.Equals(".tif") || extension.Equals(".tiff")) {
+                    type = "Image";
+                    image = extension.Substring(1);
+                }
+
+                Image img = ImageUtil.GetResourceImage(image);
+
+                image1.Source = img.Source;
+
+                typeLabel.Content = type;
 
                 int year = int.Parse(d.Location.Substring(0, 4));
                 int month = int.Parse(d.Location.Substring(4, 2));
@@ -45,15 +73,53 @@ namespace KineSis {
                 int second = int.Parse(d.Location.Substring(12, 2));
                 DateTime dt = new DateTime(year, month, day, hour, minute, second);
                 creationDateLabel.Content = dt.ToString();
+            } else {
+                deleteButton.IsEnabled = false;
+                openButton.IsEnabled = false;
+                nameLabel.Content = "";
+                typeLabel.Content = "";
+                creationDateLabel.Content = "";
+                image1.Source = null;
             }
         }
 
         private void openButton_Click(object sender, RoutedEventArgs e) {
             if (documentsListBox.SelectedIndex >= 0) {
                 Doc d = ProfileManager.ActiveProfile.Documents[documentsListBox.SelectedIndex];
-                Document doc = Document.deserialize(ProfileManager.ActiveProfile.TempFolder + "\\" + d.Location + ".kinesis");
+                Document doc = Document.deserialize(ProfileManager.ActiveProfile.TempFolder + "\\" + d.Location + ".xml");
                 mw.OpenDocument(doc);
                 this.Close();
+            }
+        }
+
+        private void documentsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            if (documentsListBox.SelectedIndex >= 0) {
+                Doc d = ProfileManager.ActiveProfile.Documents[documentsListBox.SelectedIndex];
+                Document doc = Document.deserialize(ProfileManager.ActiveProfile.TempFolder + "\\" + d.Location + ".xml");
+                mw.OpenDocument(doc);
+                this.Close();
+            }
+        }
+
+        private void deleteButton_Click(object sender, RoutedEventArgs e) {
+            if (documentsListBox.SelectedIndex >= 0) {
+                Doc d = ProfileManager.ActiveProfile.Documents[documentsListBox.SelectedIndex];
+
+                FileInfo file = new FileInfo(ProfileManager.ActiveProfile.TempFolder + "\\" + d.Location + ".xml");
+                DirectoryInfo dir = new DirectoryInfo(ProfileManager.ActiveProfile.TempFolder + "\\" + d.Location);
+
+                file.Delete();
+                dir.Delete(true);
+
+                ProfileManager.ActiveProfile.Documents.RemoveAt(documentsListBox.SelectedIndex);
+                ProfileManager.Serialize();
+
+                documentsListBox.Items.Clear();
+                foreach (Doc d1 in ProfileManager.ActiveProfile.Documents) {
+                    documentsListBox.Items.Add(d1.Name);
+                }
+
+                mw.CheckOpenedDocument();
             }
         }
     }
