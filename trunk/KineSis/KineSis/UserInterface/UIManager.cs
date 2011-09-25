@@ -7,6 +7,7 @@ using KineSis.UserInterface.Entities.Groups;
 using System.Windows.Controls;
 using KineSis.Profiles;
 using System.Windows.Shapes;
+using KineSis.ContentManagement.Model;
 
 namespace KineSis.UserInterface {
     class UIManager {
@@ -19,11 +20,38 @@ namespace KineSis.UserInterface {
         private static Boolean zoomFit = false;
         private static Boolean inPaint = false;
 
-
-        
         private static Group mainGroup = Main.Instance;
         private static Group selectedGroup = mainGroup;
 
+        public static Document ActiveDocument {
+            get {
+                if (mainw != null) {
+                    return mainw.document;
+                } else {
+                    return null;
+                }
+            }
+        }
+
+        public static int ActiveDocumentPage {
+            get {
+                if (mainw != null) {
+                    return mainw.currentPage;
+                } else {
+                    return -1;
+                }
+            }
+        }
+
+        public static Chart ActiveDocumentChart {
+            get {
+                if (mainw != null) {
+                    return mainw.currentChart;
+                } else {
+                    return null;
+                }
+            }
+        }
 
         public static Boolean InPaint {
             get {

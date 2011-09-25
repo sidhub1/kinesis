@@ -61,7 +61,7 @@ namespace KineSis {
         private BackgroundWorker documentProcessingWorker = new BackgroundWorker();
         private BackgroundWorker documentChartProcessingWorker = new BackgroundWorker();
 
-        Document document = null;
+        public Document document = null;
 
         public static int USER_SCREEN_NUMBER = 0;
 
@@ -71,7 +71,7 @@ namespace KineSis {
 
         public static String NAME = "MainWindow";
 
-        public static int currentPage = 0;
+        public int currentPage = 0;
         public static double presentationZoom = 100;
 
         public String currentFilename;
@@ -81,37 +81,71 @@ namespace KineSis {
         private int leftHandCounter = 0;
         private int rightHandCounter = 0;
 
-        private Chart currentChart = null;
-        private int chartNumber = 0;
+        public Chart currentChart = null;
+        public int chartNumber = 0;
+
+        Runtime nui;
+        DateTime lastTime = DateTime.MaxValue;
+
+        // We want to control how depth data gets converted into false-color data
+        // for more intuitive visualization, so we keep 32-bit color frame buffer versions of
+        // these, to be updated whenever we receive and process a 16-bit frame.
+        const int RED_IDX = 2;
+        const int GREEN_IDX = 1;
+        const int BLUE_IDX = 0;
+        byte[] depthFrame32 = new byte[320 * 240 * 4];
+
+
+        Dictionary<JointID, Brush> jointColors = new Dictionary<JointID, Brush>() { 
+            {JointID.HipCenter, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
+            {JointID.Spine, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
+            {JointID.ShoulderCenter, new SolidColorBrush(Color.FromRgb(168, 230, 29))},
+            {JointID.Head, new SolidColorBrush(Color.FromRgb(200, 0,   0))},
+            {JointID.ShoulderLeft, new SolidColorBrush(Color.FromRgb(79,  84,  33))},
+            {JointID.ElbowLeft, new SolidColorBrush(Color.FromRgb(84,  33,  42))},
+            {JointID.WristLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
+            {JointID.HandLeft, new SolidColorBrush(Color.FromRgb(215,  86, 0))},
+            {JointID.ShoulderRight, new SolidColorBrush(Color.FromRgb(33,  79,  84))},
+            {JointID.ElbowRight, new SolidColorBrush(Color.FromRgb(33,  33,  84))},
+            {JointID.WristRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
+            {JointID.HandRight, new SolidColorBrush(Color.FromRgb(37,   69, 243))},
+            {JointID.HipLeft, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
+            {JointID.KneeLeft, new SolidColorBrush(Color.FromRgb(69,  33,  84))},
+            {JointID.AnkleLeft, new SolidColorBrush(Color.FromRgb(229, 170, 122))},
+            {JointID.FootLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
+            {JointID.HipRight, new SolidColorBrush(Color.FromRgb(181, 165, 213))},
+            {JointID.KneeRight, new SolidColorBrush(Color.FromRgb(71, 222,  76))},
+            {JointID.AnkleRight, new SolidColorBrush(Color.FromRgb(245, 228, 156))},
+            {JointID.FootRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))}
+        };
 
         public MainWindow() {
+
             InitializeComponent();
-            
 
-            documentProcessingWorker.WorkerReportsProgress = true;
-            documentProcessingWorker.WorkerSupportsCancellation = false;
-            documentProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentProcessingWorker_ProgressChanged);
-            documentProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentProcessingWorker_RunWorkerCompleted);
-            documentProcessingWorker.DoWork += new DoWorkEventHandler(documentProcessingWorker_DoWork);
+                documentProcessingWorker.WorkerReportsProgress = true;
+                documentProcessingWorker.WorkerSupportsCancellation = false;
+                documentProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentProcessingWorker_ProgressChanged);
+                documentProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentProcessingWorker_RunWorkerCompleted);
+                documentProcessingWorker.DoWork += new DoWorkEventHandler(documentProcessingWorker_DoWork);
 
-            documentChartProcessingWorker.WorkerReportsProgress = true;
-            documentChartProcessingWorker.WorkerSupportsCancellation = false;
-            documentChartProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentChartProcessingWorker_ProgressChanged);
-            documentChartProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentChartProcessingWorker_RunWorkerCompleted);
-            documentChartProcessingWorker.DoWork += new DoWorkEventHandler(documentChartProcessingWorker_DoWork);
+                documentChartProcessingWorker.WorkerReportsProgress = true;
+                documentChartProcessingWorker.WorkerSupportsCancellation = false;
+                documentChartProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentChartProcessingWorker_ProgressChanged);
+                documentChartProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentChartProcessingWorker_RunWorkerCompleted);
+                documentChartProcessingWorker.DoWork += new DoWorkEventHandler(documentChartProcessingWorker_DoWork);
 
-            console.log(NAME, "init successfull" );
-            presentationCanvasWindow.Show();
-            presentationBrowserForm.Show();
-            userCanvasWindow.Show();
-            infoCanvasWindow.Show();
-            userBrowserForm.Show();
-            settings.mw = this;
+                console.log(NAME, "init successfull");
+                presentationCanvasWindow.Show();
+                presentationBrowserForm.Show();
+                userCanvasWindow.Show();
+                infoCanvasWindow.Show();
+                userBrowserForm.Show();
+                settings.mw = this;
 
-            ApplyProfile();
+                ApplyProfile();
 
-            console.log(NAME, "windows shown");
-
+                console.log(NAME, "windows shown");
         }
 
         public void ApplyProfile() {
@@ -119,9 +153,17 @@ namespace KineSis {
             userBrowserForm.BackColor = ColorUtil.DrawingColorFromHTML(profile.BackgroundColor.ToString());
             presentationBrowserForm.BackColor = ColorUtil.DrawingColorFromHTML(profile.BackgroundColor.ToString());
             skeleton_brush = ColorUtil.FromHTML(profile.SkeletonColor.ToString());
+
+            if (PRESENTATION_SCREEN_NUMBER != profile.PresentationScreen || USER_SCREEN_NUMBER != profile.UserScreen) {
+                PRESENTATION_SCREEN_NUMBER = profile.PresentationScreen;
+                USER_SCREEN_NUMBER = profile.UserScreen;
+                goFullScreen();
+            }
+
+            /*
             if (PRESENTATION_SCREEN_NUMBER != profile.PresentationScreen) {
                 SwitchScreens();
-            }
+            }*/
         }
 
 
@@ -145,7 +187,11 @@ namespace KineSis {
             try {
                 ProcessingProgress pp = (ProcessingProgress)e.UserState;
 
-                CanvasUtil.DrawProgress(infoCanvasWindow.canvas, pp);
+                if (pp.OverallOperationName.Contains("[Exception]")) {
+                    CanvasUtil.DrawException(infoCanvasWindow.canvas, pp.OverallOperationName);
+                } else {
+                    CanvasUtil.DrawProgress(infoCanvasWindow.canvas, pp);
+                }
             } catch (Exception) {
 
             }
@@ -158,6 +204,49 @@ namespace KineSis {
                 CanvasUtil.DrawProgress(infoCanvasWindow.canvas, pp);
             } catch (Exception) {
 
+            }
+        }
+
+
+        public void documentProcessingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            //show the page and reset parameters
+            if (document != null) {
+
+                if (document.Pages.Count > 1) {
+                    Pages.Elements = new List<Element>();
+                    foreach (KineSis.ContentManagement.Model.Page page in document.Pages) {
+                        Element element = new Element();
+                        element.Name = page.Name;
+                        element.Thumbnail = page.Thumbnail;
+                        Pages.Elements.Add(element);
+                    }
+                }
+                presentationZoom = 100;
+
+                currentPage = 0;
+
+                UpdateShapes();
+
+                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
+                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
+                } else {
+                    userBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationBrowserForm.open(document.Pages[currentPage].Location);
+                }
+
+                ApplyZoom();
+
+                infoCanvasWindow.canvas.Children.Clear();
+                documentChartProcessingWorker.RunWorkerAsync(currentFilename);
+            }
+        }
+
+        public void documentChartProcessingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            //everything is done now
+            if (document != null) {
+                UpdateShapes();
+                infoCanvasWindow.canvas.Children.Clear();
             }
         }
 
@@ -337,43 +426,14 @@ namespace KineSis {
             }
         }
 
-        public void documentProcessingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            //show the page and reset parameters
-            if (document != null) {
-
-                if (document.Pages.Count > 1) {
-                    Pages.Elements = new List<Element>();
-                    foreach (KineSis.ContentManagement.Model.Page page in document.Pages) {
-                        Element element = new Element();
-                        element.Name = page.Name;
-                        element.Thumbnail = page.Thumbnail;
-                        Pages.Elements.Add(element);
-                    }
-                }
-                presentationZoom = 100;
-
-                currentPage = 0;
-
-                UpdateShapes();
-
-                if (UIManager.ZoomFit && document.Pages[currentPage].LocationNoZoom != null) {
-                    userBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
-                    presentationBrowserForm.open(document.Pages[currentPage].LocationNoZoom);
-                } else {
-                    userBrowserForm.open(document.Pages[currentPage].Location);
-                    presentationBrowserForm.open(document.Pages[currentPage].Location);
-                }
-
-                ApplyZoom();
-
-                infoCanvasWindow.canvas.Children.Clear();
-                documentChartProcessingWorker.RunWorkerAsync(currentFilename);
-            }
-        }
-
         public void OpenDocument(Document doc) {
             document = doc;
             if (document != null) {
+
+                CloseChart();
+                presentationCanvasWindow.canvas.Children.Clear();
+                userCanvasWindow.canvas.Children.Clear();
+                UIManager.SelectedGroup = UIManager.MainGroup;
 
                 if (document.Pages.Count > 1) {
                     Pages.Elements = new List<Element>();
@@ -413,62 +473,41 @@ namespace KineSis {
             }
         }
 
-        public void documentChartProcessingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            //everything is done now
-            if (document != null) {
-                UpdateShapes();
-                infoCanvasWindow.canvas.Children.Clear();
+        public void CheckOpenedDocument() {
+            DirectoryInfo di = new DirectoryInfo(ProfileManager.ActiveProfile.TempFolder + "\\" + document.Location);
+            if (!di.Exists) {
+                document = null;
+                CloseChart();
+                presentationCanvasWindow.canvas.Children.Clear();
+                userCanvasWindow.canvas.Children.Clear();
+                presentationZoom = 100;
+                ApplyZoom();
+                userBrowserForm.open(Directory.GetCurrentDirectory() + "\\Startup\\startup.html");
+                presentationBrowserForm.open(Directory.GetCurrentDirectory() + "\\Startup\\startup.html");
+                UIManager.SelectedGroup = UIManager.MainGroup;
             }
         }
 
-        Runtime nui;
-        DateTime lastTime = DateTime.MaxValue;
-
-        // We want to control how depth data gets converted into false-color data
-        // for more intuitive visualization, so we keep 32-bit color frame buffer versions of
-        // these, to be updated whenever we receive and process a 16-bit frame.
-        const int RED_IDX = 2;
-        const int GREEN_IDX = 1;
-        const int BLUE_IDX = 0;
-        byte[] depthFrame32 = new byte[320 * 240 * 4];
-
-
-        Dictionary<JointID, Brush> jointColors = new Dictionary<JointID, Brush>() { 
-            {JointID.HipCenter, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
-            {JointID.Spine, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
-            {JointID.ShoulderCenter, new SolidColorBrush(Color.FromRgb(168, 230, 29))},
-            {JointID.Head, new SolidColorBrush(Color.FromRgb(200, 0,   0))},
-            {JointID.ShoulderLeft, new SolidColorBrush(Color.FromRgb(79,  84,  33))},
-            {JointID.ElbowLeft, new SolidColorBrush(Color.FromRgb(84,  33,  42))},
-            {JointID.WristLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
-            {JointID.HandLeft, new SolidColorBrush(Color.FromRgb(215,  86, 0))},
-            {JointID.ShoulderRight, new SolidColorBrush(Color.FromRgb(33,  79,  84))},
-            {JointID.ElbowRight, new SolidColorBrush(Color.FromRgb(33,  33,  84))},
-            {JointID.WristRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
-            {JointID.HandRight, new SolidColorBrush(Color.FromRgb(37,   69, 243))},
-            {JointID.HipLeft, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
-            {JointID.KneeLeft, new SolidColorBrush(Color.FromRgb(69,  33,  84))},
-            {JointID.AnkleLeft, new SolidColorBrush(Color.FromRgb(229, 170, 122))},
-            {JointID.FootLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
-            {JointID.HipRight, new SolidColorBrush(Color.FromRgb(181, 165, 213))},
-            {JointID.KneeRight, new SolidColorBrush(Color.FromRgb(71, 222,  76))},
-            {JointID.AnkleRight, new SolidColorBrush(Color.FromRgb(245, 228, 156))},
-            {JointID.FootRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))}
-        };
+        
 
         private void Window_Loaded(object sender, EventArgs e) {
-
-            goFullScreen();
-            nui = new Runtime();
-
-            try {
-                nui.Initialize(RuntimeOptions.UseSkeletalTracking);
-            } catch (InvalidOperationException) {
-                System.Windows.MessageBox.Show("Runtime initialization failed. Please make sure Kinect device is plugged in.");
-                return;
+            if (WindowUtils.Screens.Count() < 2) {
+                MessageBoxResult r = MessageBox.Show("You need 2 screens to run KineSis");
+                if (r == MessageBoxResult.OK) {
+                    Environment.Exit(0);
+                }
+            } else {
+                goFullScreen();
+                nui = new Runtime();
+                try {
+                    nui.Initialize(RuntimeOptions.UseSkeletalTracking);
+                } catch (InvalidOperationException) {
+                    System.Windows.MessageBox.Show("Runtime initialization failed. Please make sure Kinect device is plugged in.");
+                    return;
+                }
+                nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
             }
-
-            nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+            
         }
 
 

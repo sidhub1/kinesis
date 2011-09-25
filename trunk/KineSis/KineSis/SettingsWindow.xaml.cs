@@ -48,6 +48,7 @@ namespace KineSis {
                 device += WindowUtils.Screens[i].Primary ? "[Primary] " : "";
                 device += "(" + WindowUtils.Screens[i].Bounds.Width + "x" + WindowUtils.Screens[i].Bounds.Height + ") " + WindowUtils.Screens[i].BitsPerPixel + " bpp";
                 screensCB.Items.Add(device);
+                userScreensCB.Items.Add(device);
             }
 
             List<Profile> profiles = ProfileManager.Profiles;
@@ -79,8 +80,9 @@ namespace KineSis {
         private void PopulateForm(Profile profile) {
             //profilesCB.SelectedIndex = 
             screensCB.SelectedIndex = profile.PresentationScreen;
+            userScreensCB.SelectedIndex = profile.UserScreen;
             tempFolderTextBox.Text = profile.TempFolder;
-            deleteCheckBox.IsChecked = profile.DeleteTempAfterPresentation;
+            //deleteCheckBox.IsChecked = profile.DeleteTempAfterPresentation;
             primaryC.Background = profile.PrimaryColor;
             primaryB.Content = profile.PrimaryColor.ToString();
             secondaryC.Background = profile.SecondaryColor;
@@ -170,57 +172,63 @@ namespace KineSis {
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e) {
-            Profile profile = new Profile();
-            profile.PresentationScreen = screensCB.SelectedIndex;
-            profile.PrimaryColor = primaryC.Background;
-            profile.SecondaryColor = secondaryC.Background;
-            profile.BackgroundColor = backgroundC.Background;
-            profile.SkeletonColor = skeletonC.Background;
-            profile.TempFolder = tempFolderTextBox.Text;
-            profile.DeleteTempAfterPresentation = deleteCheckBox.IsChecked.Value;
-            profile.SlideWidth = int.Parse(slideWidthTB.Text);
-            profile.ChartWidth = int.Parse(chartWidthTB.Text);
-            profile.ChartHorizontalFaces = int.Parse(chfTB.Text);
-            profile.ChartVerticalFaces = int.Parse(cvfTB.Text);
-            Boolean exception = false;
+            if (screensCB.SelectedIndex == userScreensCB.SelectedIndex) {
+                System.Windows.Forms.MessageBox.Show("Presentation Screen cannot be the same as user Screen");
+            } else {
 
-            if (saveAsTextBox.Text == null || saveAsTextBox.Text.Length == 0) {
-                Profile profile1 = ProfileManager.GetProfile(profilesCB.SelectedItem.ToString());
-                if (profile1 != null) {
-                    profile.Name = profile1.Name;
+                Profile profile = new Profile();
+                profile.PresentationScreen = screensCB.SelectedIndex;
+                profile.UserScreen = userScreensCB.SelectedIndex;
+                profile.PrimaryColor = primaryC.Background;
+                profile.SecondaryColor = secondaryC.Background;
+                profile.BackgroundColor = backgroundC.Background;
+                profile.SkeletonColor = skeletonC.Background;
+                profile.TempFolder = tempFolderTextBox.Text;
+                //profile.DeleteTempAfterPresentation = deleteCheckBox.IsChecked.Value;
+                profile.SlideWidth = int.Parse(slideWidthTB.Text);
+                profile.ChartWidth = int.Parse(chartWidthTB.Text);
+                profile.ChartHorizontalFaces = int.Parse(chfTB.Text);
+                profile.ChartVerticalFaces = int.Parse(cvfTB.Text);
+                Boolean exception = false;
+
+                if (saveAsTextBox.Text == null || saveAsTextBox.Text.Length == 0) {
+                    Profile profile1 = ProfileManager.GetProfile(profilesCB.SelectedItem.ToString());
+                    if (profile1 != null) {
+                        profile.Name = profile1.Name;
+                        try {
+                            ProfileManager.SaveProfile(profile);
+                        } catch (Exception ex) {
+                            exception = true;
+                            System.Windows.Forms.MessageBox.Show(ex.Message);
+                        }
+                    }
+                } else {
+                    profile.Name = saveAsTextBox.Text;
                     try {
-                        ProfileManager.SaveProfile(profile);
+                        ProfileManager.AddProfile(profile);
                     } catch (Exception ex) {
                         exception = true;
                         System.Windows.Forms.MessageBox.Show(ex.Message);
                     }
                 }
-            } else {
-                profile.Name = saveAsTextBox.Text;
-                try {
-                    ProfileManager.AddProfile(profile);
-                } catch (Exception ex) {
-                    exception = true;
-                    System.Windows.Forms.MessageBox.Show(ex.Message);
-                }
-            }
 
-            if (saveAsTextBox.Text != null && saveAsTextBox.Text.Length > 0 && !exception) {
-                profilesCB.Items.Clear();
+                if (saveAsTextBox.Text != null && saveAsTextBox.Text.Length > 0 && !exception) {
+                    profilesCB.Items.Clear();
 
-                List<Profile> profiles = ProfileManager.Profiles;
-                int index = 0;
-                for (int i = 0; i < profiles.Count; i++) {
-                    String prof = profiles[i].Name;
-                    profilesCB.Items.Add(prof);
-                    if (prof.Equals(profile.Name)) {
-                        index = i;
+                    List<Profile> profiles = ProfileManager.Profiles;
+                    int index = 0;
+                    for (int i = 0; i < profiles.Count; i++) {
+                        String prof = profiles[i].Name;
+                        profilesCB.Items.Add(prof);
+                        if (prof.Equals(profile.Name)) {
+                            index = i;
+                        }
                     }
+                    profilesCB.SelectedIndex = index;
                 }
-                profilesCB.SelectedIndex = index;
-            }
 
-            saveAsTextBox.Text = "";
+                saveAsTextBox.Text = "";
+            }
         }
 
         private void primaryB_Click(object sender, RoutedEventArgs e) {
@@ -330,6 +338,8 @@ namespace KineSis {
 
         private void doneButton_Click(object sender, RoutedEventArgs e) {
             if (profilesCB.SelectedItem != null) {
+                //saveButton_Click(sender, e);
+
                 Profile profile = ProfileManager.GetProfile(profilesCB.SelectedItem.ToString());
                 ProfileManager.ActiveProfile = profile;
                 //PopulateForm(profile);
@@ -337,6 +347,10 @@ namespace KineSis {
                 mw.ApplyProfile();
                 this.Hide();
             }
+        }
+
+        private void userScreensCB_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+
         }
     }
 }

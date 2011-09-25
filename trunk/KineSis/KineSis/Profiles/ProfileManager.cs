@@ -13,7 +13,7 @@ namespace KineSis.Profiles {
 
         private static Profile activeProfile;
 
-        private static String path = "profiles.kinesis";
+        private static String path = "Profiles.kinesis";
 
         public static List<Profile> Profiles {
             get {
@@ -27,11 +27,11 @@ namespace KineSis.Profiles {
                         Profile kinesis = new Profile();
                         kinesis.Name = "KineSis";
                         kinesis.PresentationScreen = 1;
+                        kinesis.UserScreen = 0;
                         kinesis.PrimaryColor = new SolidColorBrush(Color.FromRgb(86, 58, 150));
                         kinesis.SecondaryColor = new SolidColorBrush(Color.FromRgb(138, 194, 49));
                         kinesis.BackgroundColor = Brushes.White;
                         kinesis.SkeletonColor = Brushes.Black;
-                        kinesis.DeleteTempAfterPresentation = false;
                         kinesis.TempFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString() + "\\KineSis";
                         kinesis.SlideWidth = 1280;
                         kinesis.ChartWidth = 800;
@@ -153,10 +153,11 @@ namespace KineSis.Profiles {
                 BinaryFormatter bf = new BinaryFormatter();
                 SerializableProfiles sProfiles = bf.Deserialize(file) as SerializableProfiles;
                 file.Close();
-                return sProfiles;
+                
             //} catch (Exception) {
             //    return null;
             //}
+                return sProfiles;
         }
     }
 }
