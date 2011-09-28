@@ -467,6 +467,7 @@ namespace KineSis {
                 textBlock.Text = "Ready";
                 textBlock.Foreground = System.Windows.Media.Brushes.Red;
                 textBlock.FontSize = 20;
+                infoCanvasWindow.canvas.Background = Brushes.Transparent;
                 infoCanvasWindow.canvas.Children.Add(textBlock);
                 infoCanvasWindow.canvas.UpdateLayout();
                 infoCanvasWindow.canvas.Refresh();
@@ -550,10 +551,30 @@ namespace KineSis {
             brushes[5] = new SolidColorBrush(Color.FromRgb(128, 128, 255));
 
             userCanvas.Children.Clear();
+
+            double minZ = double.MaxValue;
+            int userID = -1;
+
+                foreach (SkeletonData data in skeletonFrame.Skeletons) {
+                    if (SkeletonTrackingState.Tracked == data.TrackingState) {
+                        if (data.Joints[JointID.Head].Position.Z < minZ) {
+                            minZ = data.Joints[JointID.Head].Position.Z;
+                            userID = data.TrackingID;
+                        }
+                    }
+                }
+
             foreach (SkeletonData data in skeletonFrame.Skeletons) {
                 if (SkeletonTrackingState.Tracked == data.TrackingState) {
                     // Draw bones
-                    Brush brush = skeleton_brush; //brushes[iSkeleton % brushes.Length];
+                    Brush brush = null; //brushes[iSkeleton % brushes.Length];
+                    if (data.TrackingID == userID) {
+                        brush = skeleton_brush;
+                    } else {
+
+                        brush = ProfileManager.ActiveProfile.SkeletonColor;
+                        brush.Opacity = 0.2;
+                    }
                     userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.ShoulderCenter));
                     userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderLeft, JointID.ElbowLeft, JointID.WristLeft));
                     userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderRight, JointID.ElbowRight, JointID.WristRight));
@@ -578,6 +599,10 @@ namespace KineSis {
                             ellipse.Stroke = brush;
                             ellipse.StrokeThickness = 5;
                             ellipse.Fill = jointColors[joint.ID];
+                            if (data.TrackingID != userID) {
+                                ellipse.Fill = ProfileManager.ActiveProfile.SkeletonColor;
+                                ellipse.Fill.Opacity = 0.2;
+                            }
                             Canvas.SetTop(ellipse, jointPos.Y - 15);
                             Canvas.SetLeft(ellipse, jointPos.X - 15);
                             userCanvas.Children.Add(ellipse);
@@ -602,123 +627,132 @@ namespace KineSis {
                             ellipse.Height = 80;
                             ellipse.Stroke = brush;
                             ellipse.StrokeThickness = 10;
-                            ellipse.Fill = Brushes.LightYellow;
+                            
+                            if (data.TrackingID != userID) {
+                                ellipse.Fill = ColorUtil.FromHTML("#55FFFFE0");
+                                ellipse.Fill.Opacity = 0.2;
+                            } else {
+                                ellipse.Fill = Brushes.LightYellow;
+                            }
                             Canvas.SetTop(ellipse, jointPos.Y - 20 );
                             Canvas.SetLeft(ellipse, jointPos.X - 40);
                             userCanvas.Children.Add(ellipse);
+
                         }
                     }
 
-                    Double lDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(leftWrist.Position.X, leftWrist.Position.Z),
-                                                                                    new KineSis.Geometry.Point2D(leftShoulder.Position.X, leftShoulder.Position.Z));
-                    Double rDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(rightWrist.Position.X, rightWrist.Position.Z),
-                                                                                new KineSis.Geometry.Point2D(rightShoulder.Position.X, rightShoulder.Position.Z));
+                    if (data.TrackingID == userID) {
 
-                    Double delta = Math.Sqrt(Math.Pow(getDisplayPosition(centerShoulder).X - getDisplayPosition(centerHip).X, 2) + Math.Pow(getDisplayPosition(centerShoulder).Y - getDisplayPosition(centerHip).Y, 2));
+                        Double lDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(leftWrist.Position.X, leftWrist.Position.Z),
+                                                                                        new KineSis.Geometry.Point2D(leftShoulder.Position.X, leftShoulder.Position.Z));
+                        Double rDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(rightWrist.Position.X, rightWrist.Position.Z),
+                                                                                    new KineSis.Geometry.Point2D(rightShoulder.Position.X, rightShoulder.Position.Z));
 
-                    Ellipse ellipse2 = new Ellipse();
-                    ellipse2.Width = 100;
-                    ellipse2.Height = 100;
-                    ellipse2.Stroke = brush;
-                    ellipse2.StrokeThickness = 10;
-                    ellipse2.Fill = jointColors[leftWrist.ID];
-                    Canvas.SetTop(ellipse2, 0);
-                    Canvas.SetLeft(ellipse2, 0);
-                    userCanvas.Children.Add(ellipse2);
+                        Double delta = Math.Sqrt(Math.Pow(getDisplayPosition(centerShoulder).X - getDisplayPosition(centerHip).X, 2) + Math.Pow(getDisplayPosition(centerShoulder).Y - getDisplayPosition(centerHip).Y, 2));
 
-                    int ld = (int)( ( lDist / 0.4 ) * 10 ) ;
-                    String LD = ( ld < 10 ) ? ("0" + ld) : ld.ToString();
+                        Ellipse ellipse2 = new Ellipse();
+                        ellipse2.Width = 100;
+                        ellipse2.Height = 100;
+                        ellipse2.Stroke = brush;
+                        ellipse2.StrokeThickness = 10;
+                        ellipse2.Fill = jointColors[leftWrist.ID];
+                        Canvas.SetTop(ellipse2, 0);
+                        Canvas.SetLeft(ellipse2, 0);
+                        userCanvas.Children.Add(ellipse2);
 
-                    TextBlock tb1 = new TextBlock();
-                    tb1.Text = LD;
-                    tb1.Foreground = brush;
-                    tb1.FontSize = 50;
-                    Canvas.SetTop(tb1, 15);
-                    Canvas.SetLeft(tb1, 25);
-                    userCanvas.Children.Add(tb1);
+                        int ld = (int)( ( lDist / 0.4 ) * 10 );
+                        String LD = ( ld < 10 ) ? ( "0" + ld ) : ld.ToString();
 
-                    Ellipse ellipse3 = new Ellipse();
-                    ellipse3.Width = 100;
-                    ellipse3.Height = 100;
-                    ellipse3.Stroke = brush;
-                    ellipse3.StrokeThickness = 10;
-                    ellipse3.Fill = jointColors[rightWrist.ID];
-                    Canvas.SetTop(ellipse3, 0);
-                    Canvas.SetRight(ellipse3, 0);
-                    userCanvas.Children.Add(ellipse3);
+                        TextBlock tb1 = new TextBlock();
+                        tb1.Text = LD;
+                        tb1.Foreground = brush;
+                        tb1.FontSize = 50;
+                        Canvas.SetTop(tb1, 15);
+                        Canvas.SetLeft(tb1, 25);
+                        userCanvas.Children.Add(tb1);
 
-                    int rd = (int)( ( rDist / 0.4 ) * 10 );
-                    String RD = ( rd < 10 ) ? ( "0" + rd ) : rd.ToString();
+                        Ellipse ellipse3 = new Ellipse();
+                        ellipse3.Width = 100;
+                        ellipse3.Height = 100;
+                        ellipse3.Stroke = brush;
+                        ellipse3.StrokeThickness = 10;
+                        ellipse3.Fill = jointColors[rightWrist.ID];
+                        Canvas.SetTop(ellipse3, 0);
+                        Canvas.SetRight(ellipse3, 0);
+                        userCanvas.Children.Add(ellipse3);
 
-                    TextBlock tb2 = new TextBlock();
-                    tb2.Text = RD;
-                    tb2.Foreground = brush;
-                    tb2.FontSize = 50;
-                    Canvas.SetTop(tb2, 15);
-                    Canvas.SetRight(tb2, 25);
-                    userCanvas.Children.Add(tb2);
+                        int rd = (int)( ( rDist / 0.35 ) * 10 );
+                        String RD = ( rd < 10 ) ? ( "0" + rd ) : rd.ToString();
 
-                    if (lDist > 0.4) {
-                        leftHandCounter++;
-                        //if (leftHandCounter >= 15) {
-                        //    leftHandCounter = 15;
+                        TextBlock tb2 = new TextBlock();
+                        tb2.Text = RD;
+                        tb2.Foreground = brush;
+                        tb2.FontSize = 50;
+                        Canvas.SetTop(tb2, 15);
+                        Canvas.SetRight(tb2, 25);
+                        userCanvas.Children.Add(tb2);
+
+                        if (lDist > 0.35) {
+                            leftHandCounter++;
+                            //if (leftHandCounter >= 15) {
+                            //    leftHandCounter = 15;
                             leftHandSelected = true;
-                        //}
-                    } else {
-                        leftHandSelected = false;
-                        leftHandCounter = 0;
-                    }
+                            //}
+                        } else {
+                            leftHandSelected = false;
+                            leftHandCounter = 0;
+                        }
 
-                    if (leftHandSelected && !UIManager.InPaint) {
-                        Ellipse ellipse1 = new Ellipse();
-                        ellipse1.Width = 100;
-                        ellipse1.Height = 100;
-                        ellipse1.Stroke = brush;
-                        ellipse1.StrokeThickness = 10;
-                        ellipse1.Fill = jointColors[leftWrist.ID];
-                        Canvas.SetTop(ellipse1, getDisplayPosition(leftWrist).Y - 50);
-                        Canvas.SetLeft(ellipse1, getDisplayPosition(leftWrist).X - 50);
-                        userCanvas.Children.Add(ellipse1);
-                    } 
+                        if (leftHandSelected && !UIManager.InPaint) {
+                            Ellipse ellipse1 = new Ellipse();
+                            ellipse1.Width = 100;
+                            ellipse1.Height = 100;
+                            ellipse1.Stroke = brush;
+                            ellipse1.StrokeThickness = 10;
+                            ellipse1.Fill = jointColors[leftWrist.ID];
+                            Canvas.SetTop(ellipse1, getDisplayPosition(leftWrist).Y - 50);
+                            Canvas.SetLeft(ellipse1, getDisplayPosition(leftWrist).X - 50);
+                            userCanvas.Children.Add(ellipse1);
+                        }
 
-                    if (rDist > 0.4) {
-                        rightHandCounter++;
-                        //if (rightHandCounter >= 15) {
-                        //    rightHandCounter = 15;
+                        if (rDist > 0.35) {
+                            rightHandCounter++;
+                            //if (rightHandCounter >= 15) {
+                            //    rightHandCounter = 15;
                             rightHandSelected = true;
-                        //}
-                    } else {
-                        rightHandSelected = false;
-                        rightHandCounter = 0;
+                            //}
+                        } else {
+                            rightHandSelected = false;
+                            rightHandCounter = 0;
+                        }
+
+                        if (rightHandSelected && !UIManager.InPaint) {
+                            Ellipse ellipse1 = new Ellipse();
+                            ellipse1.Width = 100;
+                            ellipse1.Height = 100;
+                            ellipse1.Stroke = brush;
+                            ellipse1.StrokeThickness = 10;
+                            ellipse1.Fill = jointColors[rightWrist.ID];
+                            Canvas.SetTop(ellipse1, getDisplayPosition(rightWrist).Y - 50);
+                            Canvas.SetLeft(ellipse1, getDisplayPosition(rightWrist).X - 50);
+                            userCanvas.Children.Add(ellipse1);
+                        }
+
+                        Hand leftHand = new Hand();
+                        leftHand.X = getDisplayPosition(leftWrist).X;
+                        leftHand.Y = getDisplayPosition(leftWrist).Y;
+                        leftHand.IsSelected = leftHandSelected;
+
+                        Hand rightHand = new Hand();
+                        rightHand.X = getDisplayPosition(rightWrist).X;
+                        rightHand.Y = getDisplayPosition(rightWrist).Y;
+                        rightHand.IsSelected = rightHandSelected;
+
+                        UIManager.LeftHand = leftHand;
+                        UIManager.RightHand = rightHand;
+                        UIManager.Delta = delta;
+                        UIManager.Process(this);
                     }
-
-                    if (rightHandSelected && !UIManager.InPaint) {
-                        Ellipse ellipse1 = new Ellipse();
-                        ellipse1.Width = 100;
-                        ellipse1.Height = 100;
-                        ellipse1.Stroke = brush;
-                        ellipse1.StrokeThickness = 10;
-                        ellipse1.Fill = jointColors[rightWrist.ID];
-                        Canvas.SetTop(ellipse1, getDisplayPosition(rightWrist).Y - 50);
-                        Canvas.SetLeft(ellipse1, getDisplayPosition(rightWrist).X - 50);
-                        userCanvas.Children.Add(ellipse1);
-                    } 
-
-                    Hand leftHand = new Hand();
-                    leftHand.X = getDisplayPosition(leftWrist).X;
-                    leftHand.Y = getDisplayPosition(leftWrist).Y;
-                    leftHand.IsSelected = leftHandSelected;
-
-                    Hand rightHand = new Hand();
-                    rightHand.X = getDisplayPosition(rightWrist).X;
-                    rightHand.Y = getDisplayPosition(rightWrist).Y;
-                    rightHand.IsSelected = rightHandSelected;
-
-                    UIManager.LeftHand = leftHand;
-                    UIManager.RightHand = rightHand;
-                    UIManager.Delta = delta;
-                    UIManager.Process(this);
-
                 }
                 iSkeleton++;
             } // for each skeleton
