@@ -322,7 +322,8 @@ namespace KineSis.Utils {
                 background = System.Windows.Media.Brushes.White;
             }
 
-            DrawEllipse(c, centerX, centerY, centerDiameter, centerDiameter, primaryColor, ColorUtil.FromHTML("#CCFFFFFF"), background);
+            //DrawEllipse(c, centerX, centerY, centerDiameter, centerDiameter, primaryColor, ColorUtil.FromHTML("#CCFFFFFF"), background);
+            DrawEllipse(c, centerX, 200, 400, 400, primaryColor, ColorUtil.FromHTML("#CCFFFFFF"), background);
 
 
             System.Windows.Controls.Image image = null;
@@ -334,11 +335,13 @@ namespace KineSis.Utils {
                 image = new System.Windows.Controls.Image();
             }
 
-            DrawImageInCircle(c, image, centerDiameter, centerX, centerY);
+            //DrawImageInCircle(c, image, centerDiameter, centerX, centerY);
+            DrawImageInCircle(c, image, 400, centerX, 200);
 
             String caption = submenuCaption != null ? submenuCaption : submenuName;
 
             DrawTextBlock(c, caption, 0.2 * centerDiameter, System.Windows.Media.Brushes.White, primaryColor, centerX, centerY + 0.75 * image.Width);
+            DrawTextBlock(c, caption, 0.2 * 400, System.Windows.Media.Brushes.White, primaryColor, centerX, centerY + 0.75 * image.Width);
 
             System.Windows.Media.Brush fill = ColorUtil.FromHTML("#88FFFFFF");
 
