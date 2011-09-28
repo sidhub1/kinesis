@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KineSis", "KineSis\KineSis.csproj", "{FD342BC4-825A-4F97-867B-3EAD75789F74}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{79B57F12-611D-4992-91AD-0AC9A0BD50E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,13 @@ Global
 		{FD342BC4-825A-4F97-867B-3EAD75789F74}.Release|x64.Build.0 = Release|x64
 		{FD342BC4-825A-4F97-867B-3EAD75789F74}.Release|x86.ActiveCfg = Release|x86
 		{FD342BC4-825A-4F97-867B-3EAD75789F74}.Release|x86.Build.0 = Release|x86
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Debug|Any CPU.ActiveCfg = Debug
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Debug|x64.ActiveCfg = Debug
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Debug|x86.ActiveCfg = Debug
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Release|Any CPU.ActiveCfg = Release
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Release|Any CPU.Build.0 = Release
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Release|x64.ActiveCfg = Release
+		{79B57F12-611D-4992-91AD-0AC9A0BD50E2}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

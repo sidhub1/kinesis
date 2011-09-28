@@ -244,9 +244,11 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <EmbeddedResource Include="syntaxhighlighter_3.0.83.zip">
+    <Resource Include="Images\splash.bmp" />
+    <Content Include="syntaxhighlighter_3.0.83.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </Content>
+    <Resource Include="sffedoratitles.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\open.png" />
@@ -267,120 +269,120 @@
     <Resource Include="Images\switch.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Extensions.xml">
+    <Content Include="Extensions.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\clear.png">
+    </Content>
+    <Content Include="Drawables\clear.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\close.png">
+    </Content>
+    <Content Include="Drawables\close.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\down.png">
+    </Content>
+    <Content Include="Drawables\down.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\paint.png">
+    </Content>
+    <Content Include="Drawables\paint.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\left.png">
+    </Content>
+    <Content Include="Drawables\left.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\main.png">
+    </Content>
+    <Content Include="Drawables\main.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\navigate.png">
+    </Content>
+    <Content Include="Drawables\navigate.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\ok.png">
+    </Content>
+    <Content Include="Drawables\ok.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\pages.png">
+    </Content>
+    <Content Include="Drawables\pages.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\paint_blue.png">
+    </Content>
+    <Content Include="Drawables\paint_blue.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\paint_green.png">
+    </Content>
+    <Content Include="Drawables\paint_green.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\paint_orange.png">
+    </Content>
+    <Content Include="Drawables\paint_orange.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\paint_red.png">
+    </Content>
+    <Content Include="Drawables\paint_red.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\right.png">
+    </Content>
+    <Content Include="Drawables\right.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\rotate.png">
+    </Content>
+    <Content Include="Drawables\rotate.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\scroll.png">
+    </Content>
+    <Content Include="Drawables\scroll.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\select.png">
+    </Content>
+    <Content Include="Drawables\select.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\shapes.png">
+    </Content>
+    <Content Include="Drawables\shapes.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\up.png">
+    </Content>
+    <Content Include="Drawables\up.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\zoom.png">
+    </Content>
+    <Content Include="Drawables\zoom.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\zoom_in.png">
+    </Content>
+    <Content Include="Drawables\zoom_in.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\zoom_out.png">
+    </Content>
+    <Content Include="Drawables\zoom_out.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\updown.png">
+    </Content>
+    <Content Include="Drawables\updown.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\fit.png">
+    </Content>
+    <Content Include="Drawables\fit.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\unfit.png">
+    </Content>
+    <Content Include="Drawables\unfit.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\sheet.png">
+    </Content>
+    <Content Include="Drawables\sheet.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\bmp.png">
+    </Content>
+    <Content Include="Drawables\bmp.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\docx.png">
+    </Content>
+    <Content Include="Drawables\docx.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\gif.png">
+    </Content>
+    <Content Include="Drawables\gif.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\jpeg.png">
+    </Content>
+    <Content Include="Drawables\jpeg.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\jpg.png">
+    </Content>
+    <Content Include="Drawables\jpg.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\png.png">
+    </Content>
+    <Content Include="Drawables\png.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\pptx.png">
+    </Content>
+    <Content Include="Drawables\pptx.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\text.png">
+    </Content>
+    <Content Include="Drawables\text.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\tif.png">
+    </Content>
+    <Content Include="Drawables\tif.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\tiff.png">
+    </Content>
+    <Content Include="Drawables\tiff.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Drawables\xlsx.png">
+    </Content>
+    <Content Include="Drawables\xlsx.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </Content>
     <Content Include="Startup\dot.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
