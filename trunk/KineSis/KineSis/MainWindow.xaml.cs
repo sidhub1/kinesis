@@ -247,6 +247,7 @@ namespace KineSis {
             if (document != null) {
                 UpdateShapes();
                 infoCanvasWindow.canvas.Children.Clear();
+                infoCanvasWindow.canvas.Background = Brushes.Transparent;
             }
         }
 
