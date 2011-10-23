@@ -172,7 +172,7 @@ namespace KineSis {
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e) {
-            if (screensCB.SelectedIndex == userScreensCB.SelectedIndex) {
+            if (screensCB.SelectedIndex == userScreensCB.SelectedIndex && !ProfileManager.MinimalView) {
                 System.Windows.Forms.MessageBox.Show("Presentation Screen cannot be the same as user Screen");
             } else {
 

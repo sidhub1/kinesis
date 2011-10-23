@@ -76,9 +76,6 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GrayscaleEffect">
-      <HintPath>Lib\GrayscaleEffect.dll</HintPath>
-    </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>Lib\Ionic.Zip.dll</HintPath>
     </Reference>
@@ -138,9 +135,6 @@
     <Compile Include="CanvasWindow.xaml.cs">
       <DependentUpon>CanvasWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Console.xaml.cs">
-      <DependentUpon>Console.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ContentManagement\Model\Chart.cs" />
     <Compile Include="ContentManagement\Model\ChartHorizontalView.cs" />
     <Compile Include="ContentManagement\Model\ChartVerticalView.cs" />
@@ -170,6 +164,8 @@
     <Compile Include="UserInterface\Entities\Element.cs" />
     <Compile Include="UserInterface\Entities\Groups\Clear.cs" />
     <Compile Include="UserInterface\Entities\Groups\Close.cs" />
+    <Compile Include="UserInterface\Entities\Groups\Menu.cs" />
+    <Compile Include="UserInterface\Entities\Groups\Minimal.cs" />
     <Compile Include="UserInterface\Entities\Groups\PaintColor.cs" />
     <Compile Include="UserInterface\Entities\Groups\Navigate.cs" />
     <Compile Include="UserInterface\Entities\Groups\Rotate.cs" />
@@ -179,7 +175,7 @@
     <Compile Include="UserInterface\Entities\Hand.cs" />
     <Compile Include="UserInterface\Entities\Groups\Paint.cs" />
     <Compile Include="UserInterface\Entities\Groups\Group.cs" />
-    <Compile Include="UserInterface\Entities\Groups\Main.cs" />
+    <Compile Include="UserInterface\Entities\Groups\Generic.cs" />
     <Compile Include="UserInterface\Entities\Groups\Pages.cs" />
     <Compile Include="UserInterface\Entities\Groups\Shapes.cs" />
     <Compile Include="UserInterface\UIManager.cs" />
@@ -192,10 +188,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CanvasWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Console.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -245,6 +237,9 @@
     </None>
     <AppDesigner Include="Properties\" />
     <Resource Include="Images\splash.bmp" />
+    <Resource Include="Images\minimal.png" />
+    <Resource Include="Images\existing.png" />
+    <Resource Include="Images\new.png" />
     <Content Include="syntaxhighlighter_3.0.83.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -255,7 +250,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\exit.png" />
-    <Resource Include="Images\fullscreen.png" />
     <Resource Include="Images\help.png" />
     <Resource Include="Images\settings.png" />
   </ItemGroup>

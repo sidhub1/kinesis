@@ -27,6 +27,14 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
+        Boolean Group.IsActive
+        {
+            get
+            {
+                return UIManager.messOnScreen;
+            }
+        }
+
         void Group.Draw(Canvas c) {
         }
     }

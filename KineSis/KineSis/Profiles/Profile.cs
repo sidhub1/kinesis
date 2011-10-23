@@ -76,7 +76,10 @@ namespace KineSis.Profiles {
 
         public int PresentationScreen {
             get {
-                return presentationScreen;
+                if (ProfileManager.MinimalView)
+                    return 0;
+                else
+                    return presentationScreen;
             }
 
             set {
@@ -86,7 +89,10 @@ namespace KineSis.Profiles {
         
         public int UserScreen {
             get {
-                return userScreen;
+                if (ProfileManager.MinimalView)
+                    return 0;
+                else
+                    return userScreen;
             }
 
             set {

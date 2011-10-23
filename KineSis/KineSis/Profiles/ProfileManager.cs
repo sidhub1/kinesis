@@ -15,6 +15,21 @@ namespace KineSis.Profiles {
 
         private static String path = "Profiles.kinesis";
 
+        private static Boolean minimalView = false;
+
+        public static Boolean MinimalView
+        {
+            get
+            {
+                return minimalView;
+            }
+
+            set
+            {
+                minimalView = value;
+            }
+        }
+
         public static List<Profile> Profiles {
             get {
 
