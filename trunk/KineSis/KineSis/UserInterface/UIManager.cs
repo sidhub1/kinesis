@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using KineSis.Profiles;
 using System.Windows.Shapes;
 using KineSis.ContentManagement.Model;
+using KineSis.Utils;
 
 namespace KineSis.UserInterface {
     class UIManager {
@@ -19,8 +20,29 @@ namespace KineSis.UserInterface {
         private static MainWindow mainw = null;
         private static Boolean zoomFit = false;
         private static Boolean inPaint = false;
+        public static double initialX;
+        public static double initialY;
+        public static Boolean inMenuSession;
+        public static Boolean messOnScreen;
+        public static Boolean minimalScrollLock = false;
 
-        private static Group mainGroup = Main.Instance;
+        public static Double MENU_DIAMETER
+        {
+            get
+            {
+                return mainw.userCanvas.Height / 5;
+            }
+        }
+
+        public static Double SUBMENU_DIAMETER
+        {
+            get
+            {
+                return mainw.userCanvas.Height / 6;
+            }
+        }
+
+        private static Group mainGroup = KineSis.UserInterface.Entities.Groups.Menu.Instance;
         private static Group selectedGroup = mainGroup;
 
         public static Document ActiveDocument {
@@ -148,7 +170,14 @@ namespace KineSis.UserInterface {
 
         public static Group SelectedGroup {
             get {
-                return selectedGroup;
+                if (ProfileManager.MinimalView)
+                {
+                    return Minimal.Instance;
+                }
+                else
+                {
+                    return selectedGroup;
+                }
             }
 
             set {
@@ -260,6 +289,7 @@ namespace KineSis.UserInterface {
             if (mainw != null) {
                 mainw.userCanvasWindow.canvas.Children.Clear();
                 mainw.presentationCanvasWindow.canvas.Children.Clear();
+                messOnScreen = false;
             }
         }
 
@@ -285,6 +315,7 @@ namespace KineSis.UserInterface {
                 myLine2.StrokeThickness = 10;
 
                 mainw.presentationCanvasWindow.canvas.Children.Add(myLine2);
+                messOnScreen = true;
             }
         }
 
@@ -293,7 +324,7 @@ namespace KineSis.UserInterface {
                 mainw = main;
             }
 
-            selectedGroup.Draw(main.userCanvas);
+            SelectedGroup.Draw(main.userCanvas);
         }
     }
 }

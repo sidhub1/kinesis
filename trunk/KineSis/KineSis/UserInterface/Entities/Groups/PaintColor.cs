@@ -35,6 +35,14 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
+        Boolean Group.IsActive
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public PaintColor(String color) {
             this.color = color;
         }

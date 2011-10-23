@@ -20,6 +20,8 @@ namespace KineSis.Utils {
         /// <param name="imageName">image name without extension</param>
         /// <returns></returns>
         public static Image GetResourceImage(String imageName) {
+            if (imageName.CompareTo("menu") == 0) imageName = "main";
+            if (imageName.CompareTo("minimal") == 0) imageName = "scroll";
             Image image = new Image();
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(Directory.GetCurrentDirectory() + "\\Drawables\\"+imageName+".png");
             BitmapImage src = new BitmapImage();

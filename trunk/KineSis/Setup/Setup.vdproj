@@ -21,25 +21,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_442CE23033B16ECB3CB1489C9610B14A"
+        "MsmKey" = "8:_1C1DBE66E329E5793403C690AD2E2857"
         "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_442CE23033B16ECB3CB1489C9610B14A"
-        "OwnerKey" = "8:_917AA0C3402EBC9770638003C465586C"
+        "MsmKey" = "8:_1C1DBE66E329E5793403C690AD2E2857"
+        "OwnerKey" = "8:_D7D92080B31092F271C2AF598840EB29"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4BF89A52A3F1D8F74A92853505855738"
-        "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_917AA0C3402EBC9770638003C465586C"
+        "MsmKey" = "8:_3210C8D05CA4607C09EDB2586F2734C4"
         "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,24 +45,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D7D92080B31092F271C2AF598840EB29"
+        "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_ED71AFDBFEB50D7E159D0F21D365DA09"
-        "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_442CE23033B16ECB3CB1489C9610B14A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
         "MsmSig" = "8:_UNDEFINED"
@@ -76,19 +64,19 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_ED71AFDBFEB50D7E159D0F21D365DA09"
+        "OwnerKey" = "8:_3210C8D05CA4607C09EDB2586F2734C4"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4BF89A52A3F1D8F74A92853505855738"
+        "OwnerKey" = "8:_D7D92080B31092F271C2AF598840EB29"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_917AA0C3402EBC9770638003C465586C"
+        "OwnerKey" = "8:_1C1DBE66E329E5793403C690AD2E2857"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -109,6 +97,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -125,6 +134,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -174,14 +191,14 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_442CE23033B16ECB3CB1489C9610B14A"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1C1DBE66E329E5793403C690AD2E2857"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:INuiInstanceHelper, Version=1.0.0.10, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_442CE23033B16ECB3CB1489C9610B14A"
+                    "_1C1DBE66E329E5793403C690AD2E2857"
                     {
                     "Name" = "8:INuiInstanceHelper.dll"
                     "Attributes" = "3:512"
@@ -205,51 +222,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4BF89A52A3F1D8F74A92853505855738"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3210C8D05CA4607C09EDB2586F2734C4"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:GrayscaleEffect, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_4BF89A52A3F1D8F74A92853505855738"
+                    "_3210C8D05CA4607C09EDB2586F2734C4"
                     {
-                    "Name" = "8:GrayscaleEffect.dll"
+                    "Name" = "8:Ionic.Zip.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:GrayscaleEffect.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_D53F8A4270314C1EB8BC235260557A23"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_917AA0C3402EBC9770638003C465586C"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Research.Kinect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_917AA0C3402EBC9770638003C465586C"
-                    {
-                    "Name" = "8:Microsoft.Research.Kinect.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Microsoft.Research.Kinect.dll"
+            "SourcePath" = "8:Ionic.Zip.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_D53F8A4270314C1EB8BC235260557A23"
@@ -287,20 +273,20 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_ED71AFDBFEB50D7E159D0F21D365DA09"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D7D92080B31092F271C2AF598840EB29"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Research.Kinect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_ED71AFDBFEB50D7E159D0F21D365DA09"
+                    "_D7D92080B31092F271C2AF598840EB29"
                     {
-                    "Name" = "8:Ionic.Zip.dll"
+                    "Name" = "8:Microsoft.Research.Kinect.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Ionic.Zip.dll"
+            "SourcePath" = "8:Microsoft.Research.Kinect.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_D53F8A4270314C1EB8BC235260557A23"
@@ -397,7 +383,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:KineSis"
         "ProductCode" = "8:{4472B652-6800-4898-8E49-C1402A3D570C}"
-        "PackageCode" = "8:{443F8A8B-5158-4CDA-8803-11B2B0E53FA9}"
+        "PackageCode" = "8:{0EAAD343-CEB5-4AEE-AA43-E8276E9E963E}"
         "UpgradeCode" = "8:{602EF519-A1C3-43D8-9B08-9863FE8A633C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -984,7 +970,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
             {
-            "SourcePath" = "8:..\\KineSis\\obj\\Release\\KineSis.exe"
+            "SourcePath" = "8:..\\KineSis\\obj\\Debug\\KineSis.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_D53F8A4270314C1EB8BC235260557A23"

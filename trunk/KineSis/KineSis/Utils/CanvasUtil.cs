@@ -12,6 +12,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Windows.Media.Imaging;
+using KineSis.UserInterface;
 
 
 namespace KineSis.Utils {
@@ -23,7 +24,7 @@ namespace KineSis.Utils {
         /// <param name="canvas">canvas where the progress will be drawn</param>
         /// <param name="pp">active processing progress</param>
         public static void DrawProgress(Canvas canvas, ProcessingProgress pp) {
-            canvas.Background = ProfileManager.ActiveProfile.BackgroundColor;
+            canvas.Background =  ProfileManager.MinimalView ? System.Windows.Media.Brushes.Transparent : ProfileManager.ActiveProfile.BackgroundColor;
 
             String currentOperationName = pp.CurrentOperationName;
             Double currentOperation = ( (Double)pp.CurrentOperationElement * 100 / (Double)pp.CurrentOperationTotalElements );
@@ -76,12 +77,12 @@ namespace KineSis.Utils {
 
 
             System.Windows.Shapes.Rectangle overallOperationInnerRect = new System.Windows.Shapes.Rectangle();
-            overallOperationInnerRect.Width = ( ( canvas.Width - tenth - 6 ) * overallOperation ) / 100;
-            overallOperationInnerRect.Height = sixth - 6;
+            overallOperationInnerRect.Width = ProfileManager.MinimalView ? ((canvas.Width - tenth) * overallOperation) / 100  : ((canvas.Width - tenth - 6) * overallOperation) / 100;
+            overallOperationInnerRect.Height = ProfileManager.MinimalView ? sixth - 2 : sixth - 6;
             overallOperationInnerRect.Stroke = ProfileManager.ActiveProfile.BackgroundColor;
-            overallOperationInnerRect.StrokeThickness = 2;
+            overallOperationInnerRect.StrokeThickness = ProfileManager.MinimalView ? 0 : 2;
             overallOperationInnerRect.Fill = ProfileManager.ActiveProfile.PrimaryColor;
-            overallOperationInnerRect.Margin = new Thickness(( tenth + 6 ) / 2, 4 * sixth + 3, 0, 0);
+            overallOperationInnerRect.Margin = ProfileManager.MinimalView ? new Thickness(tenth / 2 + 1, 4 * sixth + 1, 0, 0) : new Thickness((tenth + 6) / 2, 4 * sixth + 3, 0, 0);
 
             TextBlock overallOperationTextBlock = new TextBlock();
             overallOperationTextBlock.Text = overallOperationName + "  [ " + overallOperationProgress + " ]";
@@ -94,11 +95,11 @@ namespace KineSis.Utils {
             overallOperationTextBlock.TextAlignment = TextAlignment.Center;
 
 
-            canvas.Children.Add(currentOperationTextBlock);
-            canvas.Children.Add(currentOperationOuterRect);
-            canvas.Children.Add(currentOperationInnerRect);
+            if (!ProfileManager.MinimalView) canvas.Children.Add(currentOperationTextBlock);
+            if (!ProfileManager.MinimalView) canvas.Children.Add(currentOperationOuterRect);
+            if (!ProfileManager.MinimalView) canvas.Children.Add(currentOperationInnerRect);
 
-            canvas.Children.Add(overallOperationTextBlock);
+            if (!ProfileManager.MinimalView) canvas.Children.Add(overallOperationTextBlock);
             canvas.Children.Add(overallOperationOuterRect);
             canvas.Children.Add(overallOperationInnerRect);
             canvas.UpdateLayout();
@@ -402,6 +403,52 @@ namespace KineSis.Utils {
             //user.image.StretchDirection = StretchDirection.DownOnly;
             user.image.Width = W * ratio;
             user.image.Height = H * ratio;
+        }
+
+        public static void DrawGrid(Canvas c)
+        {
+            int RATE = (int)c.Width / 320 * 2;
+            double width = c.Width;
+            double height = c.Height;
+
+            double i = 0;
+            while (i < height)
+            {
+                Line l = new Line();
+                l.X1 = 0;
+                l.X2 = width;
+                l.Y1 = i;
+                l.Y2 = i;
+                l.Fill = ColorUtil.FromHTML("#8888FF88");
+                l.Stroke = l.Fill;
+                c.Children.Add(l);
+                i += RATE;
+            }
+
+            i = 0;
+            while (i < width)
+            {
+                Line l = new Line();
+                l.X1 = i;
+                l.X2 = i;
+                l.Y1 = 0;
+                l.Y2 = height;
+                l.Fill = ColorUtil.FromHTML("#8888FF88");
+                l.Stroke = l.Fill;
+                c.Children.Add(l);
+                i += RATE;
+            }
+        }
+
+        public static void DrawHand(Canvas c)
+        {
+            if (UIManager.FirstHand != null && UIManager.FirstHand.IsSelected)
+            {
+                double x =  UIManager.FirstHand.X;
+                double y =  UIManager.FirstHand.Y;
+
+                DrawEllipse(c, x, y, 50, 50, System.Windows.Media.Brushes.Red, System.Windows.Media.Brushes.Pink, null);
+            }
         }
     }
 

@@ -55,7 +55,6 @@ namespace KineSis {
         public CanvasWindow presentationCanvasWindow = new CanvasWindow();
         public BrowserForm userBrowserForm = new BrowserForm();
         public BrowserForm presentationBrowserForm = new BrowserForm();
-        public Console console = new Console();
         public SettingsWindow settings = new SettingsWindow();
 
         private BackgroundWorker documentProcessingWorker = new BackgroundWorker();
@@ -78,14 +77,16 @@ namespace KineSis {
 
         private Boolean leftHandSelected = false;
         private Boolean rightHandSelected = false;
-        private int leftHandCounter = 0;
-        private int rightHandCounter = 0;
+        //private int leftHandCounter = 0;
+        //private int rightHandCounter = 0;
 
         public Chart currentChart = null;
         public int chartNumber = 0;
 
         Runtime nui;
         DateTime lastTime = DateTime.MaxValue;
+        DateTime counterL = DateTime.Now;
+        DateTime counterR = DateTime.Now;
 
         // We want to control how depth data gets converted into false-color data
         // for more intuitive visualization, so we keep 32-bit color frame buffer versions of
@@ -94,6 +95,9 @@ namespace KineSis {
         const int GREEN_IDX = 1;
         const int BLUE_IDX = 0;
         byte[] depthFrame32 = new byte[320 * 240 * 4];
+
+        List<Point> pointsL = new List<Point>();
+        List<Point> pointsR = new List<Point>();
 
 
         Dictionary<JointID, Brush> jointColors = new Dictionary<JointID, Brush>() { 
@@ -123,6 +127,11 @@ namespace KineSis {
 
             InitializeComponent();
 
+            if (WindowUtils.Screens.Count() < 2 || (WindowUtils.Screens.Count() >=2 && PRESENTATION_SCREEN_NUMBER == USER_SCREEN_NUMBER))
+            {
+                ProfileManager.MinimalView = true;
+            }
+
                 documentProcessingWorker.WorkerReportsProgress = true;
                 documentProcessingWorker.WorkerSupportsCancellation = false;
                 documentProcessingWorker.ProgressChanged += new ProgressChangedEventHandler(documentProcessingWorker_ProgressChanged);
@@ -135,7 +144,6 @@ namespace KineSis {
                 documentChartProcessingWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(documentChartProcessingWorker_RunWorkerCompleted);
                 documentChartProcessingWorker.DoWork += new DoWorkEventHandler(documentChartProcessingWorker_DoWork);
 
-                console.log(NAME, "init successfull");
                 presentationCanvasWindow.Show();
                 presentationBrowserForm.Show();
                 userCanvasWindow.Show();
@@ -144,8 +152,6 @@ namespace KineSis {
                 settings.mw = this;
 
                 ApplyProfile();
-
-                console.log(NAME, "windows shown");
         }
 
         public void ApplyProfile() {
@@ -463,13 +469,7 @@ namespace KineSis {
 
                 infoCanvasWindow.canvas.Children.Clear();
 
-                TextBlock textBlock = new TextBlock();
-
-                textBlock.Text = "Ready";
-                textBlock.Foreground = System.Windows.Media.Brushes.Red;
-                textBlock.FontSize = 20;
                 infoCanvasWindow.canvas.Background = Brushes.Transparent;
-                infoCanvasWindow.canvas.Children.Add(textBlock);
                 infoCanvasWindow.canvas.UpdateLayout();
                 infoCanvasWindow.canvas.Refresh();
             }
@@ -493,13 +493,23 @@ namespace KineSis {
         
 
         private void Window_Loaded(object sender, EventArgs e) {
-            if (WindowUtils.Screens.Count() < 2) {
-                MessageBoxResult r = MessageBox.Show("You need 2 screens to run KineSis");
-                if (r == MessageBoxResult.OK) {
-                    Environment.Exit(0);
+            if (WindowUtils.Screens.Count() < 2)
+            {
+                //MessageBoxResult r = MessageBox.Show("You don't have 2 screens. KineSis will start in Minimal Mode");
+                //if (r == MessageBoxResult.OK)
+                //{
+                    //ProfileManager.MinimalView = true;
+                //}
+                //else
+                //{
+                //    Environment.Exit(0);
+                //}
+            }
+                
+                if (!ProfileManager.MinimalView)
+                {
+                    goFullScreen();
                 }
-            } else {
-                goFullScreen();
                 nui = new Runtime();
                 try {
                     nui.Initialize(RuntimeOptions.UseSkeletalTracking);
@@ -508,7 +518,11 @@ namespace KineSis {
                     return;
                 }
                 nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-            }
+                if (ProfileManager.MinimalView)
+                {
+                    goMinimalView();
+                }
+
             
         }
 
@@ -536,7 +550,7 @@ namespace KineSis {
             Polyline polyline = new Polyline();
             polyline.Points = points;
             polyline.Stroke = brush;
-            polyline.StrokeThickness = 20;
+            polyline.StrokeThickness = userCanvas.Height / 50;// 20;// UIManager.SUBMENU_DIAMETER / 10;
             return polyline;
         }
 
@@ -552,6 +566,19 @@ namespace KineSis {
             brushes[5] = new SolidColorBrush(Color.FromRgb(128, 128, 255));
 
             userCanvas.Children.Clear();
+
+            if (ProfileManager.MinimalView)
+            {
+                Ellipse ellipse = new Ellipse();
+                ellipse.Width = userCanvas.Width / 10;
+                ellipse.Height = userCanvas.Width / 10;
+                ellipse.Stroke = ProfileManager.ActiveProfile.PrimaryColor;
+                ellipse.StrokeThickness = 10;
+                ellipse.Fill = ProfileManager.ActiveProfile.SecondaryColor;
+                Canvas.SetBottom(ellipse, -ellipse.Width/2);
+                Canvas.SetRight(ellipse, -ellipse.Height/2);
+                userCanvas.Children.Add(ellipse);
+            }
 
             double minZ = double.MaxValue;
             int userID = -1;
@@ -651,91 +678,95 @@ namespace KineSis {
 
                         Double delta = Math.Sqrt(Math.Pow(getDisplayPosition(centerShoulder).X - getDisplayPosition(centerHip).X, 2) + Math.Pow(getDisplayPosition(centerShoulder).Y - getDisplayPosition(centerHip).Y, 2));
 
-                        Ellipse ellipse2 = new Ellipse();
-                        ellipse2.Width = 100;
-                        ellipse2.Height = 100;
-                        ellipse2.Stroke = brush;
-                        ellipse2.StrokeThickness = 10;
-                        ellipse2.Fill = jointColors[leftWrist.ID];
-                        Canvas.SetTop(ellipse2, 0);
-                        Canvas.SetLeft(ellipse2, 0);
-                        userCanvas.Children.Add(ellipse2);
+                        if (!ProfileManager.MinimalView)
+                        {
+                            Ellipse ellipse2 = new Ellipse();
+                            ellipse2.Width = 100;
+                            ellipse2.Height = 100;
+                            ellipse2.Stroke = brush;
+                            ellipse2.StrokeThickness = 10;
+                            ellipse2.Fill = jointColors[leftWrist.ID];
+                            Canvas.SetTop(ellipse2, 0);
+                            Canvas.SetLeft(ellipse2, 0);
+                            userCanvas.Children.Add(ellipse2);
 
-                        int ld = (int)( ( lDist / 0.4 ) * 10 );
-                        String LD = ( ld < 10 ) ? ( "0" + ld ) : ld.ToString();
+                            int ld = (int)((lDist / 0.4) * 10);
+                            String LD = (ld < 10) ? ("0" + ld) : ld.ToString();
 
-                        TextBlock tb1 = new TextBlock();
-                        tb1.Text = LD;
-                        tb1.Foreground = brush;
-                        tb1.FontSize = 50;
-                        Canvas.SetTop(tb1, 15);
-                        Canvas.SetLeft(tb1, 25);
-                        userCanvas.Children.Add(tb1);
+                            TextBlock tb1 = new TextBlock();
+                            tb1.Text = LD;
+                            tb1.Foreground = brush;
+                            tb1.FontSize = 50;
+                            Canvas.SetTop(tb1, 15);
+                            Canvas.SetLeft(tb1, 25);
+                            userCanvas.Children.Add(tb1);
 
-                        Ellipse ellipse3 = new Ellipse();
-                        ellipse3.Width = 100;
-                        ellipse3.Height = 100;
-                        ellipse3.Stroke = brush;
-                        ellipse3.StrokeThickness = 10;
-                        ellipse3.Fill = jointColors[rightWrist.ID];
-                        Canvas.SetTop(ellipse3, 0);
-                        Canvas.SetRight(ellipse3, 0);
-                        userCanvas.Children.Add(ellipse3);
+                            Ellipse ellipse3 = new Ellipse();
+                            ellipse3.Width = 100;
+                            ellipse3.Height = 100;
+                            ellipse3.Stroke = brush;
+                            ellipse3.StrokeThickness = 10;
+                            ellipse3.Fill = jointColors[rightWrist.ID];
+                            Canvas.SetTop(ellipse3, 0);
+                            Canvas.SetRight(ellipse3, 0);
+                            userCanvas.Children.Add(ellipse3);
 
-                        int rd = (int)( ( rDist / 0.35 ) * 10 );
-                        String RD = ( rd < 10 ) ? ( "0" + rd ) : rd.ToString();
+                            int rd = (int)((rDist / 0.4) * 10);
+                            String RD = (rd < 10) ? ("0" + rd) : rd.ToString();
 
-                        TextBlock tb2 = new TextBlock();
-                        tb2.Text = RD;
-                        tb2.Foreground = brush;
-                        tb2.FontSize = 50;
-                        Canvas.SetTop(tb2, 15);
-                        Canvas.SetRight(tb2, 25);
-                        userCanvas.Children.Add(tb2);
+                            TextBlock tb2 = new TextBlock();
+                            tb2.Text = RD;
+                            tb2.Foreground = brush;
+                            tb2.FontSize = 50;
+                            Canvas.SetTop(tb2, 15);
+                            Canvas.SetRight(tb2, 25);
+                            userCanvas.Children.Add(tb2);
+                        }
 
-                        if (lDist > 0.35) {
-                            leftHandCounter++;
+                        if (lDist > 0.5) {
+                            //leftHandCounter++;
                             //if (leftHandCounter >= 15) {
                             //    leftHandCounter = 15;
                             leftHandSelected = true;
                             //}
-                        } else {
+                        } else if (lDist < 0.25) {
                             leftHandSelected = false;
-                            leftHandCounter = 0;
+                            //leftHandCounter = 0;
                         }
 
                         if (leftHandSelected && !UIManager.InPaint) {
                             Ellipse ellipse1 = new Ellipse();
-                            ellipse1.Width = 100;
-                            ellipse1.Height = 100;
+                            ellipse1.Width = UIManager.SUBMENU_DIAMETER / 1.75;
+                            ellipse1.Height = ellipse1.Width;
                             ellipse1.Stroke = brush;
                             ellipse1.StrokeThickness = 10;
                             ellipse1.Fill = jointColors[leftWrist.ID];
-                            Canvas.SetTop(ellipse1, getDisplayPosition(leftWrist).Y - 50);
-                            Canvas.SetLeft(ellipse1, getDisplayPosition(leftWrist).X - 50);
+                            Canvas.SetTop(ellipse1, getDisplayPosition(leftWrist).Y - ellipse1.Width / 2);
+                            Canvas.SetLeft(ellipse1, getDisplayPosition(leftWrist).X - ellipse1.Height /2);
                             userCanvas.Children.Add(ellipse1);
                         }
 
-                        if (rDist > 0.35) {
-                            rightHandCounter++;
+                        if (rDist > 0.5) {
+                            //rightHandCounter++;
                             //if (rightHandCounter >= 15) {
                             //    rightHandCounter = 15;
                             rightHandSelected = true;
                             //}
-                        } else {
+                        }
+                        else if (rDist < 0.25) {
                             rightHandSelected = false;
-                            rightHandCounter = 0;
+                            //rightHandCounter = 0;
                         }
 
                         if (rightHandSelected && !UIManager.InPaint) {
                             Ellipse ellipse1 = new Ellipse();
-                            ellipse1.Width = 100;
-                            ellipse1.Height = 100;
+                            ellipse1.Width = UIManager.SUBMENU_DIAMETER / 1.75;
+                            ellipse1.Height = ellipse1.Width;
                             ellipse1.Stroke = brush;
                             ellipse1.StrokeThickness = 10;
                             ellipse1.Fill = jointColors[rightWrist.ID];
-                            Canvas.SetTop(ellipse1, getDisplayPosition(rightWrist).Y - 50);
-                            Canvas.SetLeft(ellipse1, getDisplayPosition(rightWrist).X - 50);
+                            Canvas.SetTop(ellipse1, getDisplayPosition(rightWrist).Y - ellipse1.Width/2);
+                            Canvas.SetLeft(ellipse1, getDisplayPosition(rightWrist).X - ellipse1.Height / 2);
                             userCanvas.Children.Add(ellipse1);
                         }
 
@@ -749,15 +780,54 @@ namespace KineSis {
                         rightHand.Y = getDisplayPosition(rightWrist).Y;
                         rightHand.IsSelected = rightHandSelected;
 
-                        UIManager.LeftHand = leftHand;
-                        UIManager.RightHand = rightHand;
+                        pointsL.Add(new Point(leftHand.X, leftHand.Y));
+                        pointsR.Add(new Point(rightHand.X, rightHand.Y));
+
+                        //if (DateTime.Now.Subtract(counterL).Milliseconds > 150)
+                        //{
+                        //    double y = 0;
+                        //    double x = 0;
+                        //    foreach (Point p in pointsL) {
+                        //        x += p.X;
+                        //        y += p.Y;
+                        //    }
+                        //
+                        //    x = x / pointsL.Count;
+                        //    y = y / pointsL.Count;
+                        //    pointsL = new List<Point>();
+                        //    counterL = DateTime.Now;
+                            UIManager.LeftHand = leftHand;
+
+                        //}
+
+                        //if (DateTime.Now.Subtract(counterR).Milliseconds > 150)
+                        //{
+                        //    double y = 0;
+                        //    double x = 0;
+                        //    foreach (Point p in pointsR)
+                        //    {
+                        //        x += p.X;
+                        //        y += p.Y;
+                        //    }
+                        //
+                        //    x = x / pointsR.Count;
+                        //    y = y / pointsR.Count;
+                        //    pointsR = new List<Point>();
+                        //    counterR = DateTime.Now;
+                            UIManager.RightHand = rightHand;
+                        //}
+
+                        
                         UIManager.Delta = delta;
+                        
                         UIManager.Process(this);
+                        //CanvasUtil.DrawGrid(userCanvas);
+                        CanvasUtil.DrawHand(userCanvas);
                     }
                 }
                 iSkeleton++;
             } // for each skeleton
-
+            
             userCanvas.Refresh();
         }
 
@@ -773,8 +843,6 @@ namespace KineSis {
         }
 
         private void goFullScreen() {
-
-            console.log(NAME, "gone fullscreen");
 
             int PS_WIDTH = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width; //4
             int PS_HEIGHT = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height;  //3
@@ -846,6 +914,22 @@ namespace KineSis {
 
             RefreshCharts();
             UIManager.Clear();
+
+            if (ProfileManager.MinimalView)
+            {
+                double ww = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width / 2;
+                double hh = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height * ww / WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width;
+
+                double ll = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Right - ww;
+                double tt = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Bottom - hh;
+
+                infoCanvasWindow.Width = ww;
+                infoCanvasWindow.canvas.Width = ww;
+                infoCanvasWindow.Height = (hh - hh * 3 / 4) / 2;
+                infoCanvasWindow.canvas.Height = (hh - hh * 3 / 4) / 2;
+                infoCanvasWindow.Top = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Bottom - infoCanvasWindow.canvas.Height;
+                infoCanvasWindow.Left = ll;
+            }
         }
 
 
@@ -855,11 +939,29 @@ namespace KineSis {
         }
 
         private void SwitchScreens() {
-            console.log(NAME, "switched screens");
-            int x = USER_SCREEN_NUMBER;
-            USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
-            PRESENTATION_SCREEN_NUMBER = x;
-            goFullScreen();
+            
+            if (ProfileManager.MinimalView)
+            {
+                if (WindowUtils.Screens.Count() > 1)
+                {
+                    if (PRESENTATION_SCREEN_NUMBER < WindowUtils.Screens.Count() - 1)
+                    {
+                        PRESENTATION_SCREEN_NUMBER++;
+                    }
+                    else
+                    {
+                        PRESENTATION_SCREEN_NUMBER = 0;
+                    }
+                }
+                goMinimalView();
+            }
+            else
+            {
+                int x = USER_SCREEN_NUMBER;
+                USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
+                PRESENTATION_SCREEN_NUMBER = x;
+                goFullScreen();
+            }
         }
 
         private void UserCanvas_CM_Open_Click(object sender, RoutedEventArgs e) {
@@ -908,13 +1010,63 @@ namespace KineSis {
             aw.ShowDialog();
         }
 
-        private void UserCanvas_CM_Show_Console_Click(object sender, RoutedEventArgs e) {
+        private void UserCanvas_CM_Minimal_Click(object sender, RoutedEventArgs e) {
+            if (WindowUtils.Screens.Count() >= 2)
+            {
+                ProfileManager.MinimalView = !ProfileManager.MinimalView;
+                goMinimalView();
+            }
+            
+            /*
+            console.canvas1 = userCanvas;
             console.Hide();
             console.Topmost = true;
             console.ShowDialog();
-            console.WindowState = WindowState.Normal;
+            console.WindowState = WindowState.Normal;*/
+            
         }
 
+        private void goMinimalView() {
+            //if (WindowUtils.Screens.Count() >= 2)
+            //{
+                if (ProfileManager.MinimalView)
+                {
+                    USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
+                    goFullScreen();
+                    userBrowserForm.Hide();
+                    userCanvasWindow.Hide();
+                    //infoCanvasWindow.Hide();
+                    this.Hide();
+
+                    this.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width / 2;
+                    this.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height * this.Width / WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width;
+
+                    this.Left = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Right - this.Width;
+                    this.Top = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Bottom - this.Height;
+                    this.Background = Brushes.Transparent;
+                    userCanvas.Opacity = 0.3;
+                    userCanvas.Background = Brushes.Transparent;
+                    userCanvas.Margin = new Thickness(0, 0, 0, 0);
+                    userCanvas.Width = this.Width;
+                    userCanvas.Height = this.Height;
+                    this.ShowDialog();
+                }
+                else
+                {
+                    USER_SCREEN_NUMBER = ProfileManager.ActiveProfile.UserScreen;
+                    PRESENTATION_SCREEN_NUMBER = ProfileManager.ActiveProfile.PresentationScreen;
+                    this.Hide();
+                    userBrowserForm.Show();
+                    userCanvasWindow.Show();
+                    //infoCanvasWindow.Show();
+                    this.Background = ColorUtil.FromHTML("#83818181");
+                    userCanvas.Background = ColorUtil.FromHTML("#50000000");
+                    userCanvas.Opacity = 1;
+                    this.Show();
+                    goFullScreen();
+                }
+            //}
+        }
 
     }
 

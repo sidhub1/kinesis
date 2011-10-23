@@ -3,37 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
-using KineSis.Utils;
+using System.Windows.Shapes;
 using KineSis.Profiles;
 using System.Windows.Media;
+using KineSis.Utils;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using System.Windows.Media.Effects;
+using System.IO;
+using System.Windows.Forms;
 
-namespace KineSis.UserInterface.Entities.Groups {
-    class Zoom : Group {
-        String Group.Name {
-            get {
-                return "zoom";
-            }
-        }
+namespace KineSis.UserInterface.Entities.Groups
+{
+    class Menu : Group
+    {
+        private static List<Group> groups = new List<Group>();
 
-        Boolean Group.IsActive
-        {
-            get
-            {
-                return UIManager.ActiveDocument != null;
-            }
-        }
+        private Boolean leftSelected = false;
+        private Boolean rightSelected = false;
+        private Boolean upSelected = false;
+        private Boolean downSelected = false;
 
-        static readonly Zoom instance = new Zoom();
 
-        static Zoom()
-        {
-        }
+        static readonly Menu instance = new Menu();
 
-        Zoom()
+        static Menu()
         {
         }
 
-        public static Zoom Instance
+        Menu()
+        {
+        }
+
+        public static Menu Instance
         {
             get
             {
@@ -41,40 +43,44 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
-        private static List<Group> groups = new List<Group>();
+        String Group.Name
+        {
+            get
+            {
+                return "menu";
+            }
+        }
+
+        Boolean Group.IsActive
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         public static List<Group> Groups
         {
             get
             {
-                    groups = new List<Group>();
-                    Group main = UIManager.MainGroup;
-                    groups.Add(main);
-                    if (!UIManager.ZoomFit)
-                    {
-                        Group fit = new Generic("fit");
-                        groups.Add(fit);
-                    }
-                    else
-                    {
-                        Group unfit = new Generic("unfit");
-                        groups.Add(unfit);
-                    }
-                    Group zoomIn = new Generic("zoom_in");
-                    groups.Add(zoomIn);
-                    Group zoomOut = new Generic("zoom_out");
-                    groups.Add(zoomOut);
+                if (groups.Count == 0)
+                {
+                    Group zoom = Zoom.Instance;
+                    groups.Add(zoom);
+                    Group pages = Pages.Instance;
+                    groups.Add(pages);
+                    Group shapes = Shapes.Instance;
+                    groups.Add(shapes);
+                    Group paint = Paint.Instance;
+                    groups.Add(paint);
+                }
+
                 return groups;
             }
         }
-        
-        private Boolean leftSelected = false;
-        private Boolean rightSelected = false;
-        private Boolean upSelected = false;
-        private Boolean downSelected = false;
 
-        void Group.Draw(Canvas c) {
-
+        void Group.Draw(Canvas c)
+        {
             if (/*UIManager.SecondHand != null &&*/ UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
             {
                 if (!UIManager.inMenuSession)
@@ -119,10 +125,6 @@ namespace KineSis.UserInterface.Entities.Groups {
                 }
                 else if (UIManager.FirstHand.X > upAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < upAreaX + UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y > upAreaY - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y < upAreaY + UIManager.SUBMENU_DIAMETER / 2)
                 {
-                    if (!UIManager.ZoomFit)
-                    {
-                        UIManager.ZoomIn();
-                    }
                     upSelected = true;
                     leftSelected = false;
                     rightSelected = false;
@@ -130,10 +132,6 @@ namespace KineSis.UserInterface.Entities.Groups {
                 }
                 else if (UIManager.FirstHand.X > downAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < downAreaX + UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y > downAreaY - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y < downAreaY + UIManager.SUBMENU_DIAMETER / 2)
                 {
-                    if (!UIManager.ZoomFit)
-                    {
-                        UIManager.ZoomOut();
-                    }
                     downSelected = true;
                     leftSelected = false;
                     rightSelected = false;
@@ -147,9 +145,17 @@ namespace KineSis.UserInterface.Entities.Groups {
                     }
                     else if (rightSelected && Groups[1].IsActive)
                     {
-                        UIManager.ZoomFit = !UIManager.ZoomFit;
+                        UIManager.SelectedGroup = Groups[1];
                     }
-
+                    else if (upSelected && Groups[2].IsActive)
+                    {
+                        UIManager.SelectedGroup = Groups[2];
+                    }
+                    else if (downSelected && Groups[3].IsActive)
+                    {
+                        UIManager.SelectedGroup = Groups[3];
+                    }
+                    
                     leftSelected = false;
                     rightSelected = false;
                     upSelected = false;
@@ -178,23 +184,23 @@ namespace KineSis.UserInterface.Entities.Groups {
 
                 if (upSelected)
                 {
-                    CanvasUtil.DrawEllipse(c, upAreaX, upAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, !UIManager.ZoomFit ? secondaryColor : Brushes.LightGray, fill, Brushes.White);
+                    CanvasUtil.DrawEllipse(c, upAreaX, upAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, Groups[2].IsActive ? secondaryColor : Brushes.LightGray, fill, Brushes.White);
                 }
                 else
                 {
-                    CanvasUtil.DrawEllipse(c, upAreaX, upAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, !UIManager.ZoomFit ? secondaryColor : Brushes.LightGray, fill, null);
+                    CanvasUtil.DrawEllipse(c, upAreaX, upAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, Groups[2].IsActive ? secondaryColor : Brushes.LightGray, fill, null);
                 }
 
                 if (downSelected)
                 {
-                    CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, !UIManager.ZoomFit ? secondaryColor : Brushes.LightGray, fill, Brushes.White);
+                    CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, Groups[3].IsActive ? secondaryColor : Brushes.LightGray, fill, Brushes.White);
                 }
                 else
                 {
-                    CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, !UIManager.ZoomFit ? secondaryColor : Brushes.LightGray, fill, null);
+                    CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, Groups[3].IsActive ? secondaryColor : Brushes.LightGray, fill, null);
                 }
 
-                System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage(((Group) instance).Name);
+                System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage(((Group)instance).Name);
                 CanvasUtil.DrawImageInCircle(c, image0, UIManager.MENU_DIAMETER, centerX, centerY);
 
                 System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage(Groups[0].Name);
@@ -217,6 +223,7 @@ namespace KineSis.UserInterface.Entities.Groups {
                 upSelected = false;
                 downSelected = false;
             }
+
         }
     }
 }

@@ -19,13 +19,28 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
-        private Group parent;
+        Boolean Group.IsActive
+        {
+            get
+            {
+                if (parent is Shapes)
+                {
+                    return UIManager.ActiveDocument != null && (UIManager.ActiveDocumentChart == null || UIManager.ActiveDocument.Pages[UIManager.ActiveDocumentPage].Charts.Count > 1);
+                }
+                else if (parent is Pages)
+                {
+                    return UIManager.ActiveDocument != null && UIManager.ActiveDocument.Pages.Count > 1;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
 
-        private double initialX;
-        private double initialY;
+        private Group parent;
         private Boolean inSession = false;
         private Boolean selection = false;
-        private Boolean preSelected = false;
         private Boolean leftSelected = false;
         private Boolean rightSelected = false;
         private Boolean selSelected = false;
@@ -38,59 +53,64 @@ namespace KineSis.UserInterface.Entities.Groups {
         }
 
         void Group.Draw(Canvas c) {
-            if (UIManager.SecondHand != null && UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected) {
-                double centerX = ( UIManager.FirstHand.X + UIManager.SecondHand.X ) / 2;
-                double centerY = ( UIManager.FirstHand.Y + UIManager.SecondHand.Y ) / 2;
-
-                Double delta = Math.Abs(UIManager.Delta) + 1;
-
-                Double centerDiameter = Math.Sqrt(Math.Pow(UIManager.FirstHand.X - UIManager.SecondHand.X, 2) + Math.Pow(UIManager.FirstHand.Y - UIManager.SecondHand.Y, 2)) - 150;
-
-                if (centerDiameter > 2 * ( 1.75 * delta - 225 )) {
-                    centerDiameter = 2 * ( 1.75 * delta - 225 );
-                }
-                if (centerDiameter <= 0) {
-                    centerDiameter = 1;
+            if (UIManager.SecondHand != null && UIManager.SecondHand.IsSelected && UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
+            {
+                if (!UIManager.inMenuSession)
+                {
+                    UIManager.initialX = UIManager.FirstHand.X;
+                    UIManager.initialY = UIManager.FirstHand.Y;
+                    UIManager.inMenuSession = true;
                 }
 
-                double rightAreaX = UIManager.RightHand.X;
-                double rightAreaY = UIManager.LeftHand.Y;
+                System.Windows.Media.Brush primaryColor = ProfileManager.ActiveProfile.PrimaryColor;
+                System.Windows.Media.Brush secondaryColor = ProfileManager.ActiveProfile.SecondaryColor;
+                System.Windows.Media.Brush fill = ColorUtil.FromHTML("#88FFFFFF");
 
-                if (rightAreaX > centerX + 1.75 * delta - 150) {
-                    rightAreaX = centerX + 1.75 * delta - 150;
+                double centerX = UIManager.initialX;
+                double centerY = UIManager.initialY;
+
+                double leftAreaX = UIManager.initialX - 1.25 * UIManager.SUBMENU_DIAMETER;
+                double leftAreaY = UIManager.initialY;
+
+
+                if (UIManager.FirstHand.X > leftAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < leftAreaX + UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y > leftAreaY - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y < leftAreaY + UIManager.SUBMENU_DIAMETER / 2)
+                {
+                    leftSelected = true;
+
                 }
 
-                double rightSelectionX = centerX + 1.75 * delta;
-                double rightSelectionY = centerY;
-
-                double leftSelectionX = centerX - 1.75 * delta;
-                double leftSelectionY = centerY;
-
-                double leftAreaX = UIManager.LeftHand.X;
-                double leftAreaY = UIManager.RightHand.Y;
-
-                if (leftAreaX < centerX - 1.75 * delta + 150) {
-                    leftAreaX = centerX - 1.75 * delta + 150;
-                }
-
-                if (UIManager.LeftHand.X < leftSelectionX + 75 && UIManager.LeftHand.Y < leftSelectionY + 75 && UIManager.LeftHand.Y > leftSelectionY - 75) {
-                    preSelected = true;
-                } else if (UIManager.LeftHand.X > leftSelectionX + 150 && UIManager.LeftHand.Y < leftSelectionY + 75 && UIManager.LeftHand.Y > leftSelectionY - 75) {
-                    if (preSelected) {
+                else if (UIManager.FirstHand.X > centerX - UIManager.MENU_DIAMETER / 2 && UIManager.FirstHand.X < centerX + UIManager.MENU_DIAMETER / 2 && UIManager.FirstHand.Y > centerY - UIManager.MENU_DIAMETER / 2 && UIManager.FirstHand.Y < centerY + UIManager.MENU_DIAMETER / 2)
+                {
+                    if (leftSelected)
+                    {
                         UIManager.SelectedGroup = parent;
-                        preSelected = false;
                     }
-                } else if (preSelected && ( UIManager.LeftHand.Y >= leftSelectionY + 75 || UIManager.LeftHand.Y <= leftSelectionY - 75 )) {
-                    preSelected = false;
+
+
+                    leftSelected = false;
                 }
 
-                String caption = "back 2 " + parent.Name;
+                CanvasUtil.DrawEllipse(c, centerX, centerY, UIManager.MENU_DIAMETER, UIManager.MENU_DIAMETER, primaryColor, fill, null);
 
-                CanvasUtil.DrawSubmenu(c, parent.Name, caption, true, null, centerX, centerY, centerDiameter, 150, leftAreaX, leftAreaY, rightAreaX, rightAreaY, leftSelectionX, leftSelectionY, rightSelectionX, rightSelectionY, preSelected);
-            } else if (UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected && GetElements().Count > 0) {
+                if (leftSelected)
+                {
+                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, parent.IsActive ? secondaryColor : Brushes.LightGray, fill, System.Windows.Media.Brushes.White);
+                }
+                else
+                {
+                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, parent.IsActive ? secondaryColor : Brushes.LightGray, fill, null);
+                }
+
+                System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage(((Group)this).Name);
+                CanvasUtil.DrawImageInCircle(c, image0, UIManager.MENU_DIAMETER, centerX, centerY);
+
+                System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage(parent.Name);
+                CanvasUtil.DrawImageInCircle(c, image1, UIManager.SUBMENU_DIAMETER, leftAreaX, leftAreaY);
+            }
+            else if (UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected && GetElements().Count > 0 && !UIManager.inMenuSession) {
                 if (!inSession) {
-                    initialX = UIManager.FirstHand.X;
-                    initialY = UIManager.FirstHand.Y;
+                    UIManager.initialX = UIManager.FirstHand.X;
+                    UIManager.initialY = UIManager.FirstHand.Y;
                     inSession = true;
                 }
 
@@ -98,41 +118,48 @@ namespace KineSis.UserInterface.Entities.Groups {
                 System.Windows.Media.Brush secondaryColor = ProfileManager.ActiveProfile.SecondaryColor;
                 System.Windows.Media.Brush fill = ColorUtil.FromHTML("#88FFFFFF");
 
-                double centerX = initialX;
+                double centerX = UIManager.initialX;
                 double centerY = UIManager.FirstHand.Y;
 
-                double selX = initialX;
-                double selY = initialY - 250;
+                double selX = UIManager.initialX;
+                double selY = UIManager.initialY - 1.25 * UIManager.SUBMENU_DIAMETER;
 
-                double leftAreaX = initialX - 250;
+                double leftAreaX = UIManager.initialX - 1.25 * UIManager.SUBMENU_DIAMETER;
                 double leftAreaY = UIManager.FirstHand.Y;
 
-                double rightAreaX = initialX + 250;
+                double rightAreaX = UIManager.initialX + 1.25 * UIManager.SUBMENU_DIAMETER;
                 double rightAreaY = UIManager.FirstHand.Y;
 
-                double selectionAreaX = initialX;
-                double selectionAreaY = UIManager.FirstHand.Y + 250;
+                double selectionAreaX = c.Width / 2;
+                double selectionAreaY = c.Height - UIManager.MENU_DIAMETER;
 
-                double prevAreaX = initialX - 250;
-                double prevAreaY = UIManager.FirstHand.Y + 250;
+                double prevAreaX = selectionAreaX - 1.25 * UIManager.SUBMENU_DIAMETER;
+                double prevAreaY = c.Height - UIManager.SUBMENU_DIAMETER;
 
-                double nextAreaX = initialX + 250;
-                double nextAreaY = UIManager.FirstHand.Y + 250;
+                double nextAreaX = selectionAreaX + 1.25 * UIManager.SUBMENU_DIAMETER;
+                double nextAreaY = c.Height - UIManager.SUBMENU_DIAMETER;
 
-                if (UIManager.FirstHand.Y > selY - 100 && UIManager.FirstHand.Y < selY + 100 && selSelected == false) {
+                if (UIManager.FirstHand.Y > selY - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y < selY + UIManager.SUBMENU_DIAMETER / 2 && selSelected == false)
+                {
                     selSelected = true;
                     ExecuteSelect();
-                    //UIManager.GoToPage(pageIndex);
-                } else if (UIManager.FirstHand.X > rightAreaX - 75 && UIManager.FirstHand.X < rightAreaX + 75 && selection == false) {
+                }
+                else if (UIManager.FirstHand.X > rightAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < rightAreaX + UIManager.SUBMENU_DIAMETER / 2 && selection == false)
+                {
                     rightSelected = true;
                     selection = true;
                     IncrementIndex();
-                } else if (UIManager.FirstHand.X > leftAreaX - 75 && UIManager.FirstHand.X < leftAreaX + 75 && selection == false) {
+                }
+                else if (UIManager.FirstHand.X > leftAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < leftAreaX + UIManager.SUBMENU_DIAMETER / 2 && selection == false)
+                {
                     leftSelected = true;
                     selection = true;
                     DecrementIndex();
-                } else if (UIManager.FirstHand.X > centerX - 75 && UIManager.FirstHand.X < centerX + 75) {
-                    if (UIManager.FirstHand.Y >= selY + 100) {
+                }
+                else if (UIManager.FirstHand.X > centerX - UIManager.MENU_DIAMETER / 2 && UIManager.FirstHand.X < centerX + UIManager.MENU_DIAMETER / 2)
+                {
+                    if (UIManager.FirstHand.Y >= selY + UIManager.SUBMENU_DIAMETER / 2)
+                    {
                         selSelected = false;
                     }
                     selection = false;
@@ -140,60 +167,63 @@ namespace KineSis.UserInterface.Entities.Groups {
                     rightSelected = false;
                 }
 
-                CanvasUtil.DrawEllipse(c, centerX, centerY, 150, 150, secondaryColor, fill, null);
+                CanvasUtil.DrawEllipse(c, centerX, centerY, UIManager.MENU_DIAMETER, UIManager.MENU_DIAMETER, primaryColor, fill, null);
 
                 if (leftSelected) {
-                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, 150, 150, secondaryColor, fill, Brushes.White);
+                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
                 } else {
-                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, 150, 150, secondaryColor, fill, null);
+                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
                 if (rightSelected) {
-                    CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, 150, 150, secondaryColor, fill, Brushes.White);
+                    CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
                 } else {
-                    CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, 150, 150, secondaryColor, fill, null);
+                    CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
                 if (selSelected) {
-                    CanvasUtil.DrawEllipse(c, selX, selY, 200, 200, primaryColor, fill, Brushes.White);
+                    CanvasUtil.DrawEllipse(c, selX, selY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
                 } else {
-                    CanvasUtil.DrawEllipse(c, selX, selY, 200, 200, primaryColor, fill, null);
+                    CanvasUtil.DrawEllipse(c, selX, selY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
-                
 
                 System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage("select");
-                CanvasUtil.DrawImageInCircle(c, image0, 200, selX, selY);
+                CanvasUtil.DrawImageInCircle(c, image0, UIManager.SUBMENU_DIAMETER, selX, selY);
 
                 System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage("left");
-                CanvasUtil.DrawImageInCircle(c, image1, 150, leftAreaX, leftAreaY);
+                CanvasUtil.DrawImageInCircle(c, image1, UIManager.SUBMENU_DIAMETER, leftAreaX, leftAreaY);
 
                 System.Windows.Controls.Image image2 = ImageUtil.GetResourceImage("right");
-                CanvasUtil.DrawImageInCircle(c, image2, 150, rightAreaX, rightAreaY);
+                CanvasUtil.DrawImageInCircle(c, image2, UIManager.SUBMENU_DIAMETER, rightAreaX, rightAreaY);
 
 
                 if (GetElements().Count > 2) {
 
-                    CanvasUtil.DrawImageInRectangle(c, GetPrevElement().Thumbnail, secondaryColor, prevAreaX, prevAreaY, 350, 0.3);
-                    CanvasUtil.DrawImageInRectangle(c, GetNextElement().Thumbnail, secondaryColor, nextAreaX, nextAreaY, 350, 0.3);
-                    CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, 350, 0.9);
+                    CanvasUtil.DrawImageInRectangle(c, GetPrevElement().Thumbnail, secondaryColor, prevAreaX, prevAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.3);
+                    CanvasUtil.DrawImageInRectangle(c, GetNextElement().Thumbnail, secondaryColor, nextAreaX, nextAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.3);
+                    CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.9);
 
                 } else if ( GetElements().Count == 2 ) {
                     if (pageIndex == 0) {
-                        CanvasUtil.DrawImageInRectangle(c, GetNextElement().Thumbnail, secondaryColor, nextAreaX, nextAreaY, 350, 0.3);
-                        CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, 350, 0.9);
+                        CanvasUtil.DrawImageInRectangle(c, GetNextElement().Thumbnail, secondaryColor, nextAreaX, nextAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.3);
+                        CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.9);
                     } else {
-                        CanvasUtil.DrawImageInRectangle(c, GetPrevElement().Thumbnail, secondaryColor, prevAreaX, prevAreaY, 350, 0.3);
-                        CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, 350, 0.9);
+                        CanvasUtil.DrawImageInRectangle(c, GetPrevElement().Thumbnail, secondaryColor, prevAreaX, prevAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.3);
+                        CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.9);
                     }
                 } else if (GetElements().Count == 1) {
-                    CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, 350, 0.9);
+                    CanvasUtil.DrawImageInRectangle(c, GetElement().Thumbnail, primaryColor, selectionAreaX, selectionAreaY, UIManager.SUBMENU_DIAMETER * 2, 0.9);
                 }
 
-                CanvasUtil.DrawTextBlock(c, GetElement().Name, 0.1 * 350, System.Windows.Media.Brushes.White, primaryColor, centerX, centerY + 450);
+                CanvasUtil.DrawTextBlock(c, GetElement().Name, 0.1 * UIManager.SUBMENU_DIAMETER * 2, System.Windows.Media.Brushes.White, primaryColor, selectionAreaX, selectionAreaY - 1.25 * UIManager.SUBMENU_DIAMETER);
 
             } else {
                 inSession = false;
+                UIManager.inMenuSession = false;
+                selection = false;
+                leftSelected = false;
+                rightSelected = false;
             }
         }
 
@@ -235,8 +265,6 @@ namespace KineSis.UserInterface.Entities.Groups {
             Element e = GetElements()[pageIndex];
             if (e.Thumbnail == null) {
                 e.Thumbnail = ImageUtil.GetResourceImage("sheet");
-            } else {
-                //GrayScaleEffect(e.Thumbnail);
             }
             return e;
         }
@@ -246,8 +274,6 @@ namespace KineSis.UserInterface.Entities.Groups {
             Element e = GetElements()[prevIndex];
             if (e.Thumbnail == null) {
                 e.Thumbnail = ImageUtil.GetResourceImage("sheet");
-            } else {
-                //GrayScaleEffect(e.Thumbnail);
             }
             return e;
         }
@@ -257,16 +283,8 @@ namespace KineSis.UserInterface.Entities.Groups {
             Element e = GetElements()[nextIndex];
             if (e.Thumbnail == null) {
                 e.Thumbnail = ImageUtil.GetResourceImage("sheet");
-            } else {
-                //GrayScaleEffect(e.Thumbnail);
             }
             return e;
-        }
-
-        private static Image GrayScaleEffect(Image image) {
-            GrayscaleEffect.GrayscaleEffect effect = new GrayscaleEffect.GrayscaleEffect();
-            image.Effect = effect;
-            return image;
         }
     }
 }

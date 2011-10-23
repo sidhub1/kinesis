@@ -11,6 +11,11 @@ namespace KineSis.UserInterface.Entities.Groups {
             get;
         }
 
+        Boolean IsActive
+        {
+            get;
+        }
+
         void Draw(Canvas c);
     }
 }
