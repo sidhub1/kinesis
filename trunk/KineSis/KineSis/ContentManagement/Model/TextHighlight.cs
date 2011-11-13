@@ -20,12 +20,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KineSis.ContentManagement.Model {
+namespace KineSis.ContentManagement.Model
+{
 
     /// <summary>
     /// Text Highlight Utility class
     /// </summary>
-    class TextHighlight {
+    class TextHighlight
+    {
         private String filenameExtension;
         private String brushAlias;
         private String jsName;
@@ -37,9 +39,12 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Accepted scripts and brushes dictionary...that's all supported in TextHighlight 3.0.83
         /// </summary>
-        private static Dictionary<String, List<String>> AcceptedValues {
-            get {
-                if (acceptedValues == null) {
+        private static Dictionary<String, List<String>> AcceptedValues
+        {
+            get
+            {
+                if (acceptedValues == null)
+                {
                     acceptedValues = new Dictionary<String, List<String>>();
                     acceptedValues.Add("shBrushAS3.js", new string[] { "as3", "actionscript3" }.ToList<String>());
                     acceptedValues.Add("shBrushBash.js", new string[] { "bash", "shell" }.ToList<String>());
@@ -72,9 +77,12 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Accepted themes list...that's all supported in TextHighlight 3.0.83
         /// </summary>
-        private static List<String> AcceptedThemes {
-            get {
-                if (acceptedThemes == null) {
+        private static List<String> AcceptedThemes
+        {
+            get
+            {
+                if (acceptedThemes == null)
+                {
                     acceptedThemes = new List<String>();
                     acceptedThemes.Add("shCoreDefault.css");
                     acceptedThemes.Add("shCoreDjango.css");
@@ -93,28 +101,47 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Check if current text highlight is accepted
         /// </summary>
-        public Boolean IsAccepted {
-            get {
+        public Boolean IsAccepted
+        {
+            get
+            {
                 Boolean isAccepted = true;
-                if (filenameExtension == null || brushAlias == null || jsName == null || theme == null || filenameExtension.Length == 0 || brushAlias.Length == 0 || jsName.Length == 0 || theme.Length == 0) {
+                if (filenameExtension == null || brushAlias == null || jsName == null || theme == null || filenameExtension.Length == 0 || brushAlias.Length == 0 || jsName.Length == 0 || theme.Length == 0)
+                {
                     isAccepted = false;
-                } else if (!AcceptedThemes.Contains(theme)) {
+                }
+                else if (!AcceptedThemes.Contains(theme))
+                {
                     isAccepted = false;
-                } else if (!AcceptedValues.Keys.Contains(jsName)) {
+                }
+                else if (!AcceptedValues.Keys.Contains(jsName))
+                {
                     isAccepted = false;
-                } else if (!AcceptedValues[jsName].Contains(brushAlias)) {
+                }
+                else if (!AcceptedValues[jsName].Contains(brushAlias))
+                {
                     isAccepted = false;
-                } else {
-                    if (filenameExtension[0] != '.') {
+                }
+                else
+                {
+                    if (filenameExtension[0] != '.')
+                    {
                         isAccepted = false;
-                    } else {
+                    }
+                    else
+                    {
                         String shortFN = filenameExtension.Substring(1);
-                        if (shortFN.Length < 1) {
+                        if (shortFN.Length < 1)
+                        {
                             isAccepted = false;
-                        } else {
-                            for (int i = 0; i < shortFN.Length; i++) {
+                        }
+                        else
+                        {
+                            for (int i = 0; i < shortFN.Length; i++)
+                            {
                                 char c = shortFN[i];
-                                if (( c < '0' ) || ( c > '9' && c < 'a' ) || ( c > 'z' )) {
+                                if ((c < '0') || (c > '9' && c < 'a') || (c > 'z'))
+                                {
                                     isAccepted = false;
                                     break;
                                 }
@@ -129,12 +156,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Filename extension
         /// </summary>
-        public String FilenameExtension {
-            get {
+        public String FilenameExtension
+        {
+            get
+            {
                 return filenameExtension;
             }
 
-            set {
+            set
+            {
                 filenameExtension = value.ToLower();
             }
         }
@@ -142,12 +172,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Brush
         /// </summary>
-        public String BrushAlias {
-            get {
+        public String BrushAlias
+        {
+            get
+            {
                 return brushAlias;
             }
 
-            set {
+            set
+            {
                 brushAlias = value;
             }
         }
@@ -155,13 +188,17 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Script
         /// </summary>
-        public String JsName {
-            get {
+        public String JsName
+        {
+            get
+            {
                 return jsName;
             }
 
-            set {
-                if (value != null) {
+            set
+            {
+                if (value != null)
+                {
                     jsName = "shBrush" + value + ".js";
                 }
             }
@@ -170,13 +207,17 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Theme
         /// </summary>
-        public String Theme {
-            get {
+        public String Theme
+        {
+            get
+            {
                 return theme;
             }
 
-            set {
-                if (value != null) {
+            set
+            {
+                if (value != null)
+                {
                     theme = "shCore" + value + ".css";
                 }
             }
@@ -186,7 +227,8 @@ namespace KineSis.ContentManagement.Model {
         /// String representation of the current text highlight
         /// </summary>
         /// <returns></returns>
-        public override String ToString() {
+        public override String ToString()
+        {
             return "{ \"filenameExtension\":\"" + filenameExtension + "\", \"brushAlias\":\"" + brushAlias + "\", \"jsName\":\"" + jsName + "\", \"theme\":\"" + theme + "\" }";
         }
     }

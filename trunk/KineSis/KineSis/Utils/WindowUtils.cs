@@ -22,73 +22,46 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows;
 
-namespace KineSis.Utils {
-    static class WindowUtils {
-        public static Screen[] Screens {
-            get {
+namespace KineSis.Utils
+{
+    static class WindowUtils
+    {
+        public static Screen[] Screens
+        {
+            get
+            {
                 return Screen.AllScreens;
             }
         }
 
         /// <summary>
-        /// Get the number of screen where the Window is shown
+        /// Switch a window to full screen state on the screen specified
         /// </summary>
-        /// <param name="form"></param>
-        /// <returns></returns>
-        public static int DetectScreen(Window form) {
-            int screen = 0;
-
-            double right = form.Left + form.Width;
-            double left = form.Left;
-            double center = ( left + right ) / 2;
-            if (Screens[0].Bounds.Left <= center && center <= Screens[0].Bounds.Right) {
-                screen = 0;
-            } else {
-                screen = 1;
-            }
-            return screen;
-        }
-
-        public static int DetectScreen(System.Windows.Forms.Form form) {
-            int screen = 0;
-
-            double right = form.Left + form.Width;
-            double left = form.Left;
-            double center = ( left + right ) / 2;
-            if (Screens[0].Bounds.Left <= center && center <= Screens[0].Bounds.Right) {
-                screen = 0;
-            } else {
-                screen = 1;
-            }
-            return screen;
+        /// <param name="window">window to full screen</param>
+        /// <param name="screen">on wich screen to extend the window</param>
+        public static void FullScreen(Window window, int screen)
+        {
+            window.Topmost = true;
+            window.Left = Screens[screen].Bounds.Left;
+            window.Top = Screens[screen].Bounds.Top;
+            window.WindowStyle = WindowStyle.None;
+            window.Width = Screens[screen].Bounds.Width;
+            window.Height = Screens[screen].Bounds.Height;
+            window.ResizeMode = ResizeMode.NoResize;
         }
 
         /// <summary>
-        /// Switch a window to full screen state on the screen where currently is
+        /// Switch a form to full screen state on the screen specified
         /// </summary>
         /// <param name="window">window to full screen</param>
-        /// <param name="fullscreen">boolean indicating the current state of the window</param>
-        /// <param name="originalWidth">original width of the window before full screen</param>
-        /// <param name="originalHeight">original height of the window before full screen</param>
-        /// <param name="originalLeft">original left of the window before full screen</param>
-        /// <param name="originalTop">original top of the window before full screen</param>
-        public static void FullScreen(Window window, int screen) {
-                window.Topmost = true;
-                window.Left = Screens[screen].Bounds.Left;
-                window.Top = Screens[screen].Bounds.Top;
-                window.WindowStyle = WindowStyle.None;
-                window.Width = Screens[screen].Bounds.Width;
-                window.Height = Screens[screen].Bounds.Height;
-                window.ResizeMode = ResizeMode.NoResize;
-        }
-
-        public static void FullScreen(System.Windows.Forms.Form window, int screen) {
-                //window.Topmost = true;
-                window.Left = Screens[screen].Bounds.Left;
-                window.Top = Screens[screen].Bounds.Top;
-                window.Width = Screens[screen].Bounds.Width;
-                window.Height = Screens[screen].Bounds.Height;
-                window.FormBorderStyle = FormBorderStyle.None;
+        /// <param name="screen">on wich screen to extend the window</param>
+        public static void FullScreen(System.Windows.Forms.Form window, int screen)
+        {
+            window.Left = Screens[screen].Bounds.Left;
+            window.Top = Screens[screen].Bounds.Top;
+            window.Width = Screens[screen].Bounds.Width;
+            window.Height = Screens[screen].Bounds.Height;
+            window.FormBorderStyle = FormBorderStyle.None;
         }
     }
 }

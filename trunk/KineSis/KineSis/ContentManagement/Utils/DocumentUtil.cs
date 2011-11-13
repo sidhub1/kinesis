@@ -20,18 +20,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KineSis.ContentManagement.Utils {
+namespace KineSis.ContentManagement.Utils
+{
 
     /// <summary>
     /// Document Utility class
     /// </summary>
-    class DocumentUtil {
+    class DocumentUtil
+    {
 
         /// <summary>
         /// Create a directory name based on current date and time
         /// </summary>
         /// <returns></returns>
-        public static String GenerateDirectoryName() {
+        public static String GenerateDirectoryName()
+        {
             DateTime dateTime = DateTime.Now;
             return "" + dateTime.ToString("yyyyMMddHHmmss");
         }

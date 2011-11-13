@@ -22,39 +22,47 @@ using System.Text;
 using KineSis.Utils;
 using System.Windows.Media.Imaging;
 
-namespace KineSis.ContentManagement.Model {
+namespace KineSis.ContentManagement.Model
+{
 
     /// <summary>
     /// KineSis Document page
     /// </summary>
     [Serializable]
-    public class Page {
+    public class Page
+    {
         private String name;
         private String location;
         private String locationNoZoom;
         private List<Chart> charts = new List<Chart>();
-        private List<Shape> shapes = new List<Shape>();
         public String thumbUrl;
 
         /// <summary>
         /// Set the url of the thumbnail image
         /// </summary>
         /// <param name="thumbUrl"></param>
-        public void SetThumbnailUrl(String thumbUrl) {
+        public void SetThumbnailUrl(String thumbUrl)
+        {
             this.thumbUrl = thumbUrl;
         }
 
         /// <summary>
         /// Get thumbnail image
         /// </summary>
-        public System.Windows.Controls.Image Thumbnail {
-            get {
+        public System.Windows.Controls.Image Thumbnail
+        {
+            get
+            {
                 System.Windows.Controls.Image bmp = null;
-                if (thumbUrl != null && thumbUrl.Length > 0) {
-                    try {
+                if (thumbUrl != null && thumbUrl.Length > 0)
+                {
+                    try
+                    {
                         bmp = ImageUtil.GetImage(thumbUrl);
-                    } catch (Exception) {
-                        
+                    }
+                    catch (Exception)
+                    {
+
                     }
                 }
                 return bmp;
@@ -64,16 +72,22 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Location of the page in Zoom Locked mode (fit to screen, scroll not available)
         /// </summary>
-        public String LocationNoZoom {
-            get {
-                if (locationNoZoom != null && locationNoZoom.Length > 0) {
+        public String LocationNoZoom
+        {
+            get
+            {
+                if (locationNoZoom != null && locationNoZoom.Length > 0)
+                {
                     return locationNoZoom;
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
 
-            set {
+            set
+            {
                 locationNoZoom = value;
             }
         }
@@ -81,12 +95,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Name of the page / slide
         /// </summary>
-        public String Name {
-            get {
+        public String Name
+        {
+            get
+            {
                 return name;
             }
 
-            set {
+            set
+            {
                 name = value;
             }
         }
@@ -94,12 +111,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Location of the page
         /// </summary>
-        public String Location {
-            get {
+        public String Location
+        {
+            get
+            {
                 return location;
             }
 
-            set {
+            set
+            {
                 location = value;
             }
         }
@@ -107,26 +127,16 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Charts on this page
         /// </summary>
-        public List<Chart> Charts {
-            get {
+        public List<Chart> Charts
+        {
+            get
+            {
                 return charts;
             }
 
-            set {
+            set
+            {
                 charts = value;
-            }
-        }
-
-        /// <summary>
-        /// Shapes on this page
-        /// </summary>
-        public List<Shape> Shapes {
-            get {
-                return shapes;
-            }
-
-            set {
-                shapes = value;
             }
         }
     }

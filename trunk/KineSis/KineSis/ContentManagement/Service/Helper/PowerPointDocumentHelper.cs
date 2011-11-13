@@ -27,13 +27,15 @@ using Microsoft.Office.Core;
 using System.Drawing;
 using System.IO;
 
-namespace KineSis.ContentManagement.Service.Helper {
+namespace KineSis.ContentManagement.Service.Helper
+{
 
     /// <summary>
     /// Handles the powerpoint files (pptx)
     /// Open the document, save slides as images, then build a html page for each one, and for every slide parse the charts and shapes and save them as images for building a 3D model
     /// </summary>
-    class PowerPointDocumentHelper : DocumentHelper {
+    class PowerPointDocumentHelper : DocumentHelper
+    {
 
         /// <summary>
         /// The application is static in order to be used across the helper's methods.
@@ -42,7 +44,7 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// and the charts will be exported in background in parallel with presentation, so the user can use them as soon they are ready without blocking the rest of presentation
         /// </summary>
         private static Microsoft.Office.Interop.PowerPoint.Application powerPointApplication = null;
-        
+
         private static String DD = "\\"; //directory delimiter
         private static String DOC_FILES = "document_files"; //document_files
         private static String _ = "_";
@@ -51,8 +53,10 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <summary>
         /// Open the PowerPoint application
         /// </summary>
-        private void OpenOfficeApplication() {
-            if (powerPointApplication == null) {
+        private void OpenOfficeApplication()
+        {
+            if (powerPointApplication == null)
+            {
                 powerPointApplication = new Microsoft.Office.Interop.PowerPoint.Application();
             }
         }
@@ -60,8 +64,10 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <summary>
         /// Close the Powerpoint Application
         /// </summary>
-        private void CloseOfficeApplication() {
-            if (powerPointApplication != null) {
+        private void CloseOfficeApplication()
+        {
+            if (powerPointApplication != null)
+            {
                 powerPointApplication.Quit();
                 powerPointApplication = null;
             }
@@ -73,14 +79,15 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="path">full path of the power point document</param>
         /// <param name="pp">processing progress reporter</param>
         /// <returns>equivalent kinesis document model</returns>
-        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp) {
+        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.OverallOperationName = "All Document Pages";
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
             OpenOfficeApplication();
-            
+
             //directory where all the data will be saved
             String folderName = DocumentUtil.GenerateDirectoryName();
             String documentPath = System.IO.Path.Combine(DocumentService.TEMP_DIRECTORY, folderName);
@@ -103,10 +110,10 @@ namespace KineSis.ContentManagement.Service.Helper {
             String pagesPath = System.IO.Path.Combine(documentPath + DD + DOC_FILES);
             System.IO.Directory.CreateDirectory(pagesPath);
 
-            int H = (int) (DocumentService.SLIDE_WIDTH * presentation.SlideMaster.Height / presentation.SlideMaster.Width);
+            int H = (int)(DocumentService.SLIDE_WIDTH * presentation.SlideMaster.Height / presentation.SlideMaster.Width);
             int W = DocumentService.SLIDE_WIDTH;
 
-            int T_H = (int)( DocumentService.THUMB_WIDTH * H / W );
+            int T_H = (int)(DocumentService.THUMB_WIDTH * H / W);
             int T_W = DocumentService.THUMB_WIDTH;
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
@@ -116,7 +123,8 @@ namespace KineSis.ContentManagement.Service.Helper {
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
             //for every slide
-            for (int i = 1; i <= presentation.Slides.Count; i++) {
+            for (int i = 1; i <= presentation.Slides.Count; i++)
+            {
 
                 //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
                 pp.CurrentOperationName = "Page " + i;
@@ -130,7 +138,7 @@ namespace KineSis.ContentManagement.Service.Helper {
                 //create a new page
                 KineSis.ContentManagement.Model.Page page = new KineSis.ContentManagement.Model.Page();
                 page.Name = slide.Name;
-                
+
                 //export the slide as image
                 slide.Export(documentPath + DD + DOC_FILES + DD + SLIDE + i + ImageUtil.PNG_EXTENSION, ImageUtil.PNG_FILTER, W, H);
 
@@ -180,7 +188,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="path">full path of the power point document</param>
         /// <returns>equivalent kinesis document model</returns>
-        public Document ParseNewDocumentCharts(String path, ProcessingProgress pp, Document document) {
+        public Document ParseNewDocumentCharts(String path, ProcessingProgress pp, Document document)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.OverallOperationName = "All Document Charts and Shapes";
@@ -206,7 +215,8 @@ namespace KineSis.ContentManagement.Service.Helper {
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
             //for every slide
-            for (int i = 1; i <= presentation.Slides.Count; i++) {
+            for (int i = 1; i <= presentation.Slides.Count; i++)
+            {
 
                 //get slide
                 Slide slide = presentation.Slides[i];
@@ -215,14 +225,17 @@ namespace KineSis.ContentManagement.Service.Helper {
                 KineSis.ContentManagement.Model.Page page = document.Pages[i - 1];
 
                 //check if chart generation is wanted
-                if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                {
 
                     List<Microsoft.Office.Interop.PowerPoint.Shape> charts = new List<Microsoft.Office.Interop.PowerPoint.Shape>();
 
                     //get all shapes and charts
-                    for (int j = 1; j <= slide.Shapes.Count; j++) {
+                    for (int j = 1; j <= slide.Shapes.Count; j++)
+                    {
                         Microsoft.Office.Interop.PowerPoint.Shape shape = slide.Shapes[j];
-                        if (shape.HasChart == Microsoft.Office.Core.MsoTriState.msoTrue) {
+                        if (shape.HasChart == Microsoft.Office.Core.MsoTriState.msoTrue)
+                        {
                             charts.Add(shape);
                         }
                     }
@@ -232,7 +245,8 @@ namespace KineSis.ContentManagement.Service.Helper {
                     System.IO.Directory.CreateDirectory(chartPath);
 
                     //for every chart
-                    for (int j = 0; j < charts.Count; j++) {
+                    for (int j = 0; j < charts.Count; j++)
+                    {
 
                         //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
                         pp.CurrentOperationName = "Page " + i + " / Chart " + (j + 1) + " of " + charts.Count;
@@ -251,7 +265,7 @@ namespace KineSis.ContentManagement.Service.Helper {
                         //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
                         //set preferred width and height
-                        chart.Height = ((float) DocumentService.CHART_WIDTH * chart.Height) / chart.Width;
+                        chart.Height = ((float)DocumentService.CHART_WIDTH * chart.Height) / chart.Width;
                         chart.Width = DocumentService.CHART_WIDTH;
 
                         //get chart type
@@ -263,28 +277,35 @@ namespace KineSis.ContentManagement.Service.Helper {
                         int horizontalAngle = 0;
 
                         //depending on how many horizontal faces are required, calculate the angle between them
-                        if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                        if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                        {
                             horizontalAngle = 360 / DocumentService.CHART_HORIZONTAL_FACES;
                         }
 
                         int verticalAngle = 0;
 
                         //depending on how many vertical faces are required for a horizontal face, celaculate the angle between them, excluding the vertical face at 90 degrees
-                        if (DocumentService.CHART_VERTICAL_FACES > 0) {
-                            verticalAngle = 90 / ( DocumentService.CHART_VERTICAL_FACES + 1 );
+                        if (DocumentService.CHART_VERTICAL_FACES > 0)
+                        {
+                            verticalAngle = 90 / (DocumentService.CHART_VERTICAL_FACES + 1);
                         }
 
-                        if (chart.Chart.HasTitle) {
+                        if (chart.Chart.HasTitle)
+                        {
                             mChart.Title = chart.Chart.ChartTitle.Caption;
-                        } else {
+                        }
+                        else
+                        {
                             mChart.Title = chart.Name;
                         }
 
                         //does not support rotation (it's plain)
-                        if (chartType == 0) {
+                        if (chartType == 0)
+                        {
 
                             //if horizontal faces number is 0, then no chart will be outputed
-                            if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                            if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                            {
 
                                 ChartHorizontalView hView = new ChartHorizontalView();
                                 //draw chart face as image
@@ -299,10 +320,13 @@ namespace KineSis.ContentManagement.Service.Helper {
                                 pp.CurrentOperationElement++;
                                 //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
                             }
-                        } else {
+                        }
+                        else
+                        {
                             //for every horizontal face
-                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++) {
-                               
+                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++)
+                            {
+
                                 ChartHorizontalView hView = new ChartHorizontalView();
                                 //reset elevation
                                 chart.Chart.Elevation = 0;
@@ -317,8 +341,9 @@ namespace KineSis.ContentManagement.Service.Helper {
                                 //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
                                 //for every vertical face
-                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++) {
-                                    
+                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++)
+                                {
+
                                     ChartVerticalView vView = new ChartVerticalView();
 
                                     //increse elevation
@@ -337,14 +362,16 @@ namespace KineSis.ContentManagement.Service.Helper {
                                 }
 
                                 //some chart types, like 3D pie, does not support elevation less than 0
-                                if (SupportsNegativeElevation(chart.Chart)) {
+                                if (SupportsNegativeElevation(chart.Chart))
+                                {
 
                                     //reset elevation
                                     chart.Chart.Elevation = 0;
 
                                     //for every vertical face
-                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++) {
-                                        
+                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++)
+                                    {
+
                                         ChartVerticalView vView = new ChartVerticalView();
 
                                         //decrease elevation
@@ -374,58 +401,6 @@ namespace KineSis.ContentManagement.Service.Helper {
                         page.Charts.Add(mChart);
                     }
                 }
-
-                //generate shapes
-                if (DocumentService.FOCUS_SHAPES) {
-
-                    List<Microsoft.Office.Interop.PowerPoint.Shape> shapes = new List<Microsoft.Office.Interop.PowerPoint.Shape>();
-
-                    //get all shapes
-                    for (int j = 1; j <= slide.Shapes.Count; j++) {
-                        Microsoft.Office.Interop.PowerPoint.Shape shape = slide.Shapes[j];
-                        if (shape.HasChart == Microsoft.Office.Core.MsoTriState.msoFalse) {
-                            shapes.Add(shape);
-                        }
-                    }
-
-                    //create directory for shapes
-                    String shapePath = System.IO.Path.Combine(documentPath, "shapes");
-                    System.IO.Directory.CreateDirectory(shapePath);
-
-                    //for every shape
-                    for (int j = 0; j < shapes.Count; j++) {
-
-                        //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
-                        pp.CurrentOperationName = "Page " + i + " / Shape " + ( j + 1 ) + " of " + shapes.Count;
-                        pp.CurrentOperationTotalElements = shapes.Count * 2;
-                        pp.CurrentOperationElement = 0;
-                        //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
-
-                        Model.Shape mShape = new Model.Shape();
-
-                        Microsoft.Office.Interop.PowerPoint.Shape shape = shapes.ElementAt(j);
-                        //export shape as image
-                        shape.Export(shapePath + DD + i + _ + j + DocumentService.IMAGE_EXTENSION, DocumentService.IMAGE_FORMAT);
-                        //set bitmap
-                        mShape.setBitmap(shapePath + DD + i + _ + j + DocumentService.IMAGE_EXTENSION);
-
-                        //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
-                        pp.OverallOperationElement++;
-                        pp.CurrentOperationElement++;
-                        //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
-
-                        mShape.setThumbnail(GenerateThumbnail(shape, shapePath + DD + i + _ + j + "_thumb"));
-
-                        //add to page
-                        page.Shapes.Add(mShape);
-
-                        //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
-                        pp.OverallOperationElement++;
-                        pp.CurrentOperationElement++;
-                        //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
-
-                    }                 
-                }
             }
 
             //close presentation
@@ -442,38 +417,47 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="c">chart</param>
         /// <returns></returns>
-        private int EvaluateChart(Microsoft.Office.Interop.PowerPoint.Chart c) {
+        private int EvaluateChart(Microsoft.Office.Interop.PowerPoint.Chart c)
+        {
             int numberOfOperations = 1;
 
             //get chart type
             int chartType = GetChartType(c);
 
             //does not support rotation (it's plain)
-            if (chartType == 0) {
+            if (chartType == 0)
+            {
 
                 //if horizontal faces number is 0, then no chart will be outputed
-                if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                {
                     numberOfOperations++;
                 }
-            } else {
+            }
+            else
+            {
 
                 //for every horizontal face
-                for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++) {
+                for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++)
+                {
 
                     ChartHorizontalView hView = new ChartHorizontalView();
 
                     numberOfOperations++;
 
                     //for every vertical face
-                    for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++) {
+                    for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++)
+                    {
                         numberOfOperations++;
                     }
 
                     //some chart types, like 3D pie, does not support elevation less than 0
-                    if (SupportsNegativeElevation(c)) {
+                    if (SupportsNegativeElevation(c))
+                    {
 
                         //for every vertical face
-                        for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++) {
+                        for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++)
+                        {
                             numberOfOperations++;
                         }
                     }
@@ -489,7 +473,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="presentation">presentation</param>
         /// <param name="pp">processing progress</param>
         /// <returns></returns>
-        private int EvaluatePresentation(Presentation presentation, ProcessingProgress pp) {
+        private int EvaluatePresentation(Presentation presentation, ProcessingProgress pp)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.CurrentOperationName = "Evaluating document";
@@ -500,26 +485,31 @@ namespace KineSis.ContentManagement.Service.Helper {
             int numberOfOperations = 0;
 
             //for every slide
-            for (int i = 1; i <= presentation.Slides.Count; i++) {
+            for (int i = 1; i <= presentation.Slides.Count; i++)
+            {
 
                 //get slide
                 Slide slide = presentation.Slides[i];
 
                 //check if chart generation is wanted
-                if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                {
 
                     List<Microsoft.Office.Interop.PowerPoint.Shape> charts = new List<Microsoft.Office.Interop.PowerPoint.Shape>();
 
                     //get all shapes and charts
-                    for (int j = 1; j <= slide.Shapes.Count; j++) {
+                    for (int j = 1; j <= slide.Shapes.Count; j++)
+                    {
                         Microsoft.Office.Interop.PowerPoint.Shape shape = slide.Shapes[j];
-                        if (shape.HasChart == Microsoft.Office.Core.MsoTriState.msoTrue) {
+                        if (shape.HasChart == Microsoft.Office.Core.MsoTriState.msoTrue)
+                        {
                             charts.Add(shape);
                         }
                     }
 
                     //for every chart
-                    for (int j = 0; j < charts.Count; j++) {
+                    for (int j = 0; j < charts.Count; j++)
+                    {
 
                         Microsoft.Office.Interop.PowerPoint.Shape chart = charts.ElementAt(j);
 
@@ -529,45 +519,40 @@ namespace KineSis.ContentManagement.Service.Helper {
                         int chartType = GetChartType(chart.Chart);
 
                         //does not support rotation (it's plain)
-                        if (chartType == 0) {
+                        if (chartType == 0)
+                        {
 
                             //if horizontal faces number is 0, then no chart will be outputed
-                            if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                            if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                            {
                                 numberOfOperations++;
                             }
-                        } else {
-                            
+                        }
+                        else
+                        {
+
                             //for every horizontal face
-                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++) {
+                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++)
+                            {
                                 numberOfOperations++;
 
                                 //for every vertical face
-                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++) {
+                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++)
+                                {
                                     numberOfOperations++;
                                 }
 
                                 //some chart types, like 3D pie, does not support elevation less than 0
-                                if (SupportsNegativeElevation(chart.Chart)) {
+                                if (SupportsNegativeElevation(chart.Chart))
+                                {
 
                                     //for every vertical face
-                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++) {
+                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++)
+                                    {
                                         numberOfOperations++;
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-
-                //generate shapes
-                if (DocumentService.FOCUS_SHAPES) {
-
-                    //get all shapes
-                    for (int j = 1; j <= slide.Shapes.Count; j++) {
-                        Microsoft.Office.Interop.PowerPoint.Shape shape = slide.Shapes[j];
-                        if (shape.HasChart == Microsoft.Office.Core.MsoTriState.msoFalse) {
-                            numberOfOperations++;
-                            numberOfOperations++;
                         }
                     }
                 }
@@ -585,18 +570,22 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="shape"> desired shape</param>
         /// <param name="path">path where the thumbnail will be created, excluding the .extension</param>
         /// <returns>full path of the created thumbnail</returns>
-        private String GenerateThumbnail(Microsoft.Office.Interop.PowerPoint.Shape shape, String path) {
+        private String GenerateThumbnail(Microsoft.Office.Interop.PowerPoint.Shape shape, String path)
+        {
             shape.Export(path + DocumentService.IMAGE_EXTENSION, DocumentService.IMAGE_FORMAT);
 
             Bitmap bmp = new Bitmap(path + DocumentService.IMAGE_EXTENSION);
 
             int T_H, T_W;
 
-            if (bmp.Width <= bmp.Height) {
-                T_W = (int)( DocumentService.THUMB_WIDTH * bmp.Width / bmp.Height );
+            if (bmp.Width <= bmp.Height)
+            {
+                T_W = (int)(DocumentService.THUMB_WIDTH * bmp.Width / bmp.Height);
                 T_H = DocumentService.THUMB_WIDTH;
-            } else {
-                T_H = (int)( DocumentService.THUMB_WIDTH * bmp.Height / bmp.Width );
+            }
+            else
+            {
+                T_H = (int)(DocumentService.THUMB_WIDTH * bmp.Height / bmp.Width);
                 T_W = DocumentService.THUMB_WIDTH;
             }
 
@@ -618,13 +607,17 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="chart">powerpoint chart</param>
         /// <returns></returns>
-        private Boolean SupportsNegativeElevation(Microsoft.Office.Interop.PowerPoint.Chart chart) {
+        private Boolean SupportsNegativeElevation(Microsoft.Office.Interop.PowerPoint.Chart chart)
+        {
             Boolean result = true;
             int originalElevation = chart.Elevation;
-            try {
+            try
+            {
                 chart.Elevation = -45;
                 chart.Elevation = originalElevation;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 chart.Elevation = originalElevation;
                 result = false;
             }
@@ -637,7 +630,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="partialName">full name of the picture without extension</param>
         /// <returns>full path to the generated html page</returns>
-        private String GenerateHtmlPage(String partialName) {
+        private String GenerateHtmlPage(String partialName)
+        {
             System.IO.StreamWriter fileO = new System.IO.StreamWriter(partialName + ".html", false);
             fileO.WriteLine("<html><body><div align=\"center\"><img src=\"" + partialName + ".png\"/></div></body></html>");
             fileO.Flush();
@@ -652,7 +646,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="partialName">full name of the picture without extension</param>
         /// <returns>full path to the generated html page</returns>
-        private String GenerateHtmlPageNoZoom(String partialName) {
+        private String GenerateHtmlPageNoZoom(String partialName)
+        {
             System.IO.StreamWriter fileO = new System.IO.StreamWriter(partialName + "NoZoom.html", false);
             fileO.Write("<html><head><style type=\"text/css\">*{margin:0;padding:0;}#imgId{width:100%;height:auto;}</style></head><body><center><img id=\"imgId\" src=\"");
             fileO.Write(partialName + ".png");
@@ -668,47 +663,51 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="chart">powerpoint chart</param>
         /// <returns>chart type, 0 = 2D chart, 1 = 3D bar chart, 2 = 3D chart which can be fully rotated</returns>
-        private int GetChartType(Microsoft.Office.Interop.PowerPoint.Chart chart) {
+        private int GetChartType(Microsoft.Office.Interop.PowerPoint.Chart chart)
+        {
             int result = 0;
-            if (( chart.ChartType == XlChartType.xl3DArea ) ||
-                ( chart.ChartType == XlChartType.xl3DAreaStacked ) ||
-                ( chart.ChartType == XlChartType.xl3DAreaStacked100 ) ||
-                ( chart.ChartType == XlChartType.xl3DColumn ) ||
-                ( chart.ChartType == XlChartType.xl3DColumnClustered ) ||
-                ( chart.ChartType == XlChartType.xl3DColumnStacked ) ||
-                ( chart.ChartType == XlChartType.xl3DColumnStacked100 ) ||
-                ( chart.ChartType == XlChartType.xl3DLine ) ||
-                ( chart.ChartType == XlChartType.xl3DPie ) ||
-                ( chart.ChartType == XlChartType.xl3DPieExploded ) ||
-                ( chart.ChartType == XlChartType.xlConeCol ) ||
-                ( chart.ChartType == XlChartType.xlConeColClustered ) ||
-                ( chart.ChartType == XlChartType.xlConeColStacked ) ||
-                ( chart.ChartType == XlChartType.xlConeColStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlConeBarClustered ) ||
-                ( chart.ChartType == XlChartType.xlConeBarStacked ) ||
-                ( chart.ChartType == XlChartType.xlConeBarStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlCylinderCol ) ||
-                ( chart.ChartType == XlChartType.xlCylinderColClustered ) ||
-                ( chart.ChartType == XlChartType.xlCylinderColStacked ) ||
-                ( chart.ChartType == XlChartType.xlCylinderColStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlCylinderBarClustered ) ||
-                ( chart.ChartType == XlChartType.xlCylinderBarStacked ) ||
-                ( chart.ChartType == XlChartType.xlCylinderBarStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlPyramidCol ) ||
-                ( chart.ChartType == XlChartType.xlPyramidColClustered ) ||
-                ( chart.ChartType == XlChartType.xlPyramidColStacked ) ||
-                ( chart.ChartType == XlChartType.xlPyramidColStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlPyramidBarClustered ) ||
-                ( chart.ChartType == XlChartType.xlPyramidBarStacked ) ||
-                ( chart.ChartType == XlChartType.xlPyramidBarStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlSurface ) ||
-                ( chart.ChartType == XlChartType.xlSurfaceTopView ) ||
-                ( chart.ChartType == XlChartType.xlSurfaceTopViewWireframe ) ||
-                ( chart.ChartType == XlChartType.xlSurfaceWireframe )) {
+            if ((chart.ChartType == XlChartType.xl3DArea) ||
+                (chart.ChartType == XlChartType.xl3DAreaStacked) ||
+                (chart.ChartType == XlChartType.xl3DAreaStacked100) ||
+                (chart.ChartType == XlChartType.xl3DColumn) ||
+                (chart.ChartType == XlChartType.xl3DColumnClustered) ||
+                (chart.ChartType == XlChartType.xl3DColumnStacked) ||
+                (chart.ChartType == XlChartType.xl3DColumnStacked100) ||
+                (chart.ChartType == XlChartType.xl3DLine) ||
+                (chart.ChartType == XlChartType.xl3DPie) ||
+                (chart.ChartType == XlChartType.xl3DPieExploded) ||
+                (chart.ChartType == XlChartType.xlConeCol) ||
+                (chart.ChartType == XlChartType.xlConeColClustered) ||
+                (chart.ChartType == XlChartType.xlConeColStacked) ||
+                (chart.ChartType == XlChartType.xlConeColStacked100) ||
+                (chart.ChartType == XlChartType.xlConeBarClustered) ||
+                (chart.ChartType == XlChartType.xlConeBarStacked) ||
+                (chart.ChartType == XlChartType.xlConeBarStacked100) ||
+                (chart.ChartType == XlChartType.xlCylinderCol) ||
+                (chart.ChartType == XlChartType.xlCylinderColClustered) ||
+                (chart.ChartType == XlChartType.xlCylinderColStacked) ||
+                (chart.ChartType == XlChartType.xlCylinderColStacked100) ||
+                (chart.ChartType == XlChartType.xlCylinderBarClustered) ||
+                (chart.ChartType == XlChartType.xlCylinderBarStacked) ||
+                (chart.ChartType == XlChartType.xlCylinderBarStacked100) ||
+                (chart.ChartType == XlChartType.xlPyramidCol) ||
+                (chart.ChartType == XlChartType.xlPyramidColClustered) ||
+                (chart.ChartType == XlChartType.xlPyramidColStacked) ||
+                (chart.ChartType == XlChartType.xlPyramidColStacked100) ||
+                (chart.ChartType == XlChartType.xlPyramidBarClustered) ||
+                (chart.ChartType == XlChartType.xlPyramidBarStacked) ||
+                (chart.ChartType == XlChartType.xlPyramidBarStacked100) ||
+                (chart.ChartType == XlChartType.xlSurface) ||
+                (chart.ChartType == XlChartType.xlSurfaceTopView) ||
+                (chart.ChartType == XlChartType.xlSurfaceTopViewWireframe) ||
+                (chart.ChartType == XlChartType.xlSurfaceWireframe))
+            {
                 result = 2;
-            } else if (( chart.ChartType == XlChartType.xl3DBarClustered ) ||
-                ( chart.ChartType == XlChartType.xl3DBarStacked ) ||
-                ( chart.ChartType == XlChartType.xl3DBarStacked100 )) {
+            }
+            else if ((chart.ChartType == XlChartType.xl3DBarClustered) ||
+              (chart.ChartType == XlChartType.xl3DBarStacked) ||
+              (chart.ChartType == XlChartType.xl3DBarStacked100))
+            {
                 result = 1;
             }
 

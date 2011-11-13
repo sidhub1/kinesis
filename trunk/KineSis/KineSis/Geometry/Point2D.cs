@@ -20,36 +20,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KineSis.Geometry {
+namespace KineSis.Geometry
+{
 
     /// <summary>
     /// Point in a 2-dimensional space
     /// </summary>
-    class Point2D {
+    class Point2D
+    {
         private Double x;
         private Double y;
 
-        public Point2D(Double x, Double y) {
+        public Point2D(Double x, Double y)
+        {
             this.x = x;
             this.y = y;
         }
 
-        public Double X {
-            get {
+        public Double X
+        {
+            get
+            {
                 return x;
             }
 
-            set {
+            set
+            {
                 x = value;
             }
         }
 
-        public Double Y {
-            get {
+        public Double Y
+        {
+            get
+            {
                 return y;
             }
 
-            set {
+            set
+            {
                 y = value;
             }
         }

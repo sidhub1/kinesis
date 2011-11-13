@@ -21,24 +21,29 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace KineSis.ContentManagement.Model {
+namespace KineSis.ContentManagement.Model
+{
 
     /// <summary>
     /// Represent a chart vertical view
     /// </summary>
     [Serializable]
-    public class ChartVerticalView {
+    public class ChartVerticalView
+    {
         private String imageUrl;
 
         /// <summary>
         /// Image url
         /// </summary>
-        public String ImageUrl {
-            get {
+        public String ImageUrl
+        {
+            get
+            {
                 return imageUrl;
             }
 
-            set {
+            set
+            {
                 imageUrl = value;
             }
         }

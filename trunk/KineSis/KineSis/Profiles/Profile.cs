@@ -23,13 +23,15 @@ using System.Windows.Media;
 using System.Globalization;
 using KineSis.Utils;
 
-namespace KineSis.Profiles {
+namespace KineSis.Profiles
+{
 
     /// <summary>
     /// KineSis profile
     /// </summary>
     [Serializable]
-    public class Profile {
+    public class Profile
+    {
         private String name;
         private String tempFolder;
         private int presentationScreen;
@@ -43,141 +45,232 @@ namespace KineSis.Profiles {
         private int chartHorizontalFaces;
         private int chartVerticalFaces;
         private List<Doc> documents = new List<Doc>();
+        private Double touchDistance;
+        private Double untouchDistance;
 
-        public List<Doc> Documents {
-            get {
+        public Double TouchDistance
+        {
+            get
+            {
+                return touchDistance;
+            }
+
+            set
+            {
+                touchDistance = value;
+            }
+        }
+
+        public Double UntouchDistance
+        {
+            get
+            {
+                return untouchDistance;
+            }
+
+            set
+            {
+                untouchDistance = value;
+            }
+        }
+
+        public List<Doc> Documents
+        {
+            get
+            {
                 return documents;
             }
 
-            set {
+            set
+            {
                 documents = value;
             }
         }
 
-        public String Name {
-            get {
+        public String Name
+        {
+            get
+            {
                 return name;
             }
 
-            set {
+            set
+            {
                 name = value;
             }
         }
 
-        public String TempFolder {
-            get {
+        public String TempFolder
+        {
+            get
+            {
                 return tempFolder;
             }
 
-            set {
+            set
+            {
                 tempFolder = value;
             }
         }
 
-        public int PresentationScreen {
-            get {
+        public int PresentationScreen
+        {
+            get
+            {
                 if (ProfileManager.MinimalView)
                     return 0;
                 else
                     return presentationScreen;
             }
 
-            set {
+            set
+            {
                 presentationScreen = value;
             }
         }
-        
-        public int UserScreen {
-            get {
+
+        public int UserScreen
+        {
+            get
+            {
                 if (ProfileManager.MinimalView)
                     return 0;
                 else
                     return userScreen;
             }
 
-            set {
+            set
+            {
                 userScreen = value;
             }
         }
-        
-        public Brush PrimaryColor {
-            get {
+
+        public Brush PrimaryColor
+        {
+            get
+            {
                 return ColorUtil.FromHTML(primaryColor);
             }
 
-            set {
+            set
+            {
                 primaryColor = value.ToString();
             }
         }
 
-        public Brush SecondaryColor {
-            get {
+        public Brush SecondaryColor
+        {
+            get
+            {
                 return ColorUtil.FromHTML(secondaryColor);
             }
 
-            set {
+            set
+            {
                 secondaryColor = value.ToString();
             }
         }
 
-        public Brush BackgroundColor {
-            get {
+        public Brush BackgroundColor
+        {
+            get
+            {
                 return ColorUtil.FromHTML(backgroundColor);
             }
 
-            set {
+            set
+            {
                 backgroundColor = value.ToString();
             }
         }
 
-        public Brush SkeletonColor {
-            get {
+        public Brush SkeletonColor
+        {
+            get
+            {
                 return ColorUtil.FromHTML(skeletonColor);
             }
 
-            set {
+            set
+            {
                 skeletonColor = value.ToString();
             }
         }
 
-        public int SlideWidth {
-            get {
+        public int SlideWidth
+        {
+            get
+            {
                 return slideWidth;
             }
 
-            set {
+            set
+            {
                 slideWidth = value;
             }
         }
 
-        public int ChartWidth {
-            get {
+        public int ChartWidth
+        {
+            get
+            {
                 return chartWidth;
             }
 
-            set {
+            set
+            {
                 chartWidth = value;
             }
         }
 
-        public int ChartHorizontalFaces {
-            get {
+        public int ChartHorizontalFaces
+        {
+            get
+            {
                 return chartHorizontalFaces;
             }
 
-            set {
+            set
+            {
                 chartHorizontalFaces = value;
             }
         }
 
-        public int ChartVerticalFaces {
-            get {
+        public int ChartVerticalFaces
+        {
+            get
+            {
                 return chartVerticalFaces;
             }
 
-            set {
+            set
+            {
                 chartVerticalFaces = value;
             }
+        }
+
+        public Boolean Equals(Profile other)
+        {
+            Boolean eq = true;
+            if (!this.name.Equals(other.name) ||
+                !this.tempFolder.Equals(other.tempFolder) ||
+                !this.presentationScreen.Equals(other.presentationScreen) ||
+                !this.userScreen.Equals(other.userScreen) ||
+                !this.primaryColor.Equals(other.primaryColor) ||
+                !this.secondaryColor.Equals(other.secondaryColor) ||
+                !this.backgroundColor.Equals(other.backgroundColor) ||
+                !this.skeletonColor.Equals(other.skeletonColor) ||
+                !this.slideWidth.Equals(other.slideWidth) ||
+                !this.chartWidth.Equals(other.chartWidth) ||
+                !this.chartHorizontalFaces.Equals(other.chartHorizontalFaces) ||
+                !this.chartVerticalFaces.Equals(other.chartVerticalFaces) ||
+                !this.touchDistance.Equals(other.touchDistance) ||
+                !this.untouchDistance.Equals(other.untouchDistance))
+            {
+                eq = false;
+            }
+
+            return eq;
         }
     }
 }

@@ -21,12 +21,14 @@ using System.Linq;
 using System.Text;
 using Microsoft.Office.Interop.PowerPoint;
 
-namespace KineSis.ContentManagement.Utils {
+namespace KineSis.ContentManagement.Utils
+{
 
     /// <summary>
     /// Images constants class. Provides extensions, filters and formats used by document helpers in exporting pages and shapes
     /// </summary>
-    class ImageUtil {
+    class ImageUtil
+    {
         public static String BMP_EXTENSION = ".bmp";
         public static String BMP_FILTER = "bmp";
         public static PpShapeFormat BMP_FORMAT = PpShapeFormat.ppShapeFormatBMP;

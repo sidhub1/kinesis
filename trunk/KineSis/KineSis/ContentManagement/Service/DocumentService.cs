@@ -30,8 +30,14 @@ using Ionic.Zip;
 using System.ComponentModel;
 using KineSis.Profiles;
 
-namespace KineSis.ContentManagement.Service {
-    class DocumentService {
+namespace KineSis.ContentManagement.Service
+{
+
+    /// <summary>
+    /// Document Service decides which helper to call in order to transform a given document
+    /// </summary>
+    class DocumentService
+    {
         public static String TEMP_DIRECTORY = ProfileManager.ActiveProfile.TempFolder;
         public static int CHART_HORIZONTAL_FACES;
         public static int CHART_VERTICAL_FACES;
@@ -40,7 +46,6 @@ namespace KineSis.ContentManagement.Service {
         public static int THUMB_WIDTH = 256;
 
         public static Boolean FORCE_CHART_SIZE = false;
-        public static Boolean FOCUS_SHAPES = false;
 
         public static String IMAGE_EXTENSION = ImageUtil.PNG_EXTENSION;
         public static String IMAGE_FILTER = ImageUtil.PNG_FILTER;
@@ -51,9 +56,12 @@ namespace KineSis.ContentManagement.Service {
         /// <summary>
         /// Get text highlight configuration for active user
         /// </summary>
-        public static TextHighlightConfiguration TextHighlightConfiguration {
-            get {
-                if (textHighlightConfiguration == null) {
+        public static TextHighlightConfiguration TextHighlightConfiguration
+        {
+            get
+            {
+                if (textHighlightConfiguration == null)
+                {
                     UnZipSyntaxHighlighterToTemp();
                     CopyExtensionsFile();
                     textHighlightConfiguration = new TextHighlightConfiguration(TEMP_DIRECTORY + "\\Extensions.xml");
@@ -68,7 +76,8 @@ namespace KineSis.ContentManagement.Service {
         /// <param name="path">Source document path</param>
         /// <param name="worker">Who do all the job</param>
         /// <returns>created KineSis document</returns>
-        public static Document CreateNewDocument(String path, BackgroundWorker worker) {
+        public static Document CreateNewDocument(String path, BackgroundWorker worker)
+        {
             Profile profile = ProfileManager.ActiveProfile;
 
             //update static variables with active profile ones
@@ -82,7 +91,8 @@ namespace KineSis.ContentManagement.Service {
             FileInfo file = new FileInfo(path);
             DocumentHelper helper = GetHelperForDocument(path);
 
-            if (helper == null) {
+            if (helper == null)
+            {
                 return null;
             }
 
@@ -91,12 +101,15 @@ namespace KineSis.ContentManagement.Service {
 
             //start parsing
             Document document = null;
-            try {
+            try
+            {
                 document = helper.ParseNewDocument(path, pp);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 pp.OverallOperationName = "[Exception] " + ex.Message;
-            //    pp.OverallOperationTotalElements = 1;
-            //    MessageBox.Show(ex.Message);
+                //    pp.OverallOperationTotalElements = 1;
+                //    MessageBox.Show(ex.Message);
             }
             return document;
         }
@@ -107,25 +120,35 @@ namespace KineSis.ContentManagement.Service {
         /// <param name="path">Source document path</param>
         /// <param name="worker">Background Worker</param>
         /// <param name="document">Current KineSis Document</param>
-        public static void CreateNewDocumentCharts(String path, BackgroundWorker worker, Document document) {
+        public static void CreateNewDocumentCharts(String path, BackgroundWorker worker, Document document)
+        {
             FileInfo file = new FileInfo(path);
 
             DocumentHelper helper = GetHelperForDocument(path);
 
-            if (helper != null) {
+            if (helper != null)
+            {
                 ProcessingProgress pp = new ProcessingProgress(worker);
-                try {
-                    if (helper is PowerPointDocumentHelper) {
+                try
+                {
+                    if (helper is PowerPointDocumentHelper)
+                    {
                         PowerPointDocumentHelper h = (PowerPointDocumentHelper)helper;
                         h.ParseNewDocumentCharts(path, pp, document);
-                    } else if (helper is ExcelDocumentHelper) {
+                    }
+                    else if (helper is ExcelDocumentHelper)
+                    {
                         ExcelDocumentHelper h = (ExcelDocumentHelper)helper;
                         h.ParseNewDocumentCharts(path, pp, document);
-                    } else if (helper is WordDocumentHelper) {
+                    }
+                    else if (helper is WordDocumentHelper)
+                    {
                         WordDocumentHelper h = (WordDocumentHelper)helper;
                         h.ParseNewDocumentCharts(path, pp, document);
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     pp.OverallOperationName = "[Exception] " + ex.Message;
                     //    pp.OverallOperationTotalElements = 1;
                     //    MessageBox.Show(ex.Message);
@@ -143,7 +166,8 @@ namespace KineSis.ContentManagement.Service {
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static Document LoadExistingDocument(String path) {
+        public static Document LoadExistingDocument(String path)
+        {
             DocumentHelper helper = new ExcelDocumentHelper();
 
             Document document = null;
@@ -154,19 +178,25 @@ namespace KineSis.ContentManagement.Service {
         /// <summary>
         /// Syntax Highlighter comes as Embedded resource copied to bin. It need to be unzipped to user's temp directory
         /// </summary>
-        private static void UnZipSyntaxHighlighterToTemp() {
+        private static void UnZipSyntaxHighlighterToTemp()
+        {
             String path = Directory.GetCurrentDirectory() + "\\syntaxhighlighter_3.0.83.zip";
             FileInfo fi = new FileInfo(path);
 
             string zipToUnpack = path;
             string unpackDirectory = TEMP_DIRECTORY;
-            if (!Directory.Exists(unpackDirectory + "\\syntaxhighlighter_3.0.83")) {
-                using (ZipFile zip1 = ZipFile.Read(zipToUnpack)) {
-                    foreach (ZipEntry e in zip1) {
+            if (!Directory.Exists(unpackDirectory + "\\syntaxhighlighter_3.0.83"))
+            {
+                using (ZipFile zip1 = ZipFile.Read(zipToUnpack))
+                {
+                    foreach (ZipEntry e in zip1)
+                    {
                         e.Extract(unpackDirectory, ExtractExistingFileAction.OverwriteSilently);
                     }
                 }
-            } else {
+            }
+            else
+            {
                 Console.WriteLine(unpackDirectory + "\\syntaxhighlighter_3.0.83 already exists");
             }
         }
@@ -174,17 +204,24 @@ namespace KineSis.ContentManagement.Service {
         /// <summary>
         /// Copy default Extensions.xml file to user's temp directory
         /// </summary>
-        private static void CopyExtensionsFile() {
+        private static void CopyExtensionsFile()
+        {
             String path = Directory.GetCurrentDirectory() + "\\Extensions.xml";
             string path2 = TEMP_DIRECTORY + "\\Extensions.xml";
 
-            try {
-                if (!File.Exists(path2)) {
+            try
+            {
+                if (!File.Exists(path2))
+                {
                     File.Copy(path, path2);
-                } else {
+                }
+                else
+                {
                     Console.WriteLine(path2 + " already exists");
                 }
-            } catch {
+            }
+            catch
+            {
                 Console.WriteLine("Cannot copy the Extensions.xml file");
             }
         }
@@ -194,41 +231,67 @@ namespace KineSis.ContentManagement.Service {
         /// </summary>
         /// <param name="path">Source document full path</param>
         /// <returns></returns>
-        private static DocumentHelper GetHelperForDocument(String path) {
+        private static DocumentHelper GetHelperForDocument(String path)
+        {
             DocumentHelper helper = null;
             FileInfo fi = new FileInfo(path);
             String ext = fi.Extension.Substring(1).ToLower();
 
-            if (ext.Equals("docx")) {
+            if (ext.Equals("docx"))
+            {
                 helper = new WordDocumentHelper();
-            } else if (ext.Equals("xlsx")) {
+            }
+            else if (ext.Equals("xlsx"))
+            {
                 helper = new ExcelDocumentHelper();
-            } else if (ext.Equals("pptx")) {
+            }
+            else if (ext.Equals("pptx"))
+            {
                 helper = new PowerPointDocumentHelper();
-            } else if (ext.Equals("jpeg") || ext.Equals("jpg") || ext.Equals("png") || ext.Equals("bmp") || ext.Equals("gif") || ext.Equals("tiff")) {
+            }
+            else if (ext.Equals("jpeg") || ext.Equals("jpg") || ext.Equals("png") || ext.Equals("bmp") || ext.Equals("gif") || ext.Equals("tiff"))
+            {
                 helper = new PictureDocumentHelper();
-            } else {
-                if (TextHighlightConfiguration.GetTextHighlightForTextFile(path) != null) {
+            }
+            else
+            {
+                if (TextHighlightConfiguration.GetTextHighlightForTextFile(path) != null)
+                {
                     helper = new TextDocumentHelper();
                 }
             }
             return helper;
         }
 
-        public static Boolean IsFileSupported(String path) {
+        /// <summary>
+        /// Evaluates a file by it's extension and decides if it is supported or not by KineSis
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static Boolean IsFileSupported(String path)
+        {
             Boolean supported = false;
             FileInfo fi = new FileInfo(path);
             String ext = fi.Extension.Substring(1).ToLower();
 
-            if (ext.Equals("docx")) {
+            if (ext.Equals("docx"))
+            {
                 supported = true;
-            } else if (ext.Equals("xlsx")) {
+            }
+            else if (ext.Equals("xlsx"))
+            {
                 supported = true;
-            } else if (ext.Equals("pptx")) {
+            }
+            else if (ext.Equals("pptx"))
+            {
                 supported = true;
-            } else if (ext.Equals("jpeg") || ext.Equals("jpg") || ext.Equals("png") || ext.Equals("bmp") || ext.Equals("gif") || ext.Equals("tiff")) {
+            }
+            else if (ext.Equals("jpeg") || ext.Equals("jpg") || ext.Equals("png") || ext.Equals("bmp") || ext.Equals("gif") || ext.Equals("tiff"))
+            {
                 supported = true;
-            } else if (TextHighlightConfiguration.GetTextHighlightForTextFile(path) != null) {
+            }
+            else if (TextHighlightConfiguration.GetTextHighlightForTextFile(path) != null)
+            {
                 supported = true;
             }
             return supported;

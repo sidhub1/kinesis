@@ -22,13 +22,15 @@ using System.Text;
 using KineSis.Utils;
 using System.Drawing;
 
-namespace KineSis.ContentManagement.Model {
+namespace KineSis.ContentManagement.Model
+{
 
     /// <summary>
     /// Chart model
     /// </summary>
     [Serializable]
-    public class Chart {
+    public class Chart
+    {
 
         public String thumbUrl;
         private String title;
@@ -42,12 +44,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// The name of the chart, ussualy teh title
         /// </summary>
-        public String Title {
-            get {
+        public String Title
+        {
+            get
+            {
                 return title;
             }
 
-            set {
+            set
+            {
                 title = value;
             }
         }
@@ -56,20 +61,27 @@ namespace KineSis.ContentManagement.Model {
         /// Set the thumbnail url
         /// </summary>
         /// <param name="thumbUrl"></param>
-        public void SetThumbnailUrl(String thumbUrl) {
+        public void SetThumbnailUrl(String thumbUrl)
+        {
             this.thumbUrl = thumbUrl;
         }
 
         /// <summary>
         /// Get the thumbnail image
         /// </summary>
-        public System.Windows.Controls.Image Thumbnail {
-            get {
+        public System.Windows.Controls.Image Thumbnail
+        {
+            get
+            {
                 System.Windows.Controls.Image bmp = null;
-                if (thumbUrl != null && thumbUrl.Length > 0) {
-                    try {
+                if (thumbUrl != null && thumbUrl.Length > 0)
+                {
+                    try
+                    {
                         bmp = ImageUtil.GetImage(thumbUrl);
-                    } catch (Exception) {
+                    }
+                    catch (Exception)
+                    {
                     }
                 }
                 return bmp;
@@ -79,12 +91,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Horizontal views of the chart
         /// </summary>
-        public List<ChartHorizontalView> Views {
-            get {
+        public List<ChartHorizontalView> Views
+        {
+            get
+            {
                 return views;
             }
 
-            set {
+            set
+            {
                 views = value;
             }
         }
@@ -93,11 +108,13 @@ namespace KineSis.ContentManagement.Model {
         /// Get current image of the chart
         /// </summary>
         /// <returns></returns>
-        public String GetImageUrl() {
-            if (bitmap == null) {
+        public String GetImageUrl()
+        {
+            if (bitmap == null)
+            {
                 bitmap = views[0].ImageUrl;
             }
-            
+
             return bitmap;
         }
 
@@ -105,7 +122,8 @@ namespace KineSis.ContentManagement.Model {
         /// Check if an image exists
         /// </summary>
         /// <returns></returns>
-        public Boolean HasImage() {
+        public Boolean HasImage()
+        {
             return bitmap != null;
         }
 
@@ -113,11 +131,13 @@ namespace KineSis.ContentManagement.Model {
         /// Check if the chart has more up images
         /// </summary>
         /// <returns></returns>
-        public Boolean HasUpImage() {
+        public Boolean HasUpImage()
+        {
             Boolean has = false;
-                if (vIndex < views[hIndex].Up.Count) {
-                    has = true;
-                }
+            if (vIndex < views[hIndex].Up.Count)
+            {
+                has = true;
+            }
             return has;
         }
 
@@ -125,14 +145,21 @@ namespace KineSis.ContentManagement.Model {
         /// Get logically up image of the chart in rotation
         /// </summary>
         /// <returns></returns>
-        public String GetUpImageUrl() {
-            if (HasUpImage()) {
+        public String GetUpImageUrl()
+        {
+            if (HasUpImage())
+            {
                 vIndex++;
-                if (vIndex == 0) {
+                if (vIndex == 0)
+                {
                     bitmap = views[hIndex].ImageUrl;
-                } else if (vIndex > 0) {
+                }
+                else if (vIndex > 0)
+                {
                     bitmap = views[hIndex].Up[vIndex - 1].ImageUrl;
-                } else {
+                }
+                else
+                {
                     bitmap = views[hIndex].Down[-vIndex - 1].ImageUrl;
                 }
             }
@@ -143,11 +170,13 @@ namespace KineSis.ContentManagement.Model {
         /// Check if the chart has more down images
         /// </summary>
         /// <returns></returns>
-        public Boolean HasDownImage() {
+        public Boolean HasDownImage()
+        {
             Boolean has = false;
-                if (-vIndex < views[hIndex].Down.Count) {
-                    has = true;
-                }
+            if (-vIndex < views[hIndex].Down.Count)
+            {
+                has = true;
+            }
             return has;
         }
 
@@ -155,14 +184,21 @@ namespace KineSis.ContentManagement.Model {
         /// Get logically down image of the chart in rotation
         /// </summary>
         /// <returns></returns>
-        public String GetDownImageUrl() {
-            if (HasDownImage()) {
+        public String GetDownImageUrl()
+        {
+            if (HasDownImage())
+            {
                 vIndex--;
-                if (vIndex == 0) {
+                if (vIndex == 0)
+                {
                     bitmap = views[hIndex].ImageUrl;
-                } else if (vIndex > 0) {
+                }
+                else if (vIndex > 0)
+                {
                     bitmap = views[hIndex].Up[vIndex - 1].ImageUrl;
-                } else {
+                }
+                else
+                {
                     bitmap = views[hIndex].Down[-vIndex - 1].ImageUrl;
                 }
             }
@@ -173,11 +209,13 @@ namespace KineSis.ContentManagement.Model {
         /// Check if the chart hare more left images
         /// </summary>
         /// <returns></returns>
-        public Boolean HasLeftImage() {
+        public Boolean HasLeftImage()
+        {
             Boolean has = false;
-                if (views.Count > 1) {
-                    return true;
-                }
+            if (views.Count > 1)
+            {
+                return true;
+            }
             return has;
         }
 
@@ -185,19 +223,29 @@ namespace KineSis.ContentManagement.Model {
         /// Get logically left image of the chart in rotation
         /// </summary>
         /// <returns></returns>
-        public String GetLeftImageUrl() {
-            if (HasLeftImage()) {
-                if (hIndex == 0) {
+        public String GetLeftImageUrl()
+        {
+            if (HasLeftImage())
+            {
+                if (hIndex == 0)
+                {
                     hIndex = views.Count - 1;
-                } else {
+                }
+                else
+                {
                     hIndex--;
                 }
 
-                if (vIndex == 0) {
+                if (vIndex == 0)
+                {
                     bitmap = views[hIndex].ImageUrl;
-                } else if (vIndex > 0) {
+                }
+                else if (vIndex > 0)
+                {
                     bitmap = views[hIndex].Up[vIndex - 1].ImageUrl;
-                } else {
+                }
+                else
+                {
                     bitmap = views[hIndex].Down[-vIndex - 1].ImageUrl;
                 }
             }
@@ -208,11 +256,13 @@ namespace KineSis.ContentManagement.Model {
         /// Check if the chart has more right images
         /// </summary>
         /// <returns></returns>
-        public Boolean HasRightImage() {
+        public Boolean HasRightImage()
+        {
             Boolean has = false;
-                if (views.Count > 1) {
-                    return true;
-                }
+            if (views.Count > 1)
+            {
+                return true;
+            }
             return has;
         }
 
@@ -220,19 +270,29 @@ namespace KineSis.ContentManagement.Model {
         /// Get logically right image of the chart in rotation
         /// </summary>
         /// <returns></returns>
-        public String GetRightImageUrl() {
-            if (HasRightImage()) {
-                if (hIndex == views.Count - 1) {
+        public String GetRightImageUrl()
+        {
+            if (HasRightImage())
+            {
+                if (hIndex == views.Count - 1)
+                {
                     hIndex = 0;
-                } else {
+                }
+                else
+                {
                     hIndex++;
                 }
 
-                if (vIndex == 0) {
+                if (vIndex == 0)
+                {
                     bitmap = views[hIndex].ImageUrl;
-                } else if (vIndex > 0) {
+                }
+                else if (vIndex > 0)
+                {
                     bitmap = views[hIndex].Up[vIndex - 1].ImageUrl;
-                } else {
+                }
+                else
+                {
                     bitmap = views[hIndex].Down[-vIndex - 1].ImageUrl;
                 }
             }

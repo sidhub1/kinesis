@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+   Copyright 2011 Alexandru Albu - http://code.google.com/p/kinesis/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,23 +32,26 @@ using System.Windows.Media.Imaging;
 using KineSis.UserInterface;
 
 
-namespace KineSis.Utils {
-    class CanvasUtil {
+namespace KineSis.Utils
+{
+    class CanvasUtil
+    {
 
         /// <summary>
         /// Draw processing progress
         /// </summary>
         /// <param name="canvas">canvas where the progress will be drawn</param>
         /// <param name="pp">active processing progress</param>
-        public static void DrawProgress(Canvas canvas, ProcessingProgress pp) {
-            canvas.Background =  ProfileManager.MinimalView ? System.Windows.Media.Brushes.Transparent : ProfileManager.ActiveProfile.BackgroundColor;
+        public static void DrawProgress(Canvas canvas, ProcessingProgress pp)
+        {
+            canvas.Background = ProfileManager.MinimalView ? System.Windows.Media.Brushes.Transparent : ProfileManager.ActiveProfile.BackgroundColor;
 
             String currentOperationName = pp.CurrentOperationName;
-            Double currentOperation = ( (Double)pp.CurrentOperationElement * 100 / (Double)pp.CurrentOperationTotalElements );
+            Double currentOperation = ((Double)pp.CurrentOperationElement * 100 / (Double)pp.CurrentOperationTotalElements);
             String currentOperationProgress = String.Format("{0:00.00}", currentOperation) + " %";
 
             String overallOperationName = pp.OverallOperationName;
-            Double overallOperation = ( (Double)pp.OverallOperationElement * 100 / (Double)pp.OverallOperationTotalElements );
+            Double overallOperation = ((Double)pp.OverallOperationElement * 100 / (Double)pp.OverallOperationTotalElements);
             String overallOperationProgress = String.Format("{0:00.00}", overallOperation) + " %";
 
             canvas.Children.Clear();
@@ -50,12 +70,12 @@ namespace KineSis.Utils {
 
 
             System.Windows.Shapes.Rectangle currentOperationInnerRect = new System.Windows.Shapes.Rectangle();
-            currentOperationInnerRect.Width = ( ( canvas.Width - tenth - 6 ) * currentOperation ) / 100;
+            currentOperationInnerRect.Width = ((canvas.Width - tenth - 6) * currentOperation) / 100;
             currentOperationInnerRect.Height = sixth - 6;
             currentOperationInnerRect.Stroke = ProfileManager.ActiveProfile.BackgroundColor;
             currentOperationInnerRect.StrokeThickness = 2;
             currentOperationInnerRect.Fill = ProfileManager.ActiveProfile.SecondaryColor;
-            currentOperationInnerRect.Margin = new Thickness(( tenth + 6 ) / 2, sixth + 3, 0, 0);
+            currentOperationInnerRect.Margin = new Thickness((tenth + 6) / 2, sixth + 3, 0, 0);
 
             TextBlock currentOperationTextBlock = new TextBlock();
             currentOperationTextBlock.Text = currentOperationName + "  [ " + currentOperationProgress + " ]";
@@ -77,7 +97,7 @@ namespace KineSis.Utils {
 
 
             System.Windows.Shapes.Rectangle overallOperationInnerRect = new System.Windows.Shapes.Rectangle();
-            overallOperationInnerRect.Width = ProfileManager.MinimalView ? ((canvas.Width - tenth) * overallOperation) / 100  : ((canvas.Width - tenth - 6) * overallOperation) / 100;
+            overallOperationInnerRect.Width = ProfileManager.MinimalView ? ((canvas.Width - tenth) * overallOperation) / 100 : ((canvas.Width - tenth - 6) * overallOperation) / 100;
             overallOperationInnerRect.Height = ProfileManager.MinimalView ? sixth - 2 : sixth - 6;
             overallOperationInnerRect.Stroke = ProfileManager.ActiveProfile.BackgroundColor;
             overallOperationInnerRect.StrokeThickness = ProfileManager.MinimalView ? 0 : 2;
@@ -107,7 +127,13 @@ namespace KineSis.Utils {
             canvas.Refresh();
         }
 
-        public static void DrawException(Canvas canvas, String exception) {
+        /// <summary>
+        /// draw an exception
+        /// </summary>
+        /// <param name="canvas"></param>
+        /// <param name="exception"></param>
+        public static void DrawException(Canvas canvas, String exception)
+        {
             canvas.Background = ProfileManager.ActiveProfile.BackgroundColor;
 
             double sixth = canvas.Height / 6;
@@ -142,10 +168,10 @@ namespace KineSis.Utils {
         /// <param name="stroke">stroke color</param>
         /// <param name="fill">fill color</param>
         /// <param name="background">background will apply a blur bitmap effect</param>
-        public static void DrawEllipse(Canvas c, double X, double Y, double width, double height, System.Windows.Media.Brush stroke, System.Windows.Media.Brush fill, System.Windows.Media.Brush background) {
-
-            /*
-            if (background != null) {
+        public static void DrawEllipse(Canvas c, double X, double Y, double width, double height, System.Windows.Media.Brush stroke, System.Windows.Media.Brush fill, System.Windows.Media.Brush background, int thickness = 10)
+        {
+            if (background != null)
+            {
                 Ellipse ellipseB = new Ellipse();
                 ellipseB.Width = width;
                 ellipseB.Height = height;
@@ -159,21 +185,24 @@ namespace KineSis.Utils {
                 Canvas.SetLeft(ellipseB, X - 0.5 * ellipseB.Height);
                 c.Children.Add(ellipseB);
             }
-            */
+
             Ellipse ellipse = new Ellipse();
             ellipse.Width = width;
             ellipse.Height = height;
             ellipse.Stroke = stroke;
-            ellipse.StrokeThickness = 10;
+            ellipse.StrokeThickness = thickness;
 
-            if (background != null) {
+            if (background != null)
+            {
                 ellipse.Fill = background;
-            } else {
+            }
+            else
+            {
                 ellipse.Fill = fill;
             }
 
 
-            
+
             Canvas.SetTop(ellipse, Y - 0.5 * ellipse.Width);
             Canvas.SetLeft(ellipse, X - 0.5 * ellipse.Height);
             c.Children.Add(ellipse);
@@ -189,10 +218,12 @@ namespace KineSis.Utils {
         /// <param name="foreground">text color</param>
         /// <param name="X">X coordinate of the center of the text. depending on text length, the horizontal aligment will be made</param>
         /// <param name="top">distance from top of the canvas to text block</param>
-        public static void DrawTextBlock(Canvas c, String text, double fontSize, System.Windows.Media.Brush background, System.Windows.Media.Brush foreground,  double X, double top) {
+        public static void DrawTextBlock(Canvas c, String text, double fontSize, System.Windows.Media.Brush background, System.Windows.Media.Brush foreground, double X, double top)
+        {
 
             System.Drawing.Size size = TextRenderer.MeasureText(text, new Font("SF Fedora Titles", (float)fontSize));
-            if (background != null) {
+            if (background != null)
+            {
                 TextBlock submenuEffect = new TextBlock();
                 submenuEffect.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
                 submenuEffect.Background = background;
@@ -212,7 +243,7 @@ namespace KineSis.Utils {
             submenu.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
             submenu.Text = text;
             submenu.Foreground = foreground;
-            submenu.FontSize = (float) fontSize;
+            submenu.FontSize = (float)fontSize;
             Canvas.SetTop(submenu, top);
             Canvas.SetLeft(submenu, X - 0.3 * size.Width);
             c.Children.Add(submenu);
@@ -226,7 +257,8 @@ namespace KineSis.Utils {
         /// <param name="circleDiameter">diameter of the circle where the image will be centerd</param>
         /// <param name="X">X coordinate of the circle</param>
         /// <param name="Y">Y coordinate of the circle</param>
-        public static void DrawImageInCircle(Canvas c, System.Windows.Controls.Image image, double circleDiameter, double X, double Y) {
+        public static void DrawImageInCircle(Canvas c, System.Windows.Controls.Image image, double circleDiameter, double X, double Y)
+        {
             image.Opacity = 0.9;
             image.Width = circleDiameter / 2 * Math.Sqrt(2);
             image.Height = circleDiameter / 2 * Math.Sqrt(2);
@@ -245,14 +277,18 @@ namespace KineSis.Utils {
         /// <param name="X">center X</param>
         /// <param name="Y">center Y</param>
         /// <param name="maxWidthOrHight">maximum width or height permitted</param>
-        public static void DrawImageInRectangle(Canvas c, System.Windows.Controls.Image thumb, System.Windows.Media.Brush rectangleColor, double X, double Y, double maxWidthOrHight, double opacity) {
+        public static void DrawImageInRectangle(Canvas c, System.Windows.Controls.Image thumb, System.Windows.Media.Brush rectangleColor, double X, double Y, double maxWidthOrHight, double opacity)
+        {
             double W, H;
 
-            if (thumb.ActualHeight > maxWidthOrHight) {
-                W = ( thumb.ActualWidth * maxWidthOrHight ) / thumb.ActualHeight;
+            if (thumb.ActualHeight > maxWidthOrHight)
+            {
+                W = (thumb.ActualWidth * maxWidthOrHight) / thumb.ActualHeight;
                 H = maxWidthOrHight;
-            } else {
-                H = ( thumb.ActualHeight * maxWidthOrHight ) / thumb.ActualWidth;
+            }
+            else
+            {
+                H = (thumb.ActualHeight * maxWidthOrHight) / thumb.ActualWidth;
                 W = maxWidthOrHight;
             }
 
@@ -260,7 +296,7 @@ namespace KineSis.Utils {
             thumb.Width = W;
 
             thumb.Opacity = opacity;
-            Canvas.SetTop(thumb, Y - ( H - 20 ) / 2);
+            Canvas.SetTop(thumb, Y - (H - 20) / 2);
             Canvas.SetLeft(thumb, X - W / 2);
 
             System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle();
@@ -272,7 +308,7 @@ namespace KineSis.Utils {
             r.RadiusX = 20;
             r.RadiusY = 20;
             Canvas.SetTop(r, Y - H / 2);
-            Canvas.SetLeft(r, X - ( W - 20 ) / 2);
+            Canvas.SetLeft(r, X - (W - 20) / 2);
 
             System.Windows.Shapes.Rectangle r1 = new System.Windows.Shapes.Rectangle();
             r1.Stroke = System.Windows.Media.Brushes.White;
@@ -284,83 +320,22 @@ namespace KineSis.Utils {
             r1.RadiusX = 20;
             r1.RadiusY = 20;
             Canvas.SetTop(r1, Y - H / 2);
-            Canvas.SetLeft(r1, X - ( W - 20 ) / 2);
+            Canvas.SetLeft(r1, X - (W - 20) / 2);
 
             c.Children.Add(r1);
             c.Children.Add(thumb);
             c.Children.Add(r);
-            
+
         }
 
         /// <summary>
-        /// Draw a submenu on a canvas
+        /// Draw an image
         /// </summary>
-        /// <param name="c">desired canvas</param>
-        /// <param name="submenuName">name of the submenu</param>
-        /// <param name="submenuName">caption for submenu. if not null, will be used instead of submenu name. does not affect the resource name for submenu</param>
-        /// <param name="useNameForImage">true if a [submenuName].png image exists in "Drawable" directory</param>
-        /// <param name="submenuImage">image used in case a resource for this submenu does not exists (thumbnails case)</param>
-        /// <param name="centerX">X of the submenu center</param>
-        /// <param name="centerY">Y of the submenu center</param>
-        /// <param name="centerDiameter">diameter of the center</param>
-        /// <param name="selectionDiameter">diameter of the areas and selections</param>
-        /// <param name="leftAreaX">X of the left area (which contains the left hand)</param>
-        /// <param name="leftAreaY">Y of the left area (which contains the left hand)</param>
-        /// <param name="rightAreaX">X of the right area (which contains the right hand)</param>
-        /// <param name="rightAreaY">Y of the right area (which contains the right hand)</param>
-        /// <param name="leftSelectionX">X of the left selection (the circle where selection took place in left side)</param>
-        /// <param name="leftSelectionY">Y of the left selection (the circle where selection took place in left side)</param>
-        /// <param name="rightSelectionX">X of the right selection (the circle where selection took place in right side)</param>
-        /// <param name="rightSelectionY">Y of the right selection (the circle where selection took place in right side)</param>
-        /// <param name="preselected">boolean indicating if current submenu is preselected</param>
-        public static void DrawSubmenu(Canvas c, String submenuName, String submenuCaption, Boolean useNameForImage, System.Windows.Controls.Image submenuImage, double centerX, double centerY, double centerDiameter, double selectionDiameter, double leftAreaX, double leftAreaY, double rightAreaX, double rightAreaY, double leftSelectionX, double leftSelectionY, double rightSelectionX, double rightSelectionY, Boolean preselected) {
-
-            System.Windows.Media.Brush background = null;
-            System.Windows.Media.Brush primaryColor = ProfileManager.ActiveProfile.PrimaryColor;
-            System.Windows.Media.Brush secondaryColor = ProfileManager.ActiveProfile.SecondaryColor;
-
-            if (preselected) {
-                background = System.Windows.Media.Brushes.White;
-            }
-
-            //DrawEllipse(c, centerX, centerY, centerDiameter, centerDiameter, primaryColor, ColorUtil.FromHTML("#CCFFFFFF"), background);
-            DrawEllipse(c, centerX, 200, 400, 400, primaryColor, ColorUtil.FromHTML("#CCFFFFFF"), background);
-
-
-            System.Windows.Controls.Image image = null;
-            if (useNameForImage) {
-                image = ImageUtil.GetResourceImage(submenuName);
-            } else if (submenuImage != null) {
-                image = submenuImage;
-            } else {
-                image = new System.Windows.Controls.Image();
-            }
-
-            //DrawImageInCircle(c, image, centerDiameter, centerX, centerY);
-            DrawImageInCircle(c, image, 400, centerX, 200);
-
-            String caption = submenuCaption != null ? submenuCaption : submenuName;
-
-            DrawTextBlock(c, caption, 0.2 * centerDiameter, System.Windows.Media.Brushes.White, primaryColor, centerX, centerY + 0.75 * image.Width);
-            DrawTextBlock(c, caption, 0.2 * 400, System.Windows.Media.Brushes.White, primaryColor, centerX, centerY + 0.75 * image.Width);
-
-            System.Windows.Media.Brush fill = ColorUtil.FromHTML("#88FFFFFF");
-
-            DrawEllipse(c, rightAreaX, rightAreaY, selectionDiameter, selectionDiameter, secondaryColor, fill, background);
-            DrawEllipse(c, rightSelectionX, rightSelectionY, selectionDiameter, selectionDiameter, primaryColor, fill, background);
-            DrawEllipse(c, leftAreaX, leftAreaY, selectionDiameter, selectionDiameter, secondaryColor, fill, background);
-            DrawEllipse(c, leftSelectionX, leftSelectionY, selectionDiameter, selectionDiameter, primaryColor, fill, background);
-
-            System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage("updown");
-
-            DrawImageInCircle(c, image1, selectionDiameter, leftAreaX, leftAreaY);
-
-            System.Windows.Controls.Image image2 = ImageUtil.GetResourceImage("updown");
-
-            DrawImageInCircle(c, image2, selectionDiameter, rightAreaX, rightAreaY);
-        }
-
-        public static void DrawImage(CanvasWindow c, CanvasWindow user, String b) {
+        /// <param name="c"></param>
+        /// <param name="user"></param>
+        /// <param name="b"></param>
+        public static void DrawImage(CanvasWindow c, CanvasWindow user, String b)
+        {
             BitmapImage newImage = new BitmapImage();
             newImage.BeginInit();
             newImage.UriSource = new Uri(b);
@@ -370,24 +345,34 @@ namespace KineSis.Utils {
 
             double W, H;
 
-            if (newImage.Width <= c.canvas.Width && newImage.Height <= c.canvas.Height) {
+            if (newImage.Width <= c.canvas.Width && newImage.Height <= c.canvas.Height)
+            {
                 W = newImage.Width;
                 H = newImage.Height;
-            } else if (newImage.Width > c.canvas.Width && newImage.Height <= c.canvas.Height) {
-                H = ( newImage.Height * c.canvas.Width ) / newImage.Width;
+            }
+            else if (newImage.Width > c.canvas.Width && newImage.Height <= c.canvas.Height)
+            {
+                H = (newImage.Height * c.canvas.Width) / newImage.Width;
                 W = c.canvas.Width;
-            } else if (newImage.Width <= c.canvas.Width && newImage.Height > c.canvas.Height) {
-                W = ( newImage.Width * c.canvas.Height ) / newImage.Height;
+            }
+            else if (newImage.Width <= c.canvas.Width && newImage.Height > c.canvas.Height)
+            {
+                W = (newImage.Width * c.canvas.Height) / newImage.Height;
                 H = c.canvas.Height;
-            } else {
+            }
+            else
+            {
                 double widthR = (double)c.canvas.Width / (double)newImage.Width;
                 double heightR = (double)c.canvas.Height / (double)newImage.Height;
 
-                if (widthR < heightR) {
-                    H = ( newImage.Height * c.canvas.Width ) / newImage.Width;
+                if (widthR < heightR)
+                {
+                    H = (newImage.Height * c.canvas.Width) / newImage.Width;
                     W = c.canvas.Width;
-                } else {
-                    W = ( newImage.Width * c.canvas.Height ) / newImage.Height;
+                }
+                else
+                {
+                    W = (newImage.Width * c.canvas.Height) / newImage.Height;
                     H = c.canvas.Height;
                 }
             }
@@ -405,52 +390,19 @@ namespace KineSis.Utils {
             user.image.Height = H * ratio;
         }
 
-        public static void DrawGrid(Canvas c)
-        {
-            int RATE = (int)c.Width / 320 * 2;
-            double width = c.Width;
-            double height = c.Height;
-
-            double i = 0;
-            while (i < height)
-            {
-                Line l = new Line();
-                l.X1 = 0;
-                l.X2 = width;
-                l.Y1 = i;
-                l.Y2 = i;
-                l.Fill = ColorUtil.FromHTML("#8888FF88");
-                l.Stroke = l.Fill;
-                c.Children.Add(l);
-                i += RATE;
-            }
-
-            i = 0;
-            while (i < width)
-            {
-                Line l = new Line();
-                l.X1 = i;
-                l.X2 = i;
-                l.Y1 = 0;
-                l.Y2 = height;
-                l.Fill = ColorUtil.FromHTML("#8888FF88");
-                l.Stroke = l.Fill;
-                c.Children.Add(l);
-                i += RATE;
-            }
-        }
-
+        /// <summary>
+        /// Draw the slected hand
+        /// </summary>
+        /// <param name="c"></param>
         public static void DrawHand(Canvas c)
         {
             if (UIManager.FirstHand != null && UIManager.FirstHand.IsSelected)
             {
-                double x =  UIManager.FirstHand.X;
-                double y =  UIManager.FirstHand.Y;
+                double x = UIManager.FirstHand.X;
+                double y = UIManager.FirstHand.Y;
 
                 DrawEllipse(c, x, y, 50, 50, System.Windows.Media.Brushes.Red, System.Windows.Media.Brushes.Pink, null);
             }
         }
     }
-
-
 }

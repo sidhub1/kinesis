@@ -27,12 +27,14 @@ using System.Text.RegularExpressions;
 using System.Drawing;
 using System.IO;
 
-namespace KineSis.ContentManagement.Service.Helper {
+namespace KineSis.ContentManagement.Service.Helper
+{
     /// <summary>
     /// Handles the excel files (xslx)
     /// Open the document, save it as html, for every sheet parse the charts and save them as images for building a 3D model
     /// </summary>
-    class ExcelDocumentHelper : DocumentHelper {
+    class ExcelDocumentHelper : DocumentHelper
+    {
 
         private static Microsoft.Office.Interop.Excel.Application excelApplication = null;
 
@@ -43,8 +45,10 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <summary>
         /// Open the Excel application
         /// </summary>
-        private void OpenOfficeApplication() {
-            if (excelApplication == null) {
+        private void OpenOfficeApplication()
+        {
+            if (excelApplication == null)
+            {
                 excelApplication = new Microsoft.Office.Interop.Excel.Application();
             }
         }
@@ -52,8 +56,10 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <summary>
         /// Close the Excel Application
         /// </summary>
-        private void CloseOfficeApplication() {
-            if (excelApplication != null) {
+        private void CloseOfficeApplication()
+        {
+            if (excelApplication != null)
+            {
                 excelApplication.Quit();
                 excelApplication = null;
             }
@@ -65,7 +71,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="path">full path of the excel document</param>
         /// <returns>equivalent kinesis document model</returns>
-        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp) {
+        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.OverallOperationName = "All Document Pages";
@@ -109,7 +116,8 @@ namespace KineSis.ContentManagement.Service.Helper {
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
             //for every sheet
-            for (int i = 1; i <= workbook.Sheets.Count; i++) {
+            for (int i = 1; i <= workbook.Sheets.Count; i++)
+            {
 
                 //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
                 pp.CurrentOperationName = "Page " + i;
@@ -148,7 +156,8 @@ namespace KineSis.ContentManagement.Service.Helper {
 
             int pageNumber = 1;
 
-            foreach (KineSis.ContentManagement.Model.Page p in document.Pages) {
+            foreach (KineSis.ContentManagement.Model.Page p in document.Pages)
+            {
                 ProcessSheet(p.Location, pp, pageNumber++);
             }
 
@@ -161,7 +170,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="path">full path of the excel document</param>
         /// <returns>equivalent kinesis document model</returns>
-        public Document ParseNewDocumentCharts(String path, ProcessingProgress pp, Document document) {
+        public Document ParseNewDocumentCharts(String path, ProcessingProgress pp, Document document)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.OverallOperationName = "All Document Charts";
@@ -187,14 +197,16 @@ namespace KineSis.ContentManagement.Service.Helper {
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
             //for every sheet
-            for (int i = 1; i <= workbook.Sheets.Count; i++) {
+            for (int i = 1; i <= workbook.Sheets.Count; i++)
+            {
                 Worksheet worksheet = workbook.Sheets[i];
 
                 //create a new page
                 KineSis.ContentManagement.Model.Page page = document.Pages[i - 1];
 
                 //check if chart generation is wanted
-                if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                {
                     //get charts
                     ChartObjects chartObjects = worksheet.ChartObjects(Type.Missing);
 
@@ -203,7 +215,8 @@ namespace KineSis.ContentManagement.Service.Helper {
                     System.IO.Directory.CreateDirectory(chartPath);
 
                     //for every chart
-                    for (int j = 1; j <= chartObjects.Count; j++) {
+                    for (int j = 1; j <= chartObjects.Count; j++)
+                    {
 
                         //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
                         pp.CurrentOperationName = "Page " + i + " / Chart " + j + " of " + chartObjects.Count;
@@ -223,8 +236,9 @@ namespace KineSis.ContentManagement.Service.Helper {
                         pp.CurrentOperationElement++;
                         //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
-                        if (DocumentService.FORCE_CHART_SIZE) {
-                            chart.ChartArea.Height = ( (float)DocumentService.CHART_WIDTH * chart.ChartArea.Height ) / chart.ChartArea.Width;
+                        if (DocumentService.FORCE_CHART_SIZE)
+                        {
+                            chart.ChartArea.Height = ((float)DocumentService.CHART_WIDTH * chart.ChartArea.Height) / chart.ChartArea.Width;
                             chart.ChartArea.Width = DocumentService.CHART_WIDTH;
                         }
 
@@ -236,28 +250,35 @@ namespace KineSis.ContentManagement.Service.Helper {
                         int horizontalAngle = 0;
 
                         //depending on how many horizontal faces are required, calculate the angle between them
-                        if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                        if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                        {
                             horizontalAngle = 360 / DocumentService.CHART_HORIZONTAL_FACES;
                         }
 
                         int verticalAngle = 0;
 
                         //depending on how many vertical faces are required for a horizontal face, celaculate the angle between them, excluding the vertical face at 90 degrees
-                        if (DocumentService.CHART_VERTICAL_FACES > 0) {
-                            verticalAngle = 90 / ( DocumentService.CHART_VERTICAL_FACES + 1 );
+                        if (DocumentService.CHART_VERTICAL_FACES > 0)
+                        {
+                            verticalAngle = 90 / (DocumentService.CHART_VERTICAL_FACES + 1);
                         }
 
-                        if (chart.HasTitle) {
+                        if (chart.HasTitle)
+                        {
                             mChart.Title = chart.ChartTitle.Caption;
-                        } else {
+                        }
+                        else
+                        {
                             mChart.Title = chart.Name;
                         }
 
                         //does not support rotation (it's plain)
-                        if (chartType == 0) {
+                        if (chartType == 0)
+                        {
 
                             //if horizontal faces number is 0, then no chart will be outputed
-                            if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                            if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                            {
 
                                 ChartHorizontalView hView = new ChartHorizontalView();
 
@@ -273,10 +294,13 @@ namespace KineSis.ContentManagement.Service.Helper {
                                 pp.CurrentOperationElement++;
                                 //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
                             }
-                        } else {
+                        }
+                        else
+                        {
 
                             //for every horizontal face
-                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++) {
+                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++)
+                            {
 
                                 ChartHorizontalView hView = new ChartHorizontalView();
                                 //reset elevation
@@ -293,7 +317,8 @@ namespace KineSis.ContentManagement.Service.Helper {
                                 //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
 
                                 //for every vertical face
-                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++) {
+                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++)
+                                {
                                     ChartVerticalView vView = new ChartVerticalView();
                                     //increse elevation
                                     chart.Elevation += verticalAngle;
@@ -312,13 +337,15 @@ namespace KineSis.ContentManagement.Service.Helper {
                                 }
 
                                 //some chart types, like 3D pie, does not support elevation less than 0
-                                if (SupportsNegativeElevation(chart)) {
+                                if (SupportsNegativeElevation(chart))
+                                {
 
                                     //reset elevation
                                     chart.Elevation = 0;
 
                                     //for every vertical face
-                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++) {
+                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++)
+                                    {
                                         ChartVerticalView vView = new ChartVerticalView();
 
                                         //decrease elevation
@@ -365,35 +392,44 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="c">chart</param>
         /// <returns></returns>
-        private int EvaluateChart(Microsoft.Office.Interop.Excel.Chart c) {
+        private int EvaluateChart(Microsoft.Office.Interop.Excel.Chart c)
+        {
             int numberOfOperations = 1;
 
             //get chart type
             int chartType = GetChartType(c);
 
             //does not support rotation (it's plain)
-            if (chartType == 0) {
+            if (chartType == 0)
+            {
 
                 //if horizontal faces number is 0, then no chart will be outputed
-                if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                {
                     numberOfOperations++;
                 }
-            } else {
+            }
+            else
+            {
 
                 //for every horizontal face
-                for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++) {
+                for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++)
+                {
                     numberOfOperations++;
 
                     //for every vertical face
-                    for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++) {
+                    for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++)
+                    {
                         numberOfOperations++;
                     }
 
                     //some chart types, like 3D pie, does not support elevation less than 0
-                    if (SupportsNegativeElevation(c)) {
+                    if (SupportsNegativeElevation(c))
+                    {
 
                         //for every vertical face
-                        for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++) {
+                        for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++)
+                        {
                             numberOfOperations++;
                         }
                     }
@@ -404,7 +440,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         }
 
 
-        private int EvaluateWorkbook(Workbook workbook, ProcessingProgress pp) {
+        private int EvaluateWorkbook(Workbook workbook, ProcessingProgress pp)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.CurrentOperationName = "Evaluating document";
@@ -415,16 +452,19 @@ namespace KineSis.ContentManagement.Service.Helper {
             int numberOfOperations = 0;
 
             //for every sheet
-            for (int i = 1; i <= workbook.Sheets.Count; i++) {
+            for (int i = 1; i <= workbook.Sheets.Count; i++)
+            {
                 Worksheet worksheet = workbook.Sheets[i];
 
                 //check if chart generation is wanted
-                if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                {
                     //get charts
                     ChartObjects chartObjects = worksheet.ChartObjects(Type.Missing);
 
                     //for every chart
-                    for (int j = 1; j <= chartObjects.Count; j++) {
+                    for (int j = 1; j <= chartObjects.Count; j++)
+                    {
 
                         numberOfOperations++;
 
@@ -434,27 +474,35 @@ namespace KineSis.ContentManagement.Service.Helper {
                         int chartType = GetChartType(chart);
 
                         //does not support rotation (it's plain)
-                        if (chartType == 0) {
+                        if (chartType == 0)
+                        {
 
                             //if horizontal faces number is 0, then no chart will be outputed
-                            if (DocumentService.CHART_HORIZONTAL_FACES > 0) {
+                            if (DocumentService.CHART_HORIZONTAL_FACES > 0)
+                            {
                                 numberOfOperations++;
                             }
-                        } else {
+                        }
+                        else
+                        {
 
                             //for every horizontal face
-                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++) {
+                            for (int k = 0; k < DocumentService.CHART_HORIZONTAL_FACES; k++)
+                            {
                                 numberOfOperations++;
 
                                 //for every vertical face
-                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++) {
+                                for (int l = 0; l < DocumentService.CHART_VERTICAL_FACES; l++)
+                                {
                                     numberOfOperations++;
                                 }
 
                                 //some chart types, like 3D pie, does not support elevation less than 0
-                                if (SupportsNegativeElevation(chart)) {
+                                if (SupportsNegativeElevation(chart))
+                                {
                                     //for every vertical face
-                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++) {
+                                    for (int m = 0; m < DocumentService.CHART_VERTICAL_FACES; m++)
+                                    {
                                         numberOfOperations++;
                                     }
                                 }
@@ -476,18 +524,22 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="shape"> desired shape</param>
         /// <param name="path">path where the thumbnail will be created, excluding the .extension</param>
         /// <returns>full path of the created thumbnail</returns>
-        private String GenerateThumbnail(Microsoft.Office.Interop.Excel.Chart shape, String path) {
+        private String GenerateThumbnail(Microsoft.Office.Interop.Excel.Chart shape, String path)
+        {
             shape.Export(path + DocumentService.IMAGE_EXTENSION, DocumentService.IMAGE_FILTER, false);
 
             Bitmap bmp = new Bitmap(path + DocumentService.IMAGE_EXTENSION);
 
             int T_H, T_W;
 
-            if (bmp.Width <= bmp.Height) {
-                T_W = (int)( DocumentService.THUMB_WIDTH * bmp.Width / bmp.Height );
+            if (bmp.Width <= bmp.Height)
+            {
+                T_W = (int)(DocumentService.THUMB_WIDTH * bmp.Width / bmp.Height);
                 T_H = DocumentService.THUMB_WIDTH;
-            } else {
-                T_H = (int)( DocumentService.THUMB_WIDTH * bmp.Height / bmp.Width );
+            }
+            else
+            {
+                T_H = (int)(DocumentService.THUMB_WIDTH * bmp.Height / bmp.Width);
                 T_W = DocumentService.THUMB_WIDTH;
             }
 
@@ -511,11 +563,15 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="i">integer index of te sheet</param>
         /// <returns>generated string index of the sheet</returns>
-        private String GetSheetNumber(int i) {
+        private String GetSheetNumber(int i)
+        {
             String number = i.ToString();
-            if (i < 10) {
+            if (i < 10)
+            {
                 number = "00" + i;
-            } else if (i < 100) {
+            }
+            else if (i < 100)
+            {
                 number = "0" + i;
             }
             return number;
@@ -526,47 +582,51 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="chart">excel chart</param>
         /// <returns>chart type, 0 = 2D chart, 1 = 3D bar chart, 2 = 3D chart which can be fully rotated</returns>
-        private int GetChartType(Microsoft.Office.Interop.Excel.Chart chart) {
+        private int GetChartType(Microsoft.Office.Interop.Excel.Chart chart)
+        {
             int result = 0;
-            if (( chart.ChartType == XlChartType.xl3DArea ) ||
-                ( chart.ChartType == XlChartType.xl3DAreaStacked ) ||
-                ( chart.ChartType == XlChartType.xl3DAreaStacked100 ) ||
-                ( chart.ChartType == XlChartType.xl3DColumn ) ||
-                ( chart.ChartType == XlChartType.xl3DColumnClustered ) ||
-                ( chart.ChartType == XlChartType.xl3DColumnStacked ) ||
-                ( chart.ChartType == XlChartType.xl3DColumnStacked100 ) ||
-                ( chart.ChartType == XlChartType.xl3DLine ) ||
-                ( chart.ChartType == XlChartType.xl3DPie ) ||
-                ( chart.ChartType == XlChartType.xl3DPieExploded ) ||
-                ( chart.ChartType == XlChartType.xlConeCol ) ||
-                ( chart.ChartType == XlChartType.xlConeColClustered ) ||
-                ( chart.ChartType == XlChartType.xlConeColStacked ) ||
-                ( chart.ChartType == XlChartType.xlConeColStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlConeBarClustered ) ||
-                ( chart.ChartType == XlChartType.xlConeBarStacked ) ||
-                ( chart.ChartType == XlChartType.xlConeBarStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlCylinderCol ) ||
-                ( chart.ChartType == XlChartType.xlCylinderColClustered ) ||
-                ( chart.ChartType == XlChartType.xlCylinderColStacked ) ||
-                ( chart.ChartType == XlChartType.xlCylinderColStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlCylinderBarClustered ) ||
-                ( chart.ChartType == XlChartType.xlCylinderBarStacked ) ||
-                ( chart.ChartType == XlChartType.xlCylinderBarStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlPyramidCol ) ||
-                ( chart.ChartType == XlChartType.xlPyramidColClustered ) ||
-                ( chart.ChartType == XlChartType.xlPyramidColStacked ) ||
-                ( chart.ChartType == XlChartType.xlPyramidColStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlPyramidBarClustered ) ||
-                ( chart.ChartType == XlChartType.xlPyramidBarStacked ) ||
-                ( chart.ChartType == XlChartType.xlPyramidBarStacked100 ) ||
-                ( chart.ChartType == XlChartType.xlSurface ) ||
-                ( chart.ChartType == XlChartType.xlSurfaceTopView ) ||
-                ( chart.ChartType == XlChartType.xlSurfaceTopViewWireframe ) ||
-                ( chart.ChartType == XlChartType.xlSurfaceWireframe )) {
+            if ((chart.ChartType == XlChartType.xl3DArea) ||
+                (chart.ChartType == XlChartType.xl3DAreaStacked) ||
+                (chart.ChartType == XlChartType.xl3DAreaStacked100) ||
+                (chart.ChartType == XlChartType.xl3DColumn) ||
+                (chart.ChartType == XlChartType.xl3DColumnClustered) ||
+                (chart.ChartType == XlChartType.xl3DColumnStacked) ||
+                (chart.ChartType == XlChartType.xl3DColumnStacked100) ||
+                (chart.ChartType == XlChartType.xl3DLine) ||
+                (chart.ChartType == XlChartType.xl3DPie) ||
+                (chart.ChartType == XlChartType.xl3DPieExploded) ||
+                (chart.ChartType == XlChartType.xlConeCol) ||
+                (chart.ChartType == XlChartType.xlConeColClustered) ||
+                (chart.ChartType == XlChartType.xlConeColStacked) ||
+                (chart.ChartType == XlChartType.xlConeColStacked100) ||
+                (chart.ChartType == XlChartType.xlConeBarClustered) ||
+                (chart.ChartType == XlChartType.xlConeBarStacked) ||
+                (chart.ChartType == XlChartType.xlConeBarStacked100) ||
+                (chart.ChartType == XlChartType.xlCylinderCol) ||
+                (chart.ChartType == XlChartType.xlCylinderColClustered) ||
+                (chart.ChartType == XlChartType.xlCylinderColStacked) ||
+                (chart.ChartType == XlChartType.xlCylinderColStacked100) ||
+                (chart.ChartType == XlChartType.xlCylinderBarClustered) ||
+                (chart.ChartType == XlChartType.xlCylinderBarStacked) ||
+                (chart.ChartType == XlChartType.xlCylinderBarStacked100) ||
+                (chart.ChartType == XlChartType.xlPyramidCol) ||
+                (chart.ChartType == XlChartType.xlPyramidColClustered) ||
+                (chart.ChartType == XlChartType.xlPyramidColStacked) ||
+                (chart.ChartType == XlChartType.xlPyramidColStacked100) ||
+                (chart.ChartType == XlChartType.xlPyramidBarClustered) ||
+                (chart.ChartType == XlChartType.xlPyramidBarStacked) ||
+                (chart.ChartType == XlChartType.xlPyramidBarStacked100) ||
+                (chart.ChartType == XlChartType.xlSurface) ||
+                (chart.ChartType == XlChartType.xlSurfaceTopView) ||
+                (chart.ChartType == XlChartType.xlSurfaceTopViewWireframe) ||
+                (chart.ChartType == XlChartType.xlSurfaceWireframe))
+            {
                 result = 2;
-            } else if (( chart.ChartType == XlChartType.xl3DBarClustered ) ||
-                ( chart.ChartType == XlChartType.xl3DBarStacked ) ||
-                ( chart.ChartType == XlChartType.xl3DBarStacked100 )) {
+            }
+            else if ((chart.ChartType == XlChartType.xl3DBarClustered) ||
+              (chart.ChartType == XlChartType.xl3DBarStacked) ||
+              (chart.ChartType == XlChartType.xl3DBarStacked100))
+            {
                 result = 1;
             }
             return result;
@@ -577,13 +637,17 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="chart">excel chart</param>
         /// <returns></returns>
-        private Boolean SupportsNegativeElevation(Microsoft.Office.Interop.Excel.Chart chart) {
+        private Boolean SupportsNegativeElevation(Microsoft.Office.Interop.Excel.Chart chart)
+        {
             Boolean result = true;
             int originalElevation = chart.Elevation;
-            try {
+            try
+            {
                 chart.Elevation = -45;
                 chart.Elevation = originalElevation;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 chart.Elevation = originalElevation;
                 result = false;
             }
@@ -597,7 +661,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// modifying an office html generated file, it will cut off the support for all languages, so an UTF-8 character encoding will be forced
         /// </summary>
         /// <param name="path">the full path of the generated html sheet</param>
-        private void ProcessSheet(String path, ProcessingProgress pp, int pageNumber) {
+        private void ProcessSheet(String path, ProcessingProgress pp, int pageNumber)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.CurrentOperationName = "Page " + pageNumber;
@@ -629,7 +694,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="input">input string</param>
         /// <returns>the input filtered</returns>
-        private string TrimScript(String input) {
+        private string TrimScript(String input)
+        {
             String output = "";
             output = Regex.Replace(input, "<script(.|\n)*</script>", "");
             return output;

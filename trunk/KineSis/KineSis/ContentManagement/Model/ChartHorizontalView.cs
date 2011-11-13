@@ -21,13 +21,15 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace KineSis.ContentManagement.Model {
+namespace KineSis.ContentManagement.Model
+{
 
     /// <summary>
     /// Represents a chart horizontal view with more vertical views
     /// </summary>
     [Serializable]
-    public class ChartHorizontalView {
+    public class ChartHorizontalView
+    {
         private String imageUrl;
 
         private List<ChartVerticalView> up = new List<ChartVerticalView>();
@@ -36,12 +38,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Image url
         /// </summary>
-        public String ImageUrl {
-            get {
+        public String ImageUrl
+        {
+            get
+            {
                 return imageUrl;
             }
 
-            set {
+            set
+            {
                 imageUrl = value;
             }
         }
@@ -49,12 +54,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Logically up views list
         /// </summary>
-        public List<ChartVerticalView> Up {
-            get {
+        public List<ChartVerticalView> Up
+        {
+            get
+            {
                 return up;
             }
 
-            set {
+            set
+            {
                 up = value;
             }
         }
@@ -62,12 +70,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Logically down views list
         /// </summary>
-        public List<ChartVerticalView> Down {
-            get {
+        public List<ChartVerticalView> Down
+        {
+            get
+            {
                 return down;
             }
 
-            set {
+            set
+            {
                 down = value;
             }
         }

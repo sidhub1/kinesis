@@ -26,13 +26,15 @@ using System.Windows;
 using System.Windows.Threading;
 using System.ComponentModel;
 
-namespace KineSis.ContentManagement.Progress {
+namespace KineSis.ContentManagement.Progress
+{
 
     /// <summary>
     /// Processing progress management, used for displaying loading bars
     /// </summary>
-    class ProcessingProgress {
-        
+    class ProcessingProgress
+    {
+
         private String currentOperationName = "";
         private Double currentOperationElement = 0;
         private Double currentOperationTotalElements = 1;
@@ -44,67 +46,85 @@ namespace KineSis.ContentManagement.Progress {
         //the background worker
         BackgroundWorker worker;
 
-        public String CurrentOperationName {
-            get {
+        public String CurrentOperationName
+        {
+            get
+            {
                 return currentOperationName;
             }
 
-            set {
+            set
+            {
                 currentOperationName = value;
                 WriteProgress();
             }
         }
 
-        public String OverallOperationName {
-            get {
+        public String OverallOperationName
+        {
+            get
+            {
                 return overallOperationName;
             }
 
-            set {
+            set
+            {
                 overallOperationName = value;
                 WriteProgress();
             }
         }
 
-        public Double CurrentOperationElement {
-            get {
+        public Double CurrentOperationElement
+        {
+            get
+            {
                 return currentOperationElement;
             }
 
-            set {
+            set
+            {
                 currentOperationElement = value;
                 WriteProgress();
             }
         }
 
-        public Double OverallOperationElement {
-            get {
+        public Double OverallOperationElement
+        {
+            get
+            {
                 return overallOperationElement;
             }
 
-            set {
+            set
+            {
                 overallOperationElement = value;
                 WriteProgress();
             }
         }
 
-        public Double CurrentOperationTotalElements {
-            get {
+        public Double CurrentOperationTotalElements
+        {
+            get
+            {
                 return currentOperationTotalElements;
             }
 
-            set {
+            set
+            {
                 currentOperationTotalElements = value;
                 WriteProgress();
             }
         }
 
-        public Double OverallOperationTotalElements {
-            get {
+        public Double OverallOperationTotalElements
+        {
+            get
+            {
                 return overallOperationTotalElements;
             }
 
-            set {
+            set
+            {
                 overallOperationTotalElements = value;
                 WriteProgress();
             }
@@ -114,15 +134,17 @@ namespace KineSis.ContentManagement.Progress {
         /// Creates an ProcessingProgress for a given background worker
         /// </summary>
         /// <param name="worker"></param>
-        public ProcessingProgress(BackgroundWorker worker) {
+        public ProcessingProgress(BackgroundWorker worker)
+        {
             this.worker = worker;
         }
 
         /// <summary>
         /// Report progress
         /// </summary>
-        private void WriteProgress() {
-            Double overallOperation = ( (Double)overallOperationElement * 100 / (Double)overallOperationTotalElements );
+        private void WriteProgress()
+        {
+            Double overallOperation = ((Double)overallOperationElement * 100 / (Double)overallOperationTotalElements);
             worker.ReportProgress((int)overallOperation, this);
         }
     }

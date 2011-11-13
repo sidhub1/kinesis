@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+   Copyright 2011 Alexandru Albu - http://code.google.com/p/kinesis/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +32,9 @@ using System.Windows.Forms;
 
 namespace KineSis.UserInterface.Entities.Groups
 {
+    /// <summary>
+    /// the main group. it's the start point in controlling presentation. as submenus, it have the Pointer, Shapes, Naigation and Paint.
+    /// </summary>
     class Menu : Group
     {
         private static List<Group> groups = new List<Group>();
@@ -65,8 +85,8 @@ namespace KineSis.UserInterface.Entities.Groups
             {
                 if (groups.Count == 0)
                 {
-                    Group zoom = Zoom.Instance;
-                    groups.Add(zoom);
+                    Group pointer = Pointer.Instance;
+                    groups.Add(pointer);
                     Group pages = Pages.Instance;
                     groups.Add(pages);
                     Group shapes = Shapes.Instance;
@@ -79,10 +99,16 @@ namespace KineSis.UserInterface.Entities.Groups
             }
         }
 
+        /// <summary>
+        /// Draw submenu depending on skeleton
+        /// </summary>
+        /// <param name="c"></param>
         void Group.Draw(Canvas c)
         {
-            if (/*UIManager.SecondHand != null &&*/ UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
+            //if one hand is selecting
+            if (UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
             {
+                //create a menu session
                 if (!UIManager.inMenuSession)
                 {
                     UIManager.initialX = UIManager.FirstHand.X;
@@ -90,10 +116,12 @@ namespace KineSis.UserInterface.Entities.Groups
                     UIManager.inMenuSession = true;
                 }
 
+                //get colors
                 System.Windows.Media.Brush primaryColor = ProfileManager.ActiveProfile.PrimaryColor;
                 System.Windows.Media.Brush secondaryColor = ProfileManager.ActiveProfile.SecondaryColor;
                 System.Windows.Media.Brush fill = ColorUtil.FromHTML("#88FFFFFF");
 
+                //compute submenus locations
                 double centerX = UIManager.initialX;
                 double centerY = UIManager.initialY;
 
@@ -109,6 +137,7 @@ namespace KineSis.UserInterface.Entities.Groups
                 double downAreaX = UIManager.initialX;
                 double downAreaY = UIManager.initialY + 1.25 * UIManager.SUBMENU_DIAMETER;
 
+                //handle the touches
                 if (UIManager.FirstHand.X > rightAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < rightAreaX + UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y > rightAreaY - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y < rightAreaY + UIManager.SUBMENU_DIAMETER / 2)
                 {
                     rightSelected = true;
@@ -155,13 +184,14 @@ namespace KineSis.UserInterface.Entities.Groups
                     {
                         UIManager.SelectedGroup = Groups[3];
                     }
-                    
+
                     leftSelected = false;
                     rightSelected = false;
                     upSelected = false;
                     downSelected = false;
                 }
 
+                //draw the submenus
                 CanvasUtil.DrawEllipse(c, centerX, centerY, UIManager.MENU_DIAMETER, UIManager.MENU_DIAMETER, primaryColor, fill, null);
 
                 if (leftSelected)
@@ -200,6 +230,7 @@ namespace KineSis.UserInterface.Entities.Groups
                     CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, Groups[3].IsActive ? secondaryColor : Brushes.LightGray, fill, null);
                 }
 
+                //draw submenus images
                 System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage(((Group)instance).Name);
                 CanvasUtil.DrawImageInCircle(c, image0, UIManager.MENU_DIAMETER, centerX, centerY);
 
@@ -217,13 +248,13 @@ namespace KineSis.UserInterface.Entities.Groups
             }
             else
             {
+                //dispose menu session
                 UIManager.inMenuSession = false;
                 leftSelected = false;
                 rightSelected = false;
                 upSelected = false;
                 downSelected = false;
             }
-
         }
     }
 }

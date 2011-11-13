@@ -22,34 +22,46 @@ using System.Text;
 using System.Windows.Controls;
 using KineSis.Profiles;
 using KineSis.Utils;
-using System.Windows.Shapes;
 using System.Windows.Media;
+using System.Collections;
+using KineSis.Geometry;
 
 namespace KineSis.UserInterface.Entities.Groups
 {
     /// <summary>
-    /// ensure navigation between slides. (next/previous)
+    /// pointer group
     /// </summary>
-    class Navigate : Group
+    class Pointer : Group
     {
-
-        private Group parent;
-
         private Boolean inSession = false;
-        private Boolean selection = false;
         private Boolean leftSelected = false;
-        private Boolean rightSelected = false;
+        private static Queue<Point2D> pointsLeft = new Queue<Point2D>();
+        private static Queue<Point2D> pointsLeft2 = new Queue<Point2D>();
 
-        public Navigate(Group parent)
+        static readonly Pointer instance = new Pointer();
+        List<String> colors = new List<String>() { "#9999FF00", "#9999FF33", "#9999FF66", "#9999FF99", "#9999FFCC", "#9999FFFF", "#9999CCFF", "#999999FF", "#999966FF", "#999933FF", "#999900FF" };
+
+        static Pointer()
         {
-            this.parent = parent;
+        }
+
+        Pointer()
+        {
+        }
+
+        public static Pointer Instance
+        {
+            get
+            {
+                return instance;
+            }
         }
 
         String Group.Name
         {
             get
             {
-                return "navigate";
+                return "pointer";
             }
         }
 
@@ -57,12 +69,13 @@ namespace KineSis.UserInterface.Entities.Groups
         {
             get
             {
-                return UIManager.ActiveDocument != null && UIManager.ActiveDocument.Pages.Count > 1;
+                return true;
             }
         }
 
         void Group.Draw(Canvas c)
         {
+            UIManager.Clear();
             if (UIManager.ShowSecondaryMenu)
             {
                 if (!UIManager.inMenuSession)
@@ -97,7 +110,7 @@ namespace KineSis.UserInterface.Entities.Groups
                 {
                     if (leftSelected)
                     {
-                        UIManager.SelectedGroup = parent;
+                        UIManager.SelectedGroup = UIManager.MainGroup;
                     }
 
 
@@ -108,17 +121,17 @@ namespace KineSis.UserInterface.Entities.Groups
 
                 if (leftSelected)
                 {
-                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, parent.IsActive ? secondaryColor : Brushes.LightGray, fill, System.Windows.Media.Brushes.White);
+                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, UIManager.MainGroup.IsActive ? secondaryColor : Brushes.LightGray, fill, System.Windows.Media.Brushes.White);
                 }
                 else
                 {
-                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, parent.IsActive ? secondaryColor : Brushes.LightGray, fill, null);
+                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, UIManager.MainGroup.IsActive ? secondaryColor : Brushes.LightGray, fill, null);
                 }
 
                 System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage(((Group)this).Name);
                 CanvasUtil.DrawImageInCircle(c, image0, UIManager.MENU_DIAMETER, centerX, centerY);
 
-                System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage(parent.Name);
+                System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage(UIManager.MainGroup.Name);
                 CanvasUtil.DrawImageInCircle(c, image1, UIManager.SUBMENU_DIAMETER, leftAreaX, leftAreaY);
             }
             else if (UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected && !UIManager.inMenuSession)
@@ -134,69 +147,38 @@ namespace KineSis.UserInterface.Entities.Groups
                 System.Windows.Media.Brush secondaryColor = ProfileManager.ActiveProfile.SecondaryColor;
                 System.Windows.Media.Brush fill = ColorUtil.FromHTML("#88FFFFFF");
 
-                double centerX = UIManager.initialX;
-                double centerY = UIManager.FirstHand.Y;
+                Brush color = null;
 
-                double leftAreaX = UIManager.initialX - 1.25 * UIManager.SUBMENU_DIAMETER;
-                double leftAreaY = UIManager.FirstHand.Y;
-
-                double rightAreaX = UIManager.initialX + 1.25 * UIManager.SUBMENU_DIAMETER;
-                double rightAreaY = UIManager.FirstHand.Y;
-
-                if (UIManager.FirstHand.X > rightAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < rightAreaX + UIManager.SUBMENU_DIAMETER / 2 && selection == false)
+                int i = 0;
+                foreach (Point2D p in pointsLeft)
                 {
-                    rightSelected = true;
-                    selection = true;
-                    UIManager.ToNextPage();
-                }
-                else if (UIManager.FirstHand.X > leftAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < leftAreaX + UIManager.SUBMENU_DIAMETER / 2 && selection == false)
-                {
-                    leftSelected = true;
-                    selection = true;
-                    UIManager.ToPreviousPage();
-                }
-                else if (UIManager.FirstHand.X > centerX - UIManager.MENU_DIAMETER / 2 && UIManager.FirstHand.X < centerX + UIManager.MENU_DIAMETER / 2)
-                {
-                    selection = false;
-                    leftSelected = false;
-                    rightSelected = false;
+                    if (UIManager.FirstHandNumber == 1)
+                    {
+                        color = ColorUtil.FromHTML(colors[i]);
+                    }
+                    else
+                    {
+                        color = ColorUtil.FromHTML(colors[colors.Count - 1 - i]);
+                    }
+                    UIManager.Draw(p, color, Brushes.Transparent);
+                    i++;
                 }
 
-                CanvasUtil.DrawEllipse(c, centerX, centerY, UIManager.MENU_DIAMETER, UIManager.MENU_DIAMETER, primaryColor, fill, null);
 
-                if (leftSelected)
+                if (pointsLeft.Count > 10)
                 {
-                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
-                }
-                else
-                {
-                    CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
+                    pointsLeft.Dequeue();
                 }
 
-                if (rightSelected)
-                {
-                    CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
-                }
-                else
-                {
-                    CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
-                }
-
-                System.Windows.Controls.Image image0 = ImageUtil.GetResourceImage(((Group)this).Name);
-                CanvasUtil.DrawImageInCircle(c, image0, UIManager.MENU_DIAMETER, centerX, centerY);
-
-                System.Windows.Controls.Image image1 = ImageUtil.GetResourceImage("left");
-                CanvasUtil.DrawImageInCircle(c, image1, UIManager.SUBMENU_DIAMETER, leftAreaX, leftAreaY);
-
-                System.Windows.Controls.Image image2 = ImageUtil.GetResourceImage("right");
-                CanvasUtil.DrawImageInCircle(c, image2, UIManager.SUBMENU_DIAMETER, rightAreaX, rightAreaY);
+                Point2D currentPoint = new Point2D(UIManager.FirstHand.X, UIManager.FirstHand.Y);
+                pointsLeft.Enqueue(currentPoint);
             }
             else
             {
+                pointsLeft.Clear();
                 inSession = false;
                 UIManager.inMenuSession = false;
                 leftSelected = false;
-                rightSelected = false;
             }
         }
     }

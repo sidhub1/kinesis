@@ -23,19 +23,22 @@ using KineSis.ContentManagement.Utils;
 using KineSis.ContentManagement.Model;
 using KineSis.ContentManagement.Progress;
 
-namespace KineSis.ContentManagement.Service.Helper {
+namespace KineSis.ContentManagement.Service.Helper
+{
 
     /// <summary>
     /// Handles the text documents
     /// generates a html file which combine the document text with syntaxhighlighter 3.0.83 for a nice styling. 
     /// </summary>
-    class TextDocumentHelper : DocumentHelper {
+    class TextDocumentHelper : DocumentHelper
+    {
 
         private static String DD = "\\"; //directory delimiter
         private static String DOC_FILES = "document_files"; //document_files
         private static String DOCUMENT_HTML = "document.html";
 
-        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp) {
+        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.OverallOperationName = "Document";
@@ -90,7 +93,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="path">full source name</param>
         /// <param name="destination">full destination name</param>
         /// <returns></returns>
-        private String WriteTextDocument(String path, String destination) {
+        private String WriteTextDocument(String path, String destination)
+        {
             //read the source
             System.IO.StreamReader fileI = new System.IO.StreamReader(path);
             String content = fileI.ReadToEnd();
@@ -111,7 +115,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="path">full source name</param>
         /// <returns></returns>
-        private String GetDocumentHeader(String path) {
+        private String GetDocumentHeader(String path)
+        {
             //get text higlight for given path
             TextHighlight th = DocumentService.TextHighlightConfiguration.GetTextHighlightForTextFile(path);
             //the base string
@@ -145,7 +150,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// return footer for document
         /// </summary>
         /// <returns>the closure for generating html document</returns>
-        private String GetDocumentFooter() {
+        private String GetDocumentFooter()
+        {
             return "]]></script></html>";
         }
     }

@@ -22,12 +22,14 @@ using System.Text;
 using KineSis.ContentManagement.Model;
 using System.Xml;
 
-namespace KineSis.ContentManagement.Utils {
+namespace KineSis.ContentManagement.Utils
+{
 
     /// <summary>
     /// TextHighlighting configuration - for text documents
     /// </summary>
-    class TextHighlightConfiguration {
+    class TextHighlightConfiguration
+    {
 
         private static List<TextHighlight> textHighlights;
 
@@ -35,54 +37,82 @@ namespace KineSis.ContentManagement.Utils {
         /// Construct a configuration from a configuration xml file
         /// </summary>
         /// <param name="configurationXmlFile">configuration xml file</param>
-        public TextHighlightConfiguration(String configurationXmlFile) {
-            if (textHighlights == null) {
+        public TextHighlightConfiguration(String configurationXmlFile)
+        {
+            if (textHighlights == null)
+            {
                 XmlTextReader textReader = new XmlTextReader(configurationXmlFile);
                 textHighlights = new List<TextHighlight>();
-                while (textReader.Read()) {
-                    if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("sourceCodeFormatterConf")) {
-                        while (!( textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("sourceCodeFormatterConf") )) {
-                            if (textReader.Read()) {
-                                if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("conf")) {
+                while (textReader.Read())
+                {
+                    if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("sourceCodeFormatterConf"))
+                    {
+                        while (!(textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("sourceCodeFormatterConf")))
+                        {
+                            if (textReader.Read())
+                            {
+                                if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("conf"))
+                                {
                                     TextHighlight th = new TextHighlight();
 
-                                    while (!( textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("conf") )) {
-                                        if (textReader.Read()) {
-                                            if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("brushAlias")) {
+                                    while (!(textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("conf")))
+                                    {
+                                        if (textReader.Read())
+                                        {
+                                            if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("brushAlias"))
+                                            {
                                                 String text = null;
-                                                while (!( textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("brushAlias") )) {
-                                                    if (textReader.Read()) {
-                                                        if (textReader.NodeType == XmlNodeType.Text) {
+                                                while (!(textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("brushAlias")))
+                                                {
+                                                    if (textReader.Read())
+                                                    {
+                                                        if (textReader.NodeType == XmlNodeType.Text)
+                                                        {
                                                             text = textReader.Value.ToString();
                                                         }
                                                     }
                                                 }
                                                 th.BrushAlias = text;
-                                            } else if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("jsName")) {
+                                            }
+                                            else if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("jsName"))
+                                            {
                                                 String text = null;
-                                                while (!( textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("jsName") )) {
-                                                    if (textReader.Read()) {
-                                                        if (textReader.NodeType == XmlNodeType.Text) {
+                                                while (!(textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("jsName")))
+                                                {
+                                                    if (textReader.Read())
+                                                    {
+                                                        if (textReader.NodeType == XmlNodeType.Text)
+                                                        {
                                                             text = textReader.Value.ToString();
                                                         }
                                                     }
                                                 }
                                                 th.JsName = text;
-                                            } else if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("filenameExtension")) {
+                                            }
+                                            else if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("filenameExtension"))
+                                            {
                                                 String text = null;
-                                                while (!( textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("filenameExtension") )) {
-                                                    if (textReader.Read()) {
-                                                        if (textReader.NodeType == XmlNodeType.Text) {
+                                                while (!(textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("filenameExtension")))
+                                                {
+                                                    if (textReader.Read())
+                                                    {
+                                                        if (textReader.NodeType == XmlNodeType.Text)
+                                                        {
                                                             text = textReader.Value.ToString();
                                                         }
                                                     }
                                                 }
                                                 th.FilenameExtension = text;
-                                            } else if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("theme")) {
+                                            }
+                                            else if (textReader.NodeType == XmlNodeType.Element && textReader.Name.Equals("theme"))
+                                            {
                                                 String text = null;
-                                                while (!( textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("theme") )) {
-                                                    if (textReader.Read()) {
-                                                        if (textReader.NodeType == XmlNodeType.Text) {
+                                                while (!(textReader.NodeType == XmlNodeType.EndElement && textReader.Name.Equals("theme")))
+                                                {
+                                                    if (textReader.Read())
+                                                    {
+                                                        if (textReader.NodeType == XmlNodeType.Text)
+                                                        {
                                                             text = textReader.Value.ToString();
                                                         }
                                                     }
@@ -91,10 +121,13 @@ namespace KineSis.ContentManagement.Utils {
                                             }
                                         }
                                     }
-                                    if (th.IsAccepted) {
+                                    if (th.IsAccepted)
+                                    {
                                         textHighlights.Add(th);
                                         System.Console.WriteLine("New Conf:" + th.ToString());
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         System.Console.WriteLine("Skipped:" + th.ToString());
                                     }
                                 }
@@ -110,8 +143,10 @@ namespace KineSis.ContentManagement.Utils {
         /// <summary>
         /// All available text highlights
         /// </summary>
-        public List<TextHighlight> TextHighlights {
-            get {
+        public List<TextHighlight> TextHighlights
+        {
+            get
+            {
                 return textHighlights;
             }
         }
@@ -120,11 +155,14 @@ namespace KineSis.ContentManagement.Utils {
         /// String representation of configuration
         /// </summary>
         /// <returns></returns>
-        public override string ToString() {
+        public override string ToString()
+        {
             string str = base.ToString();
-            if (textHighlights != null) {
+            if (textHighlights != null)
+            {
                 str = "{ \"textHighlights\": ";
-                foreach (TextHighlight th in textHighlights) {
+                foreach (TextHighlight th in textHighlights)
+                {
                     str += th.ToString();
                     str += ", ";
                 }
@@ -139,11 +177,14 @@ namespace KineSis.ContentManagement.Utils {
         /// </summary>
         /// <param name="path">source file full path</param>
         /// <returns></returns>
-        public TextHighlight GetTextHighlightForTextFile(String path) {
+        public TextHighlight GetTextHighlightForTextFile(String path)
+        {
             String extension = path.Substring(path.LastIndexOf("."));
             TextHighlight th = null;
-            foreach (TextHighlight t in textHighlights) {
-                if (t.FilenameExtension.Equals(extension)) {
+            foreach (TextHighlight t in textHighlights)
+            {
+                if (t.FilenameExtension.Equals(extension))
+                {
                     th = t;
                     break;
                 }

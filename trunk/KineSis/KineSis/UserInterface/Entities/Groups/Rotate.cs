@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+   Copyright 2011 Alexandru Albu - http://code.google.com/p/kinesis/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +24,13 @@ using KineSis.Utils;
 using KineSis.Profiles;
 using System.Windows.Media;
 
-namespace KineSis.UserInterface.Entities.Groups {
-    class Rotate : Group {
+namespace KineSis.UserInterface.Entities.Groups
+{
+    /// <summary>
+    /// group for rotating charts
+    /// </summary>
+    class Rotate : Group
+    {
 
         private Group parent;
         private Boolean inSession = false;
@@ -18,8 +40,10 @@ namespace KineSis.UserInterface.Entities.Groups {
         private Boolean downSelected = false;
         private Boolean selected = false;
 
-        String Group.Name {
-            get {
+        String Group.Name
+        {
+            get
+            {
                 return "rotate";
             }
         }
@@ -32,12 +56,14 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
-        public Rotate(Group parent) {
+        public Rotate(Group parent)
+        {
             this.parent = parent;
         }
 
-        void Group.Draw(Canvas c) {
-            if (UIManager.SecondHand != null && UIManager.SecondHand.IsSelected && UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
+        void Group.Draw(Canvas c)
+        {
+            if (UIManager.ShowSecondaryMenu)
             {
                 if (!UIManager.inMenuSession)
                 {
@@ -55,6 +81,11 @@ namespace KineSis.UserInterface.Entities.Groups {
 
                 double leftAreaX = UIManager.initialX - 1.25 * UIManager.SUBMENU_DIAMETER;
                 double leftAreaY = UIManager.initialY;
+
+                if (UIManager.FirstHandNumber == 2)
+                {
+                    leftAreaX = UIManager.initialX + 1.25 * UIManager.SUBMENU_DIAMETER;
+                }
 
 
                 if (UIManager.FirstHand.X > leftAreaX - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.X < leftAreaX + UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y > leftAreaY - UIManager.SUBMENU_DIAMETER / 2 && UIManager.FirstHand.Y < leftAreaY + UIManager.SUBMENU_DIAMETER / 2)
@@ -93,7 +124,8 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
             else if (UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
             {
-                if (!inSession) {
+                if (!inSession)
+                {
                     UIManager.initialX = UIManager.FirstHand.X;
                     UIManager.initialY = UIManager.FirstHand.Y;
                     inSession = true;
@@ -153,27 +185,39 @@ namespace KineSis.UserInterface.Entities.Groups {
 
                 CanvasUtil.DrawEllipse(c, centerX, centerY, UIManager.MENU_DIAMETER, UIManager.MENU_DIAMETER, primaryColor, fill, null);
 
-                if (leftSelected) {
+                if (leftSelected)
+                {
                     CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
-                } else {
+                }
+                else
+                {
                     CanvasUtil.DrawEllipse(c, leftAreaX, leftAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
-                if (rightSelected) {
+                if (rightSelected)
+                {
                     CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
-                } else {
+                }
+                else
+                {
                     CanvasUtil.DrawEllipse(c, rightAreaX, rightAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
-                if (upSelected) {
+                if (upSelected)
+                {
                     CanvasUtil.DrawEllipse(c, upAreaX, upAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
-                } else {
+                }
+                else
+                {
                     CanvasUtil.DrawEllipse(c, upAreaX, upAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
-                if (downSelected) {
+                if (downSelected)
+                {
                     CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, Brushes.White);
-                } else {
+                }
+                else
+                {
                     CanvasUtil.DrawEllipse(c, downAreaX, downAreaY, UIManager.SUBMENU_DIAMETER, UIManager.SUBMENU_DIAMETER, secondaryColor, fill, null);
                 }
 
@@ -191,7 +235,9 @@ namespace KineSis.UserInterface.Entities.Groups {
 
                 System.Windows.Controls.Image image4 = ImageUtil.GetResourceImage("down");
                 CanvasUtil.DrawImageInCircle(c, image4, UIManager.SUBMENU_DIAMETER, downAreaX, downAreaY);
-            } else {
+            }
+            else
+            {
                 inSession = false;
                 UIManager.inMenuSession = false;
                 leftSelected = false;
