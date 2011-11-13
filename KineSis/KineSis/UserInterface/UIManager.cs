@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+   Copyright 2011 Alexandru Albu - http://code.google.com/p/kinesis/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,14 +26,20 @@ using KineSis.Profiles;
 using System.Windows.Shapes;
 using KineSis.ContentManagement.Model;
 using KineSis.Utils;
+using KineSis.Geometry;
+using System.Windows.Media;
 
-namespace KineSis.UserInterface {
-    class UIManager {
+namespace KineSis.UserInterface
+{
+    /// <summary>
+    /// UIManager is the central brain of user interface. Its role is to link the user movements to presentation flow.
+    /// </summary>
+    class UIManager
+    {
 
         private static Hand leftHand;
         private static Hand rightHand;
-        private static int firstHand;
-        private static Double delta = 1;
+        private static int firstHand; //0-none; 1=left; 2=right;
         private static MainWindow mainw = null;
         private static Boolean zoomFit = false;
         private static Boolean inPaint = false;
@@ -24,8 +47,66 @@ namespace KineSis.UserInterface {
         public static double initialY;
         public static Boolean inMenuSession;
         public static Boolean messOnScreen;
-        public static Boolean minimalScrollLock = false;
+        private static Boolean rightHandOnTop;
+        private static Boolean leftHandOnTop;
 
+        /// <summary>
+        /// minimal scroll lock - decides for minimal view if the menu should act like scroll or like navigate
+        /// </summary>
+        public static Boolean MinimalScrollLock
+        {
+            get
+            {
+                return (mainw != null && mainw.document != null && mainw.document.Pages.Count == 1);
+            }
+        }
+
+        /// <summary>
+        /// secondary menu is shown if user have one hand up and the other one selected
+        /// </summary>
+        public static Boolean ShowSecondaryMenu
+        {
+            get
+            {
+                return (firstHand == 1 && rightHandOnTop) || (firstHand == 2 && leftHandOnTop) && FirstHand.IsSelected;
+            }
+        }
+
+        /// <summary>
+        /// right hand is up or not
+        /// </summary>
+        public static Boolean RightHandOnTop
+        {
+            get
+            {
+                return rightHandOnTop;
+            }
+
+            set
+            {
+                rightHandOnTop = value;
+            }
+        }
+
+        /// <summary>
+        /// left hand is up or not
+        /// </summary>
+        public static Boolean LeftHandOnTop
+        {
+            get
+            {
+                return leftHandOnTop;
+            }
+
+            set
+            {
+                leftHandOnTop = value;
+            }
+        }
+
+        /// <summary>
+        /// computes the menu diameter based on user canvas height.
+        /// </summary>
         public static Double MENU_DIAMETER
         {
             get
@@ -34,142 +115,227 @@ namespace KineSis.UserInterface {
             }
         }
 
+        /// <summary>
+        /// computes the submenu diameter based on user canvas height.
+        /// </summary>
         public static Double SUBMENU_DIAMETER
         {
             get
             {
-                return mainw.userCanvas.Height / 6;
+                if (mainw != null && mainw.userCanvas != null)
+                {
+                    return mainw.userCanvas.Height / 6;
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 
         private static Group mainGroup = KineSis.UserInterface.Entities.Groups.Menu.Instance;
         private static Group selectedGroup = mainGroup;
 
-        public static Document ActiveDocument {
-            get {
-                if (mainw != null) {
+        /// <summary>
+        /// active document
+        /// </summary>
+        public static Document ActiveDocument
+        {
+            get
+            {
+                if (mainw != null)
+                {
                     return mainw.document;
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
         }
 
-        public static int ActiveDocumentPage {
-            get {
-                if (mainw != null) {
+        /// <summary>
+        /// active document page
+        /// </summary>
+        public static int ActiveDocumentPage
+        {
+            get
+            {
+                if (mainw != null)
+                {
                     return mainw.currentPage;
-                } else {
+                }
+                else
+                {
                     return -1;
                 }
             }
         }
 
-        public static Chart ActiveDocumentChart {
-            get {
-                if (mainw != null) {
+        /// <summary>
+        /// active document page chart
+        /// </summary>
+        public static Chart ActiveDocumentChart
+        {
+            get
+            {
+                if (mainw != null)
+                {
                     return mainw.currentChart;
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
         }
 
-        public static Boolean InPaint {
-            get {
+        /// <summary>
+        /// inPaint is on when user is drawing something on the screen
+        /// </summary>
+        public static Boolean InPaint
+        {
+            get
+            {
                 return inPaint;
             }
 
-            set {
+            set
+            {
                 inPaint = value;
             }
         }
 
-        public static Boolean ZoomFit {
-            get {
+        /// <summary>
+        /// return the status of zoom. If zoomFit is on, then the zoom in or out is disabled.
+        /// </summary>
+        public static Boolean ZoomFit
+        {
+            get
+            {
                 return zoomFit;
             }
 
-            set {
+            set
+            {
                 zoomFit = value;
-                if (mainw != null) {
+                if (mainw != null)
+                {
                     mainw.ZoomFit();
                 }
             }
         }
 
-        public static Double Delta {
-            get {
-                return delta;
-            }
-
-            set {
-                delta = value;
-            }
-        }
-
-        public static int FirstHandNumber {
-            get {
+        /// <summary>
+        /// return number of the first hand: 0-none, 1-left, 2-right
+        /// </summary>
+        public static int FirstHandNumber
+        {
+            get
+            {
                 return firstHand;
             }
         }
 
-        public static Hand SecondHand {
-            get {
-                if (firstHand == 1 && rightHand != null && rightHand.IsSelected) {
+        /// <summary>
+        /// return second touched hand
+        /// </summary>
+        public static Hand SecondHand
+        {
+            get
+            {
+                if (firstHand == 1 && rightHand != null && rightHand.IsSelected)
+                {
                     return rightHand;
-                } else if (firstHand == 2 && leftHand != null && leftHand.IsSelected) {
+                }
+                else if (firstHand == 2 && leftHand != null && leftHand.IsSelected)
+                {
                     return leftHand;
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
         }
 
-        public static Hand FirstHand {
-            get {
-                if (firstHand == 1) {
+        /// <summary>
+        /// return first touched hand
+        /// </summary>
+        public static Hand FirstHand
+        {
+            get
+            {
+                if (firstHand == 1)
+                {
                     return leftHand;
-                } else if (firstHand == 2) {
+                }
+                else if (firstHand == 2)
+                {
                     return rightHand;
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
         }
 
-        public static Hand LeftHand {
-            get {
+        /// <summary>
+        /// return left hand
+        /// </summary>
+        public static Hand LeftHand
+        {
+            get
+            {
                 return leftHand;
             }
-            
-            set {
+
+            set
+            {
                 leftHand = value;
-                if ((rightHand == null || !rightHand.IsSelected) && (leftHand == null || !leftHand.IsSelected)) {
+                if ((rightHand == null || !rightHand.IsSelected) && (leftHand == null || !leftHand.IsSelected))
+                {
                     firstHand = 0;
-                } else if (leftHand != null && leftHand.IsSelected && firstHand == 0) {
+                }
+                else if (leftHand != null && leftHand.IsSelected && firstHand == 0)
+                {
                     firstHand = 1;
                 }
             }
         }
 
-        public static Hand RightHand {
-            get {
+        /// <summary>
+        /// return right hand
+        /// </summary>
+        public static Hand RightHand
+        {
+            get
+            {
                 return rightHand;
             }
 
-            set {
+            set
+            {
                 rightHand = value;
-                if (( rightHand == null || !rightHand.IsSelected ) && ( leftHand == null || !leftHand.IsSelected )) {
+                if ((rightHand == null || !rightHand.IsSelected) && (leftHand == null || !leftHand.IsSelected))
+                {
                     firstHand = 0;
-                } else if (rightHand != null && rightHand.IsSelected && firstHand == 0) {
+                }
+                else if (rightHand != null && rightHand.IsSelected && firstHand == 0)
+                {
                     firstHand = 2;
                 }
             }
         }
 
-        public static Group SelectedGroup {
-            get {
+        /// <summary>
+        /// selected group is the active group/menu
+        /// </summary>
+        public static Group SelectedGroup
+        {
+            get
+            {
                 if (ProfileManager.MinimalView)
                 {
                     return Minimal.Instance;
@@ -180,128 +346,223 @@ namespace KineSis.UserInterface {
                 }
             }
 
-            set {
+            set
+            {
                 selectedGroup = value;
             }
         }
 
-        public static Group MainGroup {
-            get {
+        /// <summary>
+        /// main group is the starting group, the root of groups
+        /// </summary>
+        public static Group MainGroup
+        {
+            get
+            {
                 return mainGroup;
             }
 
-            set {
+            set
+            {
                 mainGroup = value;
             }
         }
 
-        public static void ToNextPage() {
-            if (mainw != null) {
+        /// <summary>
+        /// call next page of the document
+        /// </summary>
+        public static void ToNextPage()
+        {
+            if (mainw != null)
+            {
                 mainw.ToNextPage();
             }
         }
 
-        public static void ToPreviousPage() {
-            if (mainw != null) {
+        /// <summary>
+        /// call previous page of the document
+        /// </summary>
+        public static void ToPreviousPage()
+        {
+            if (mainw != null)
+            {
                 mainw.ToPreviousPage();
             }
         }
 
-        public static void GoToPage(int pageNumber) {
-            if (mainw != null) {
+        /// <summary>
+        /// go to a specific page number
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        public static void GoToPage(int pageNumber)
+        {
+            if (mainw != null)
+            {
                 mainw.GoToPage(pageNumber);
             }
         }
 
-        public static void ScrollRight() {
-            if (mainw != null) {
+        /// <summary>
+        /// call scroll right
+        /// </summary>
+        public static void ScrollRight()
+        {
+            if (mainw != null)
+            {
                 mainw.ScrollRight();
             }
         }
 
-        public static void ScrollLeft() {
-            if (mainw != null) {
+        /// <summary>
+        /// call scroll left
+        /// </summary>
+        public static void ScrollLeft()
+        {
+            if (mainw != null)
+            {
                 mainw.ScrollLeft();
             }
         }
 
-        public static void ScrollUp() {
-            if (mainw != null) {
+        /// <summary>
+        /// call scroll up
+        /// </summary>
+        public static void ScrollUp()
+        {
+            if (mainw != null)
+            {
                 mainw.ScrollUp();
             }
         }
 
-        public static void ScrollDown() {
-            if (mainw != null) {
+        /// <summary>
+        /// call scroll down
+        /// </summary>
+        public static void ScrollDown()
+        {
+            if (mainw != null)
+            {
                 mainw.ScrollDown();
             }
         }
 
-        public static void ZoomIn() {
-            if (mainw != null) {
+        /// <summary>
+        /// call zoom in
+        /// </summary>
+        public static void ZoomIn()
+        {
+            if (mainw != null)
+            {
                 mainw.ZoomIn();
             }
         }
 
-        public static void ZoomOut() {
-            if (mainw != null) {
+        /// <summary>
+        /// call zoom out
+        /// </summary>
+        public static void ZoomOut()
+        {
+            if (mainw != null)
+            {
                 mainw.ZoomOut();
             }
         }
 
-        public static void GoToChart(int chartNumber) {
-            if (mainw != null) {
+        /// <summary>
+        /// go to a specific chart in current page
+        /// </summary>
+        /// <param name="chartNumber"></param>
+        public static void GoToChart(int chartNumber)
+        {
+            if (mainw != null)
+            {
                 mainw.GoToChart(chartNumber);
             }
         }
 
-        public static void CloseChart() {
-            if (mainw != null) {
+        /// <summary>
+        /// close opened chart
+        /// </summary>
+        public static void CloseChart()
+        {
+            if (mainw != null)
+            {
                 mainw.CloseChart();
             }
         }
 
-        public static void RotateRight() {
-            if (mainw != null) {
+        /// <summary>
+        /// call roate chart right
+        /// </summary>
+        public static void RotateRight()
+        {
+            if (mainw != null)
+            {
                 mainw.RotateRight();
             }
         }
 
-        public static void RotateLeft() {
-            if (mainw != null) {
+        /// <summary>
+        /// call rotate chart left
+        /// </summary>
+        public static void RotateLeft()
+        {
+            if (mainw != null)
+            {
                 mainw.RotateLeft();
             }
         }
 
-        public static void RotateUp() {
-            if (mainw != null) {
+        /// <summary>
+        /// call rotate chart up
+        /// </summary>
+        public static void RotateUp()
+        {
+            if (mainw != null)
+            {
                 mainw.RotateUp();
             }
         }
 
-        public static void RotateDown() {
-            if (mainw != null) {
+        /// <summary>
+        /// call rotate chart down
+        /// </summary>
+        public static void RotateDown()
+        {
+            if (mainw != null)
+            {
                 mainw.RotateDown();
             }
         }
 
-        public static void Clear() {
-            if (mainw != null) {
+        /// <summary>
+        /// call clear all drawn lines on both screens
+        /// </summary>
+        public static void Clear()
+        {
+            if (mainw != null)
+            {
                 mainw.userCanvasWindow.canvas.Children.Clear();
                 mainw.presentationCanvasWindow.canvas.Children.Clear();
                 messOnScreen = false;
             }
         }
 
-        public static void Draw(Line myLine) {
-            if (mainw != null) {
+        /// <summary>
+        /// draw a line on both screens
+        /// </summary>
+        /// <param name="myLine"></param>
+        public static void Draw(Line myLine)
+        {
+            if (mainw != null)
+            {
 
                 Line myLine1 = new Line();
                 myLine1.Stroke = myLine.Stroke;
-                myLine1.X1 = myLine.X1 + mainw.userCanvasWindow.canvas.Width/2 - mainw.userCanvas.Width/2;
-                myLine1.X2 = myLine.X2 + mainw.userCanvasWindow.canvas.Width/2 - mainw.userCanvas.Width/2;
-                myLine1.Y1 = myLine.Y1 + mainw.userCanvasWindow.canvas.Height/2 - mainw.userCanvas.Height/2;
-                myLine1.Y2 = myLine.Y2 + mainw.userCanvasWindow.canvas.Height/2 - mainw.userCanvas.Height/2;
+                myLine1.X1 = myLine.X1 + mainw.userCanvasWindow.canvas.Width / 2 - mainw.userCanvas.Width / 2;
+                myLine1.X2 = myLine.X2 + mainw.userCanvasWindow.canvas.Width / 2 - mainw.userCanvas.Width / 2;
+                myLine1.Y1 = myLine.Y1 + mainw.userCanvasWindow.canvas.Height / 2 - mainw.userCanvas.Height / 2;
+                myLine1.Y2 = myLine.Y2 + mainw.userCanvasWindow.canvas.Height / 2 - mainw.userCanvas.Height / 2;
                 myLine1.StrokeThickness = 10;
 
                 mainw.userCanvasWindow.canvas.Children.Add(myLine1);
@@ -319,8 +580,39 @@ namespace KineSis.UserInterface {
             }
         }
 
-        public static void Process(MainWindow main) {
-            if (mainw == null) {
+        /// <summary>
+        /// draw a circle (point) on both screens
+        /// </summary>
+        /// <param name="myLine"></param>
+        /// <param name="stroke"></param>
+        /// <param name="fill"></param>
+        public static void Draw(Point2D myPoint, Brush stroke, Brush fill)
+        {
+            if (mainw != null)
+            {
+
+                Point2D myPoint1 = new Point2D(myPoint.X, myPoint.Y);
+
+                myPoint1.X = myPoint.X + mainw.userCanvasWindow.canvas.Width / 2 - mainw.userCanvas.Width / 2;
+                myPoint1.Y = myPoint.Y + mainw.userCanvasWindow.canvas.Height / 2 - mainw.userCanvas.Height / 2;
+                CanvasUtil.DrawEllipse(mainw.userCanvasWindow.canvas, myPoint1.X, myPoint1.Y, 50, 50, stroke, fill, null, 5);
+
+                Point2D myPoint2 = new Point2D(myPoint.X, myPoint.Y);
+                myPoint2.X = myPoint1.X * mainw.presentationCanvasWindow.canvas.Width / mainw.userCanvasWindow.canvas.Width;
+                myPoint2.Y = myPoint1.Y * mainw.presentationCanvasWindow.canvas.Height / mainw.userCanvasWindow.canvas.Height;
+
+                CanvasUtil.DrawEllipse(mainw.presentationCanvasWindow.canvas, myPoint2.X, myPoint2.Y, 50, 50, stroke, fill, null, 5);
+            }
+        }
+
+        /// <summary>
+        /// process a frame by calling the Draw method of selected group
+        /// </summary>
+        /// <param name="main"></param>
+        public static void Process(MainWindow main)
+        {
+            if (mainw == null)
+            {
                 mainw = main;
             }
 

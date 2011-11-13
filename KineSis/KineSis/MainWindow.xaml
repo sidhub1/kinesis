@@ -35,12 +35,12 @@
                                     <Image Source="/KineSis;component/Images/switch.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Minimal View" ToolTip="Minimal View" Click="UserCanvas_CM_Minimal_Click" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Switch Minimal View" ToolTip="Minimal View combines user screen and presentation screen in order to fit in one screen. You can just navigate through pages and scroll." Click="UserCanvas_CM_Minimal_Click" FontFamily="SF Fedora Titles">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/minimal.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Exit" ToolTip="Exit from Application" Click="Window_Closed" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Exit" ToolTip="Leave KineSis" Click="Window_Closed" FontFamily="SF Fedora Titles">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/exit.png" />
                                 </MenuItem.Icon>

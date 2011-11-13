@@ -140,7 +140,6 @@
     <Compile Include="ContentManagement\Model\ChartVerticalView.cs" />
     <Compile Include="ContentManagement\Model\Document.cs" />
     <Compile Include="ContentManagement\Model\Page.cs" />
-    <Compile Include="ContentManagement\Model\Shape.cs" />
     <Compile Include="ContentManagement\Model\TextHighlight.cs" />
     <Compile Include="ContentManagement\Progress\ProcessingProgress.cs" />
     <Compile Include="ContentManagement\Service\DocumentService.cs" />
@@ -168,10 +167,10 @@
     <Compile Include="UserInterface\Entities\Groups\Minimal.cs" />
     <Compile Include="UserInterface\Entities\Groups\PaintColor.cs" />
     <Compile Include="UserInterface\Entities\Groups\Navigate.cs" />
+    <Compile Include="UserInterface\Entities\Groups\Pointer.cs" />
     <Compile Include="UserInterface\Entities\Groups\Rotate.cs" />
     <Compile Include="UserInterface\Entities\Groups\Scroll.cs" />
     <Compile Include="UserInterface\Entities\Groups\Select.cs" />
-    <Compile Include="UserInterface\Entities\Groups\Zoom.cs" />
     <Compile Include="UserInterface\Entities\Hand.cs" />
     <Compile Include="UserInterface\Entities\Groups\Paint.cs" />
     <Compile Include="UserInterface\Entities\Groups\Group.cs" />
@@ -230,7 +229,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="KineSis.licenseheader" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -240,6 +238,9 @@
     <Resource Include="Images\minimal.png" />
     <Resource Include="Images\existing.png" />
     <Resource Include="Images\new.png" />
+    <Content Include="Drawables\pointer.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="syntaxhighlighter_3.0.83.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

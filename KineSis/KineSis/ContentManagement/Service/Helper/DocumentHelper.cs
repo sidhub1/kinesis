@@ -22,12 +22,14 @@ using System.Text;
 using KineSis.ContentManagement.Model;
 using KineSis.ContentManagement.Progress;
 
-namespace KineSis.ContentManagement.Service.Helper {
+namespace KineSis.ContentManagement.Service.Helper
+{
 
     /// <summary>
     /// interface for all document helpers
     /// </summary>
-    interface DocumentHelper {
+    interface DocumentHelper
+    {
 
         /// <summary>
         /// parse an input document and return a kinesis document model

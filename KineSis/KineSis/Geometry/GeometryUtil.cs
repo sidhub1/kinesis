@@ -20,12 +20,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KineSis.Geometry {
+namespace KineSis.Geometry
+{
 
     /// <summary>
     /// Geometry Utility class
     /// </summary>
-    class GeometryUtil {
+    class GeometryUtil
+    {
 
         /// <summary>
         /// Get distance between 2 points in an XOY plane
@@ -33,7 +35,8 @@ namespace KineSis.Geometry {
         /// <param name="a">Point A</param>
         /// <param name="b">Point b</param>
         /// <returns></returns>
-        public static Double GetDistance2D(Point2D a, Point2D b) {
+        public static Double GetDistance2D(Point2D a, Point2D b)
+        {
             Double dist = Math.Sqrt(Math.Pow(b.X - a.X, 2) + Math.Pow(b.Y - a.Y, 2));
             return dist;
         }

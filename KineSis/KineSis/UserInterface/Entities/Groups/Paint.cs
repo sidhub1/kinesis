@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+   Copyright 2011 Alexandru Albu - http://code.google.com/p/kinesis/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +26,13 @@ using KineSis.Profiles;
 using KineSis.Geometry;
 using System.Windows.Shapes;
 
-namespace KineSis.UserInterface.Entities.Groups {
-    class Paint : Group {
+namespace KineSis.UserInterface.Entities.Groups
+{
+    /// <summary>
+    /// paint group
+    /// </summary>
+    class Paint : Group
+    {
 
         private static List<Group> groups = new List<Group>();
         private Brush brush = null;
@@ -26,8 +48,10 @@ namespace KineSis.UserInterface.Entities.Groups {
         private Boolean upSelected = false;
         private Boolean downSelected = false;
 
-        String Group.Name {
-            get {
+        String Group.Name
+        {
+            get
+            {
                 return "paint";
             }
         }
@@ -42,49 +66,55 @@ namespace KineSis.UserInterface.Entities.Groups {
 
         static readonly Paint instance = new Paint();
 
-        static Paint() {
+        static Paint()
+        {
         }
 
-        Paint() {
+        Paint()
+        {
         }
 
-        public static Paint Instance {
-            get {
+        public static Paint Instance
+        {
+            get
+            {
                 return instance;
             }
         }
 
-        public List<Group> Groups {
-            get {
-                //if (groups.Count == 0) {
+        public List<Group> Groups
+        {
+            get
+            {
                 groups = new List<Group>();
-                    Group main = UIManager.MainGroup;
-                    groups.Add(main);
-                    Group clear = Clear.Instance;
-                    groups.Add(clear);
-                    if (instance.brush == null || (instance.brush != null && !instance.brush.ToString().Equals("#FFFF0000")))
-                    {
-                        Group red = new PaintColor("red");
-                        groups.Add(red);
-                    }
-                    if (instance.brush == null || (instance.brush != null && !instance.brush.ToString().Equals("#FF00FF00")))
-                    {
-                        Group green = new PaintColor("green");
-                        groups.Add(green);
-                    }
-                    if (instance.brush == null || (instance.brush != null && !instance.brush.ToString().Equals("#FF0000FF")))
-                    {
-                        Group blue = new PaintColor("blue");
-                        groups.Add(blue);
-                    }
-                //}
+                Group main = UIManager.MainGroup;
+                groups.Add(main);
+                Group clear = Clear.Instance;
+                groups.Add(clear);
+                if (instance.brush == null || (instance.brush != null && !instance.brush.ToString().Equals("#FFFF0000")))
+                {
+                    Group red = new PaintColor("red");
+                    groups.Add(red);
+                }
+                if (instance.brush == null || (instance.brush != null && !instance.brush.ToString().Equals("#FF00FF00")))
+                {
+                    Group green = new PaintColor("green");
+                    groups.Add(green);
+                }
+                if (instance.brush == null || (instance.brush != null && !instance.brush.ToString().Equals("#FF0000FF")))
+                {
+                    Group blue = new PaintColor("blue");
+                    groups.Add(blue);
+                }
                 return groups;
             }
         }
 
-        void Group.Draw(Canvas c) {
+        void Group.Draw(Canvas c)
+        {
 
-            if ((UIManager.SecondHand != null || instance.brush == null || UIManager.inMenuSession) && UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected) {
+            if ((instance.brush == null || UIManager.inMenuSession || UIManager.ShowSecondaryMenu) && UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
+            {
                 UIManager.InPaint = false;
 
                 if (!UIManager.inMenuSession)
@@ -223,7 +253,8 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
             else if (UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected && !UIManager.inMenuSession)
             {
-                if (!inSession) {
+                if (!inSession)
+                {
                     initialX = UIManager.FirstHand.X;
                     initialY = UIManager.FirstHand.Y;
                     inSession = true;
@@ -231,7 +262,8 @@ namespace KineSis.UserInterface.Entities.Groups {
                     lastY = initialY;
                 }
 
-                if (brush != null) {
+                if (brush != null)
+                {
                     UIManager.InPaint = true;
                     UIManager.inMenuSession = false;
 
@@ -248,7 +280,8 @@ namespace KineSis.UserInterface.Entities.Groups {
                     Point2D last = new Point2D(lastX, lastY);
                     Point2D current = new Point2D(UIManager.FirstHand.X, UIManager.FirstHand.Y);
 
-                    if (GeometryUtil.GetDistance2D(last, current) > 50) {
+                    if (GeometryUtil.GetDistance2D(last, current) > 50)
+                    {
                         Line myLine = new Line();
                         myLine.Stroke = brush;
                         myLine.X1 = lastX;
@@ -265,7 +298,9 @@ namespace KineSis.UserInterface.Entities.Groups {
                 }
 
 
-            } else {
+            }
+            else
+            {
                 inSession = false;
                 UIManager.inMenuSession = false;
                 leftSelected = false;
@@ -274,15 +309,23 @@ namespace KineSis.UserInterface.Entities.Groups {
                 downSelected = false;
             }
 
-            if (brush != null) {
+            if (brush != null)
+            {
                 String resource = "paint_";
-                if (brush.ToString().Equals("#FFFF0000")) {
+                if (brush.ToString().Equals("#FFFF0000"))
+                {
                     resource += "red";
-                } else if (brush.ToString().Equals("#FF0000FF")) {
+                }
+                else if (brush.ToString().Equals("#FF0000FF"))
+                {
                     resource += "blue";
-                } else if (brush.ToString().Equals("#FF00FF00")) {
+                }
+                else if (brush.ToString().Equals("#FF00FF00"))
+                {
                     resource += "green";
-                } else {
+                }
+                else
+                {
                     resource += "orange";
                 }
 

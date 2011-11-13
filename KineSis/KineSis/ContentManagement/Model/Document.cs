@@ -22,13 +22,15 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace KineSis.ContentManagement.Model {
+namespace KineSis.ContentManagement.Model
+{
 
     /// <summary>
     /// KineSis Document model
     /// </summary>
     [Serializable]
-    public class Document {
+    public class Document
+    {
         private String name;
         private String location;
         private String type;
@@ -37,12 +39,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Name of the document
         /// </summary>
-        public String Name {
-            get {
+        public String Name
+        {
+            get
+            {
                 return name;
             }
 
-            set {
+            set
+            {
                 name = value;
             }
         }
@@ -50,12 +55,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Location of the document withing the user's temp directory
         /// </summary>
-        public String Location {
-            get {
+        public String Location
+        {
+            get
+            {
                 return location;
             }
 
-            set {
+            set
+            {
                 location = value;
             }
         }
@@ -63,12 +71,15 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Type of the document
         /// </summary>
-        public String Type {
-            get {
+        public String Type
+        {
+            get
+            {
                 return type;
             }
 
-            set {
+            set
+            {
                 type = value;
             }
         }
@@ -76,24 +87,29 @@ namespace KineSis.ContentManagement.Model {
         /// <summary>
         /// Document pages list
         /// </summary>
-        public List<Page> Pages {
-            get {
+        public List<Page> Pages
+        {
+            get
+            {
                 return pages;
             }
 
-            set {
+            set
+            {
                 pages = value;
             }
         }
 
-        public static void serialize(Document document, String path) {
+        public static void serialize(Document document, String path)
+        {
             Stream b = File.OpenWrite(path);
             System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(document.GetType());
             x.Serialize(b, document);
             b.Close();
         }
 
-        public static Document deserialize(String path) {
+        public static Document deserialize(String path)
+        {
             Document doc = new Document();
 
             Stream b = File.OpenRead(path);

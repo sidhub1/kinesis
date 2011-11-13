@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+   Copyright 2011 Alexandru Albu - http://code.google.com/p/kinesis/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +24,13 @@ using KineSis.Utils;
 using System.Windows.Media;
 using KineSis.Profiles;
 
-namespace KineSis.UserInterface.Entities.Groups {
-    class Shapes : Group {
+namespace KineSis.UserInterface.Entities.Groups
+{
+    /// <summary>
+    /// group for shapes. Submenus for selecting a chart, rotation and closing.
+    /// </summary>
+    class Shapes : Group
+    {
 
         private static List<Group> groups = new List<Group>();
         private int pos = 0;
@@ -19,8 +41,10 @@ namespace KineSis.UserInterface.Entities.Groups {
         private Boolean downSelected = false;
         static readonly Shapes instance = new Shapes();
 
-        String Group.Name {
-            get {
+        String Group.Name
+        {
+            get
+            {
                 return "shapes";
             }
         }
@@ -33,33 +57,43 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
-        static Shapes() {
+        static Shapes()
+        {
         }
 
-        Shapes() {
+        Shapes()
+        {
         }
 
-        public static Shapes Instance {
-            get {
+        public static Shapes Instance
+        {
+            get
+            {
                 return instance;
             }
         }
 
         private static List<Element> elements;
 
-        public static List<Element> Elements {
-            get {
+        public static List<Element> Elements
+        {
+            get
+            {
                 return elements;
             }
 
-            set {
+            set
+            {
                 elements = value;
             }
         }
 
-        public static List<Group> Groups {
-            get {
-                if (groups.Count == 0) {
+        public static List<Group> Groups
+        {
+            get
+            {
+                if (groups.Count == 0)
+                {
                     Group main = UIManager.MainGroup;
                     groups.Add(main);
                     Group close = new Close();
@@ -74,7 +108,8 @@ namespace KineSis.UserInterface.Entities.Groups {
             }
         }
 
-        void Group.Draw(Canvas c) {
+        void Group.Draw(Canvas c)
+        {
             if (/*UIManager.SecondHand != null &&*/ UIManager.FirstHandNumber != 0 && UIManager.FirstHand.IsSelected)
             {
                 if (!UIManager.inMenuSession)
@@ -291,23 +326,32 @@ namespace KineSis.UserInterface.Entities.Groups {
             }*/
         }
 
-        private void IncrementPos() {
-            if (pos < Groups.Count - 1 && !posChanged) {
+        private void IncrementPos()
+        {
+            if (pos < Groups.Count - 1 && !posChanged)
+            {
                 pos++;
-            } else if (pos == Groups.Count - 1 && !posChanged) {
+            }
+            else if (pos == Groups.Count - 1 && !posChanged)
+            {
                 pos = 0;
             }
         }
 
-        private void DecrementPos() {
-            if (pos > 0 && !posChanged) {
+        private void DecrementPos()
+        {
+            if (pos > 0 && !posChanged)
+            {
                 pos--;
-            } else if (pos == 0 && !posChanged) {
+            }
+            else if (pos == 0 && !posChanged)
+            {
                 pos = Groups.Count - 1;
             }
         }
 
-        private String GetSubmenu() {
+        private String GetSubmenu()
+        {
             return Groups[pos].Name;
         }
     }

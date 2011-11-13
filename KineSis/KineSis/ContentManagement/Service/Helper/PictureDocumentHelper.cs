@@ -24,13 +24,15 @@ using KineSis.ContentManagement.Model;
 using KineSis.ContentManagement.Progress;
 using System.IO;
 
-namespace KineSis.ContentManagement.Service.Helper {
+namespace KineSis.ContentManagement.Service.Helper
+{
 
     /// <summary>
     /// Handles the pictures
     /// creates a copy of the picture in temp directory, and generate a html page, just good to be rendered within kinesis
     /// </summary>
-    class PictureDocumentHelper : DocumentHelper {
+    class PictureDocumentHelper : DocumentHelper
+    {
 
         private static String DD = "\\"; //directory delimiter
         private static String DOC_FILES = "document_files"; //document_files
@@ -42,7 +44,8 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// </summary>
         /// <param name="path">full path of the picture</param>
         /// <returns>an equivalent kinesis document model</returns>
-        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp) {
+        Document DocumentHelper.ParseNewDocument(String path, ProcessingProgress pp)
+        {
 
             //~~~~~~~~~~~~~progress~~~~~~~~~~~~~//
             pp.OverallOperationName = "Document";
@@ -106,10 +109,12 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="path">path of the original picture</param>
         /// <param name="pagesPath">path to temp pages directory for the document</param>
         /// <returns>full path to the generated html page</returns>
-        private String WritePictureDocument(String path, String pagesPath) {
+        private String WritePictureDocument(String path, String pagesPath)
+        {
             FileInfo fi = new FileInfo(path);
             FileInfo fic = new FileInfo(pagesPath + DD + "picture" + fi.Extension);
-            if (!fic.Exists) {
+            if (!fic.Exists)
+            {
                 fi.CopyTo(fic.FullName);
             }
             System.IO.StreamWriter fileO = new System.IO.StreamWriter(pagesPath + DD + DOCUMENT_HTML, false);
@@ -126,10 +131,12 @@ namespace KineSis.ContentManagement.Service.Helper {
         /// <param name="path">path of the original picture</param>
         /// <param name="pagesPath">path to temp pages directory for the document</param>
         /// <returns>full path to the generated html page</returns>
-        private String WritePictureDocumentNoZoom(String path, String pagesPath) {
+        private String WritePictureDocumentNoZoom(String path, String pagesPath)
+        {
             FileInfo fi = new FileInfo(path);
             FileInfo fic = new FileInfo(pagesPath + DD + "picture" + fi.Extension);
-            if (!fic.Exists) {
+            if (!fic.Exists)
+            {
                 fi.CopyTo(fic.FullName);
             }
             System.IO.StreamWriter fileO = new System.IO.StreamWriter(pagesPath + DD + DOCUMENT_NO_ZOOM_HTML, false);

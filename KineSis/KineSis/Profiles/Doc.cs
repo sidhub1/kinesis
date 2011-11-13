@@ -20,32 +20,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KineSis.Profiles {
+namespace KineSis.Profiles
+{
 
     /// <summary>
     /// Document saved for a profile
     /// </summary>
     [Serializable]
-    public class Doc {
+    public class Doc
+    {
         private String name;
         private String location;
 
-        public String Name {
-            get {
+        public String Name
+        {
+            get
+            {
                 return name;
             }
 
-            set {
+            set
+            {
                 name = value;
             }
         }
 
-        public String Location {
-            get {
+        public String Location
+        {
+            get
+            {
                 return location;
             }
 
-            set {
+            set
+            {
                 location = value;
             }
         }
