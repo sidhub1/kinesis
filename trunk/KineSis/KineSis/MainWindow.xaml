@@ -9,38 +9,38 @@
                 <Canvas Width="800" Height="600" Name="userCanvas" Margin="0 0 0 0" Background="#50000000" ClipToBounds="True">
                     <Canvas.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Open" ToolTip="Open a Presentation" FontSize="12" MaxWidth="Infinity" Focusable="True" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Open" ToolTip="Open a Presentation" FontSize="12" MaxWidth="Infinity" Focusable="True" FontFamily="Century Gothic">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/open.png" />
                                 </MenuItem.Icon>
-                                <MenuItem Header="New" ToolTip="Open a new Presentation" Click="UserCanvas_CM_Open_Click" FontSize="12" Width="Auto" Height="Auto" MaxWidth="Infinity" Focusable="True" FontFamily="SF Fedora Titles">
+                                <MenuItem Header="New" ToolTip="Open a new Presentation" Click="UserCanvas_CM_Open_Click" FontSize="12" Width="Auto" Height="Auto" MaxWidth="Infinity" Focusable="True" FontFamily="Century Gothic">
                                     <MenuItem.Icon>
                                         <Image Source="/KineSis;component/Images/new.png" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Existing" ToolTip="Open an existing Presentation" Click="UserCanvas_CM_Open_Existing_Click" FontSize="12" Width="Auto" Height="Auto" MaxWidth="Infinity" Focusable="True" FontFamily="SF Fedora Titles">
+                                <MenuItem Header="Existing" ToolTip="Open an existing Presentation" Click="UserCanvas_CM_Open_Existing_Click" FontSize="12" Width="Auto" Height="Auto" MaxWidth="Infinity" Focusable="True" FontFamily="Century Gothic">
                                     <MenuItem.Icon>
                                         <Image Source="/KineSis;component/Images/existing.png" />
                                     </MenuItem.Icon>
                                 </MenuItem>
 
                             </MenuItem>
-                            <MenuItem Header="Settings" ToolTip="Configure Application" Click="UserCanvas_CM_Settings_Click" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Settings" ToolTip="Configure Application" Click="UserCanvas_CM_Settings_Click" FontFamily="Century Gothic">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/settings.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Switch Screens" ToolTip="Switch Screens" Click="UserCanvas_CM_SwitchScreens_Click" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Switch Screens" ToolTip="Switch Screens" Click="UserCanvas_CM_SwitchScreens_Click" FontFamily="Century Gothic">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/switch.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Switch Minimal View" ToolTip="Minimal View combines user screen and presentation screen in order to fit in one screen. You can just navigate through pages and scroll." Click="UserCanvas_CM_Minimal_Click" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Switch Minimal View" ToolTip="Minimal View combines user screen and presentation screen in order to fit in one screen. You can just navigate through pages and scroll." Click="UserCanvas_CM_Minimal_Click" FontFamily="Century Gothic">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/minimal.png" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Exit" ToolTip="Leave KineSis" Click="Window_Closed" FontFamily="SF Fedora Titles">
+                            <MenuItem Header="Exit" ToolTip="Leave KineSis" Click="Window_Closed" FontFamily="Century Gothic">
                                 <MenuItem.Icon>
                                     <Image Source="/KineSis;component/Images/exit.png" />
                                 </MenuItem.Icon>

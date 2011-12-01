@@ -47,7 +47,7 @@ namespace KineSis {
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             foreach (Doc d in ProfileManager.ActiveProfile.Documents) {
-                documentsListBox.Items.Add(d.Name);
+                documentsListBox.Items.Add(getDocumentDate(d) + "\t" + d.Name);
             }
         }
 
@@ -82,14 +82,7 @@ namespace KineSis {
 
                 typeLabel.Content = type;
 
-                int year = int.Parse(d.Location.Substring(0, 4));
-                int month = int.Parse(d.Location.Substring(4, 2));
-                int day = int.Parse(d.Location.Substring(6, 2));
-                int hour = int.Parse(d.Location.Substring(8, 2));
-                int minute = int.Parse(d.Location.Substring(10, 2));
-                int second = int.Parse(d.Location.Substring(12, 2));
-                DateTime dt = new DateTime(year, month, day, hour, minute, second);
-                creationDateLabel.Content = dt.ToString();
+                creationDateLabel.Content = getDocumentDate(d).ToString();
             } else {
                 deleteButton.IsEnabled = false;
                 openButton.IsEnabled = false;
@@ -137,6 +130,17 @@ namespace KineSis {
                 }
                 mw.CheckOpenedDocument();
             }
+        }
+
+        private DateTime getDocumentDate(Doc d) {
+            int year = int.Parse(d.Location.Substring(0, 4));
+            int month = int.Parse(d.Location.Substring(4, 2));
+            int day = int.Parse(d.Location.Substring(6, 2));
+            int hour = int.Parse(d.Location.Substring(8, 2));
+            int minute = int.Parse(d.Location.Substring(10, 2));
+            int second = int.Parse(d.Location.Substring(12, 2));
+            DateTime dt = new DateTime(year, month, day, hour, minute, second);
+            return dt;
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿<Window x:Class="KineSis.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KineSis - Settings" Height="828" Width="800" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico" ShowInTaskbar="False">
+        Title="KineSis - Settings" Height="828" Width="800" Closed="Window_Closed" Icon="/KineSis;component/Images/kinesis.ico" ShowInTaskbar="False" FontFamily="Century Gothic" ResizeMode="NoResize">
     <Grid Height="793">
-        <GroupBox Header="Screens" Height="93" HorizontalAlignment="Left" Margin="12,73,0,0" Name="groupBox1" VerticalAlignment="Top" Width="754" ToolTip="Choose the user's screen and Presentation screen. User screeen is presented only to user, and contains a real-time rendered skeleton and menu. The Presentation screen is presented only to public, and contains only the presentation">
+        <GroupBox Header="Screens" Height="93" HorizontalAlignment="Left" Margin="12,73,0,0" Name="groupBox1" VerticalAlignment="Top" Width="754" ToolTip="Choose the user's screen and Presentation screen. User screeen is presented only to user, and contains a real-time rendered skeleton and menu. The Presentation screen is presented only to public, and contains only the presentation" FontFamily="Century Gothic">
             <Grid>
                 <Label Content="Default Presentation Screen" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label1" VerticalAlignment="Top" Width="181" />
                 <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,6,0,0" Name="screensCB" VerticalAlignment="Top" Width="543" SelectionChanged="screensCB_SelectionChanged" />
@@ -11,19 +11,19 @@
                 <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,41,0,0" Name="userScreensCB" VerticalAlignment="Top" Width="543" SelectionChanged="userScreensCB_SelectionChanged" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Profiles" Height="61" HorizontalAlignment="Left" Margin="12,6,0,0" Name="groupBox2" VerticalAlignment="Top" Width="754" ToolTip="Load a KineSis profile. A profile contains settings related to screens, location of generated files, properties of pages and charts, color preferences, and optimal touch distance"></GroupBox>
+        <GroupBox Header="Profiles" Height="61" HorizontalAlignment="Left" Margin="12,6,0,0" Name="groupBox2" VerticalAlignment="Top" Width="754" ToolTip="Load a KineSis profile. A profile contains settings related to screens, location of generated files, properties of pages and charts, color preferences, and optimal touch distance" FontFamily="Century Gothic"></GroupBox>
         <Grid Margin="18,24,18,734">
-            <Label Content="Load profile" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label3" VerticalAlignment="Top" />
-            <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,6,0,0" Name="profilesCB" VerticalAlignment="Top" Width="543" SelectionChanged="profilesCB_SelectionChanged" />
+            <Label Content="Load profile" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label3" VerticalAlignment="Top" FontFamily="Century Gothic" />
+            <ComboBox Height="23" HorizontalAlignment="Left" Margin="187,6,0,0" Name="profilesCB" VerticalAlignment="Top" Width="543" SelectionChanged="profilesCB_SelectionChanged" FontFamily="Century Gothic" />
         </Grid>
-        <GroupBox Header="Location" Height="65" HorizontalAlignment="Left" Margin="12,172,0,0" Name="groupBox3" VerticalAlignment="Top" Width="754" ToolTip="When opening a new presentation, KineSis transform the document in a format that can be rendered by the application. The Temp folder is a directory where all the generated files are stored.">
+        <GroupBox Header="Location" Height="65" HorizontalAlignment="Left" Margin="12,172,0,0" Name="groupBox3" VerticalAlignment="Top" Width="754" ToolTip="When opening a new presentation, KineSis transform the document in a format that can be rendered by the application. The Temp folder is a directory where all the generated files are stored." FontFamily="Century Gothic">
             <Grid>
                 <Label Content="Temp folder" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label5" VerticalAlignment="Top" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="187,11,0,0" Name="tempFolderTextBox" VerticalAlignment="Top" Width="396" IsEnabled="False" />
                 <Button Content="Change" Height="23" HorizontalAlignment="Left" Margin="589,10,0,0" Name="button2" VerticalAlignment="Top" Width="141" Click="button2_Click" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Theme" Height="165" HorizontalAlignment="Left" Margin="12,416,0,0" Name="groupBox4" VerticalAlignment="Top" Width="754" ToolTip="Choose colors of menu, skeleton and background">
+        <GroupBox Header="Theme" Height="165" HorizontalAlignment="Left" Margin="12,416,0,0" Name="groupBox4" VerticalAlignment="Top" Width="754" ToolTip="Choose colors of menu, skeleton and background" FontFamily="Century Gothic">
             <Grid>
                 <Label Content="Primary" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="primaryL" VerticalAlignment="Top" />
                 <Label Content="Secondary" Height="28" HorizontalAlignment="Left" Margin="6,40,0,0" Name="secondaryL" VerticalAlignment="Top" />
@@ -39,8 +39,8 @@
                 <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="589,109,0,0" Name="skeletonB" VerticalAlignment="Top" Width="141" Click="skeletonB_Click" />
             </Grid>
         </GroupBox>
-        <Button Content="Done" Height="23" HorizontalAlignment="Left" Margin="607,756,0,0" Name="doneButton" VerticalAlignment="Top" Width="141" Click="doneButton_Click" IsEnabled="True" />
-        <GroupBox Header="Slides and Charts" Height="167" HorizontalAlignment="Left" Margin="12,243,0,0" Name="groupBox5" VerticalAlignment="Top" Width="754" ToolTip="You can choose the maximum width of generated slides and charts. Also, for each chart, you can choose how many faces will be generated for 3D rotation">
+        <Button Content="Done" Height="23" HorizontalAlignment="Left" Margin="607,756,0,0" Name="doneButton" VerticalAlignment="Top" Width="141" Click="doneButton_Click" IsEnabled="True" FontFamily="Century Gothic" />
+        <GroupBox Header="Slides and Charts" Height="167" HorizontalAlignment="Left" Margin="12,243,0,0" Name="groupBox5" VerticalAlignment="Top" Width="754" ToolTip="You can choose the maximum width of generated slides and charts. Also, for each chart, you can choose how many faces will be generated for 3D rotation" FontFamily="Century Gothic">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="42*" />
@@ -60,7 +60,7 @@
                 <TextBox Grid.Column="1" Height="23" HorizontalAlignment="Left" Margin="547,113,0,0" Name="cvfTB" VerticalAlignment="Top" Width="141" IsEnabled="False" TextAlignment="Center"  />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Distances" Height="93" HorizontalAlignment="Left" Margin="12,587,0,0" Name="groupBox6" VerticalAlignment="Top" Width="754" ToolTip="Touch distance is calculated in centimeters, and represent the 3D distance between your hand and your body. Once you are in touch, you can navigate through menus and perform actions on presentation.">
+        <GroupBox Header="Distances" Height="93" HorizontalAlignment="Left" Margin="12,587,0,0" Name="groupBox6" VerticalAlignment="Top" Width="754" ToolTip="Touch distance is calculated in centimeters, and represent the 3D distance between your hand and your body. Once you are in touch, you can navigate through menus and perform actions on presentation." FontFamily="Century Gothic">
             <Grid>
                 <Label Content="Touch Distance" Height="28" HorizontalAlignment="Left" Margin="6,8,0,0" Name="label10" VerticalAlignment="Top" />
                 <Slider Height="23" HorizontalAlignment="Left" Margin="187,8,0,0" Name="touchSlider" VerticalAlignment="Top" Width="396" ValueChanged="touchSlider_ValueChanged" Value="0" Maximum="15" SmallChange="1" />
@@ -70,11 +70,11 @@
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="589,40,0,0" Name="untouchTB" VerticalAlignment="Top" Width="141" IsEnabled="False" IsReadOnly="True" TextAlignment="Center" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Save" Height="64" HorizontalAlignment="Left" Margin="12,686,0,0" Name="groupBox7" VerticalAlignment="Top" Width="754" ToolTip="Save your own profile."></GroupBox>
+        <GroupBox Header="Save" Height="64" HorizontalAlignment="Left" Margin="12,686,0,0" Name="groupBox7" VerticalAlignment="Top" Width="754" ToolTip="Save your own profile." FontFamily="Century Gothic"></GroupBox>
         <Grid Margin="18,704,18,0" Height="37" VerticalAlignment="Top">
-            <Label Content="Save Profile As .." Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label4" VerticalAlignment="Top" />
-            <TextBox Height="23" HorizontalAlignment="Left" Margin="187,8,0,0" Name="saveAsTextBox" VerticalAlignment="Top" Width="396" TextChanged="saveAsTextBox_TextChanged" />
-            <Button Content="Save" Height="23" HorizontalAlignment="Left" Margin="589,6,0,0" Name="saveButton" VerticalAlignment="Top" Width="141" Click="saveButton_Click" IsEnabled="False" />
+            <Label Content="Save Profile As .." Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label4" VerticalAlignment="Top" FontFamily="Century Gothic" />
+            <TextBox Height="23" HorizontalAlignment="Left" Margin="187,8,0,0" Name="saveAsTextBox" VerticalAlignment="Top" Width="396" TextChanged="saveAsTextBox_TextChanged" FontFamily="Century Gothic" />
+            <Button Content="Save" Height="23" HorizontalAlignment="Left" Margin="589,6,0,0" Name="saveButton" VerticalAlignment="Top" Width="141" Click="saveButton_Click" IsEnabled="False" FontFamily="Century Gothic" />
         </Grid>
     </Grid>
 </Window>

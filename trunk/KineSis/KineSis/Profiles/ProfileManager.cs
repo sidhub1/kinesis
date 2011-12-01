@@ -69,8 +69,8 @@ namespace KineSis.Profiles
                         kinesis.Name = "KineSis";
                         kinesis.PresentationScreen = 1;
                         kinesis.UserScreen = 0;
-                        kinesis.PrimaryColor = new SolidColorBrush(Color.FromRgb(86, 58, 150));
-                        kinesis.SecondaryColor = new SolidColorBrush(Color.FromRgb(138, 194, 49));
+                        kinesis.PrimaryColor = new SolidColorBrush(Color.FromRgb(80, 48, 143));
+                        kinesis.SecondaryColor = new SolidColorBrush(Color.FromRgb(44, 172, 227));
                         kinesis.BackgroundColor = Brushes.White;
                         kinesis.SkeletonColor = Brushes.Black;
                         kinesis.TempFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString() + "\\KineSis";

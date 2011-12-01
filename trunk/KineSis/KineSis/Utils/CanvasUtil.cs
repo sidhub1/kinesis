@@ -82,7 +82,7 @@ namespace KineSis.Utils
             currentOperationTextBlock.Foreground = ProfileManager.ActiveProfile.SecondaryColor;
             currentOperationTextBlock.FontSize = sixth / 1.5;
             currentOperationTextBlock.Width = canvas.Width;
-            currentOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
+            currentOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("Century Gothic");
 
             currentOperationTextBlock.TextAlignment = TextAlignment.Center;
 
@@ -110,7 +110,7 @@ namespace KineSis.Utils
             overallOperationTextBlock.FontSize = sixth / 1.5;
             overallOperationTextBlock.Width = canvas.Width;
             overallOperationTextBlock.Margin = new Thickness(0, 3 * sixth, 0, 0);
-            overallOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
+            overallOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("Century Gothic");
 
             overallOperationTextBlock.TextAlignment = TextAlignment.Center;
 
@@ -147,7 +147,7 @@ namespace KineSis.Utils
             overallOperationTextBlock.FontSize = sixth / 1.5;
             overallOperationTextBlock.Width = canvas.Width;
             overallOperationTextBlock.Margin = new Thickness(0, 3 * sixth, 0, 0);
-            overallOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
+            overallOperationTextBlock.FontFamily = new System.Windows.Media.FontFamily("Century Gothic");
 
             overallOperationTextBlock.TextAlignment = TextAlignment.Center;
 
@@ -221,11 +221,11 @@ namespace KineSis.Utils
         public static void DrawTextBlock(Canvas c, String text, double fontSize, System.Windows.Media.Brush background, System.Windows.Media.Brush foreground, double X, double top)
         {
 
-            System.Drawing.Size size = TextRenderer.MeasureText(text, new Font("SF Fedora Titles", (float)fontSize));
+            System.Drawing.Size size = TextRenderer.MeasureText(text, new Font("Century Gothic", (float)fontSize));
             if (background != null)
             {
                 TextBlock submenuEffect = new TextBlock();
-                submenuEffect.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
+                submenuEffect.FontFamily = new System.Windows.Media.FontFamily("Century Gothic");
                 submenuEffect.Background = background;
                 submenuEffect.Text = text;
                 submenuEffect.Foreground = foreground;
@@ -240,7 +240,7 @@ namespace KineSis.Utils
             }
 
             TextBlock submenu = new TextBlock();
-            submenu.FontFamily = new System.Windows.Media.FontFamily("SF Fedora Titles");
+            submenu.FontFamily = new System.Windows.Media.FontFamily("Century Gothic");
             submenu.Text = text;
             submenu.Foreground = foreground;
             submenu.FontSize = (float)fontSize;
