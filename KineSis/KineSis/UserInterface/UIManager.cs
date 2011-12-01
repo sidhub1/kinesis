@@ -375,6 +375,14 @@ namespace KineSis.UserInterface
         {
             if (mainw != null)
             {
+                if (messOnScreen)
+                {
+                    Clear();
+                }
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocumentChart != null)
+                {
+                    CloseChart();
+                }
                 mainw.ToNextPage();
             }
         }
@@ -386,6 +394,14 @@ namespace KineSis.UserInterface
         {
             if (mainw != null)
             {
+                if (messOnScreen)
+                {
+                    Clear();
+                }
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocumentChart != null)
+                {
+                    CloseChart();
+                }
                 mainw.ToPreviousPage();
             }
         }
@@ -398,6 +414,14 @@ namespace KineSis.UserInterface
         {
             if (mainw != null)
             {
+                if (messOnScreen)
+                {
+                    Clear();
+                }
+                if (UIManager.ActiveDocument != null && UIManager.ActiveDocumentChart != null)
+                {
+                    CloseChart();
+                }
                 mainw.GoToPage(pageNumber);
             }
         }

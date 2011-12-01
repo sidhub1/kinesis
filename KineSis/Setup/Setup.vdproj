@@ -21,14 +21,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1C1DBE66E329E5793403C690AD2E2857"
-        "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
+        "MsmKey" = "8:_21AE5A70D3FEC8EC6285044634A4B183"
+        "OwnerKey" = "8:_3C421F75BFEDFECFA30AE48C9E290A45"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_1C1DBE66E329E5793403C690AD2E2857"
-        "OwnerKey" = "8:_D7D92080B31092F271C2AF598840EB29"
+        "MsmKey" = "8:_21AE5A70D3FEC8EC6285044634A4B183"
+        "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -39,13 +39,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A1A3AB2091E54D639111509C3F3779A3"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D7D92080B31092F271C2AF598840EB29"
+        "MsmKey" = "8:_3C421F75BFEDFECFA30AE48C9E290A45"
         "OwnerKey" = "8:_E4EBA5A3BB1549379421A4DEF8B7D6EB"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -64,19 +58,19 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_3C421F75BFEDFECFA30AE48C9E290A45"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_21AE5A70D3FEC8EC6285044634A4B183"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_3210C8D05CA4607C09EDB2586F2734C4"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D7D92080B31092F271C2AF598840EB29"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1C1DBE66E329E5793403C690AD2E2857"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -141,6 +135,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
     }
@@ -191,14 +198,14 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1C1DBE66E329E5793403C690AD2E2857"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_21AE5A70D3FEC8EC6285044634A4B183"
             {
             "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:INuiInstanceHelper, Version=1.0.0.10, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86"
+            "AssemblyIsInGAC" = "11:TRUE"
+            "AssemblyAsmDisplayName" = "8:INuiInstanceHelper, Version=0.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_1C1DBE66E329E5793403C690AD2E2857"
+                    "_21AE5A70D3FEC8EC6285044634A4B183"
                     {
                     "Name" = "8:INuiInstanceHelper.dll"
                     "Attributes" = "3:512"
@@ -253,34 +260,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A1A3AB2091E54D639111509C3F3779A3"
-            {
-            "SourcePath" = "8:..\\KineSis\\sffedoratitles.ttf"
-            "TargetName" = "8:sffedoratitles.ttf"
-            "Tag" = "8:"
-            "Folder" = "8:_753C2BA1CA084BBEA90C68F9DC6CADDF"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:5"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D7D92080B31092F271C2AF598840EB29"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3C421F75BFEDFECFA30AE48C9E290A45"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Research.Kinect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Research.Kinect, Version=1.0.0.45, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D7D92080B31092F271C2AF598840EB29"
+                    "_3C421F75BFEDFECFA30AE48C9E290A45"
                     {
                     "Name" = "8:Microsoft.Research.Kinect.dll"
                     "Attributes" = "3:512"
@@ -383,7 +370,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:KineSis"
         "ProductCode" = "8:{4472B652-6800-4898-8E49-C1402A3D570C}"
-        "PackageCode" = "8:{0EAAD343-CEB5-4AEE-AA43-E8276E9E963E}"
+        "PackageCode" = "8:{745E7FDC-7B6A-4129-A801-F3C356F4CEEF}"
         "UpgradeCode" = "8:{602EF519-A1C3-43D8-9B08-9863FE8A633C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

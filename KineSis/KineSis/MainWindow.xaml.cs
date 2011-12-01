@@ -81,6 +81,7 @@ namespace KineSis
 
         public Chart currentChart = null;
         public int chartNumber = 0;
+        public Boolean connected = false;
 
         Runtime nui;
 
@@ -155,24 +156,65 @@ namespace KineSis
         /// <param name="e"></param>
         private void Window_Loaded(object sender, EventArgs e)
         {
+            Runtime.Kinects.StatusChanged += new EventHandler<StatusChangedEventArgs>(Kinects_StatusChanged);
+
             if (!ProfileManager.MinimalView)
             {
                 goFullScreen();
             }
-            nui = new Runtime();
-            try
-            {
-                nui.Initialize(RuntimeOptions.UseSkeletalTracking);
-            }
-            catch (InvalidOperationException)
-            {
-                System.Windows.MessageBox.Show("Runtime initialization failed. Please make sure Kinect device is plugged in.");
-                return;
-            }
-            nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+
             if (ProfileManager.MinimalView)
             {
                 goMinimalView();
+            }
+
+            nui = Runtime.Kinects[0];
+            if (nui != null && nui.Status == KinectStatus.Connected)
+            {
+                nui.Initialize(RuntimeOptions.UseSkeletalTracking);
+                nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+            }
+
+        }
+
+        /// <summary>
+        /// handle the kinect device plug-in or plug-out events
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Kinects_StatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            switch (e.Status)
+            {
+                case KinectStatus.Connected:
+                    if (nui != null)
+                    {
+                        nui.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                        nui.Uninitialize();
+                    }
+                    nui = e.KinectRuntime;
+                    if (nui != null)
+                    {
+                        nui.Initialize(RuntimeOptions.UseSkeletalTracking);
+                        nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                    }
+                    break;
+                case KinectStatus.Disconnected:
+                    nui.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                    nui.Uninitialize();
+                    nui = null;
+                    CanvasUtil.DrawTextBlock(userCanvas, "Plug-In a Kinect Sensor!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
+                    break;
+                default:
+                    if (e.Status.HasFlag(KinectStatus.Error))
+                    {
+                        nui.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                        nui.Uninitialize();
+                        nui = null;
+                        CanvasUtil.DrawTextBlock(userCanvas, "Plug-In a Kinect Sensor!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
+                        break;
+                    }
+                    break;
             }
         }
 
@@ -230,6 +272,8 @@ namespace KineSis
                 {
                     userBrowserForm.open(document.Pages[currentPage].Location);
                     presentationBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationZoom = 100;
+                    ApplyZoom();
                 }
             }
         }
@@ -252,6 +296,8 @@ namespace KineSis
                 {
                     userBrowserForm.open(document.Pages[currentPage].Location);
                     presentationBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationZoom = 100;
+                    ApplyZoom();
                 }
             }
         }
@@ -275,6 +321,8 @@ namespace KineSis
                 {
                     userBrowserForm.open(document.Pages[currentPage].Location);
                     presentationBrowserForm.open(document.Pages[currentPage].Location);
+                    presentationZoom = 100;
+                    ApplyZoom();
                 }
             }
         }
@@ -730,6 +778,7 @@ namespace KineSis
             // only ImageResolution.Resolution640x480 is supported at this point
             nui.NuiCamera.GetColorPixelCoordinatesFromDepthPixel(ImageResolution.Resolution640x480, iv, (int)depthX, (int)depthY, (short)0, out colorX, out colorY);
 
+
             // map back to skeleton.Width & skeleton.Height
             return new Point((int)(userCanvas.Width * colorX / 640.0), (int)(userCanvas.Height * colorY / 480));
         }
@@ -752,9 +801,15 @@ namespace KineSis
         void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             SkeletonFrame skeletonFrame = e.SkeletonFrame;
+
             int iSkeleton = 0;
 
             userCanvas.Children.Clear();
+
+            if (skeletonFrame == null)
+            {
+                return;
+            }
 
             if (ProfileManager.MinimalView)
             {
