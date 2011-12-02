@@ -1,6 +1,6 @@
 #labels kinesis,kinect,userinterface,menu,submenu,group,select,example,user,presentation,pointer,pages,navigate,scroll,zoom,select,shapes,charts,rotate,close,paint,draw,clear,screen
 <font face="Century Gothic">
-<table align="center"><tr><td align="center">Welcome to</td></tr><tr><td align="center"><img width="200px" src="http://i1114.photobucket.com/albums/k536/sandualbu/logo.png"/></td></tr></table>
+<table align="center"><tr><td align="center">Welcome to</td></tr><tr><td align="center"><img width="200px" src="http://i1114.photobucket.com/albums/k536/sandualbu/logo.png"/></td></tr><tr><td align="center"><wiki:video url="http://www.youtube.com/watch?v=FWIvsc0JZx8"/></td></tr></table>
 <br/>
 <div>KineSis is a project designed to be a help in presenting documents. Using Microsoft Kinect, it's easy to control presentations using your body gestures instead of remote controls, keyboards or any other electronic devices.</div>
 
