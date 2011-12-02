@@ -402,7 +402,7 @@ Next, the groups tree:
 <tr>
 <td><div><img align="right" src="http://i1114.photobucket.com/albums/k536/sandualbu/i_line.png"/></div></td>
 <td><div><img align="right" src="http://i1114.photobucket.com/albums/k536/sandualbu/i_line.png"/></div></td>
-<td><div><img align="right" src="http://i1114.photobucket.com/albums/k536/sandualbu/t_line.png"/></div></td>
+<td><div><img align="right" src="http://i1114.photobucket.com/albums/k536/sandualbu/l_line.png"/></div></td>
 <td>
 <table  align="left" border="1" cellspacing="0" cellpadding="0">
 <tr>
