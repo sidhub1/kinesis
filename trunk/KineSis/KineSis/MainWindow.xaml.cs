@@ -161,10 +161,7 @@ namespace KineSis
             if (!ProfileManager.MinimalView)
             {
                 goFullScreen();
-            }
-
-            if (ProfileManager.MinimalView)
-            {
+            } else {
                 goMinimalView();
             }
 
@@ -174,7 +171,6 @@ namespace KineSis
                 nui.Initialize(RuntimeOptions.UseSkeletalTracking);
                 nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
             }
-
         }
 
         /// <summary>
@@ -1131,14 +1127,10 @@ namespace KineSis
             {
                 if (WindowUtils.Screens.Count() > 1)
                 {
-                    if (PRESENTATION_SCREEN_NUMBER < WindowUtils.Screens.Count() - 1)
-                    {
-                        PRESENTATION_SCREEN_NUMBER++;
-                    }
-                    else
-                    {
-                        PRESENTATION_SCREEN_NUMBER = 0;
-                    }
+                    int x = USER_SCREEN_NUMBER;
+                    USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
+                    PRESENTATION_SCREEN_NUMBER = x;
+                    goFullScreen();
                 }
                 goMinimalView();
             }
@@ -1155,14 +1147,11 @@ namespace KineSis
         /// combines user and presentation screens in one screen
         /// </summary>
         private void goMinimalView()
-        {
+        {           
             if (ProfileManager.MinimalView)
             {
-                USER_SCREEN_NUMBER = PRESENTATION_SCREEN_NUMBER;
-                goFullScreen();
                 userBrowserForm.Hide();
                 userCanvasWindow.Hide();
-                this.Hide();
 
                 this.Width = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width / 2;
                 this.Height = WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Height * this.Width / WindowUtils.Screens[PRESENTATION_SCREEN_NUMBER].Bounds.Width;
@@ -1175,19 +1164,14 @@ namespace KineSis
                 userCanvas.Margin = new Thickness(0, 0, 0, 0);
                 userCanvas.Width = this.Width;
                 userCanvas.Height = this.Height;
-                this.ShowDialog();
             }
             else
             {
-                USER_SCREEN_NUMBER = ProfileManager.ActiveProfile.UserScreen;
-                PRESENTATION_SCREEN_NUMBER = ProfileManager.ActiveProfile.PresentationScreen;
-                this.Hide();
                 userBrowserForm.Show();
                 userCanvasWindow.Show();
                 this.Background = ColorUtil.FromHTML("#83818181");
                 userCanvas.Background = ColorUtil.FromHTML("#50000000");
                 userCanvas.Opacity = 1;
-                this.Show();
                 goFullScreen();
             }
         }
