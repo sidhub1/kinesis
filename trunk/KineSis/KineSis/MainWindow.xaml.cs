@@ -1,5 +1,5 @@
 ﻿/*
-   Copyright 2011 Alexandru Albu - sandu.albu@gmail.com
+   Copyright 2012 Alexandru Albu - sandu.albu@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Research.Kinect.Nui;
 using KineSis.Utils;
 using mshtml;
 using KineSis.ContentManagement.Model;
@@ -44,6 +43,7 @@ using KineSis.Profiles;
 using KineSis.UserInterface;
 using KineSis.UserInterface.Entities;
 using KineSis.UserInterface.Entities.Groups;
+using Microsoft.Kinect;
 
 namespace KineSis
 {
@@ -83,7 +83,7 @@ namespace KineSis
         public int chartNumber = 0;
         public Boolean connected = false;
 
-        Runtime nui;
+        KinectSensor sensor;
 
         // We want to control how depth data gets converted into false-color data
         // for more intuitive visualization, so we keep 32-bit color frame buffer versions of
@@ -93,27 +93,29 @@ namespace KineSis
         const int BLUE_IDX = 0;
         byte[] depthFrame32 = new byte[320 * 240 * 4];
 
-        Dictionary<JointID, Brush> jointColors = new Dictionary<JointID, Brush>() { 
-            {JointID.HipCenter, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
-            {JointID.Spine, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
-            {JointID.ShoulderCenter, new SolidColorBrush(Color.FromRgb(168, 230, 29))},
-            {JointID.Head, new SolidColorBrush(Color.FromRgb(200, 0,   0))},
-            {JointID.ShoulderLeft, new SolidColorBrush(Color.FromRgb(79,  84,  33))},
-            {JointID.ElbowLeft, new SolidColorBrush(Color.FromRgb(84,  33,  42))},
-            {JointID.WristLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
-            {JointID.HandLeft, new SolidColorBrush(Color.FromRgb(215,  86, 0))},
-            {JointID.ShoulderRight, new SolidColorBrush(Color.FromRgb(33,  79,  84))},
-            {JointID.ElbowRight, new SolidColorBrush(Color.FromRgb(33,  33,  84))},
-            {JointID.WristRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
-            {JointID.HandRight, new SolidColorBrush(Color.FromRgb(37,   69, 243))},
-            {JointID.HipLeft, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
-            {JointID.KneeLeft, new SolidColorBrush(Color.FromRgb(69,  33,  84))},
-            {JointID.AnkleLeft, new SolidColorBrush(Color.FromRgb(229, 170, 122))},
-            {JointID.FootLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
-            {JointID.HipRight, new SolidColorBrush(Color.FromRgb(181, 165, 213))},
-            {JointID.KneeRight, new SolidColorBrush(Color.FromRgb(71, 222,  76))},
-            {JointID.AnkleRight, new SolidColorBrush(Color.FromRgb(245, 228, 156))},
-            {JointID.FootRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))}
+        TransformSmoothParameters parameters = new TransformSmoothParameters();
+
+        Dictionary<JointType, Brush> jointColors = new Dictionary<JointType, Brush>() { 
+            {JointType.HipCenter, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
+            {JointType.Spine, new SolidColorBrush(Color.FromRgb(169, 176, 155))},
+            {JointType.ShoulderCenter, new SolidColorBrush(Color.FromRgb(168, 230, 29))},
+            {JointType.Head, new SolidColorBrush(Color.FromRgb(200, 0,   0))},
+            {JointType.ShoulderLeft, new SolidColorBrush(Color.FromRgb(79,  84,  33))},
+            {JointType.ElbowLeft, new SolidColorBrush(Color.FromRgb(84,  33,  42))},
+            {JointType.WristLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
+            {JointType.HandLeft, new SolidColorBrush(Color.FromRgb(215,  86, 0))},
+            {JointType.ShoulderRight, new SolidColorBrush(Color.FromRgb(33,  79,  84))},
+            {JointType.ElbowRight, new SolidColorBrush(Color.FromRgb(33,  33,  84))},
+            {JointType.WristRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
+            {JointType.HandRight, new SolidColorBrush(Color.FromRgb(37,   69, 243))},
+            {JointType.HipLeft, new SolidColorBrush(Color.FromRgb(77,  109, 243))},
+            {JointType.KneeLeft, new SolidColorBrush(Color.FromRgb(69,  33,  84))},
+            {JointType.AnkleLeft, new SolidColorBrush(Color.FromRgb(229, 170, 122))},
+            {JointType.FootLeft, new SolidColorBrush(Color.FromRgb(255, 126, 0))},
+            {JointType.HipRight, new SolidColorBrush(Color.FromRgb(181, 165, 213))},
+            {JointType.KneeRight, new SolidColorBrush(Color.FromRgb(71, 222,  76))},
+            {JointType.AnkleRight, new SolidColorBrush(Color.FromRgb(245, 228, 156))},
+            {JointType.FootRight, new SolidColorBrush(Color.FromRgb(77,  109, 243))}
         };
         #endregion
 
@@ -147,6 +149,12 @@ namespace KineSis
             settings.mw = this;
 
             ApplyProfile();
+
+            parameters.Smoothing = 0.2f;
+            parameters.Correction = 0.8f;
+            parameters.Prediction = 0.0f;
+            parameters.JitterRadius = 0.5f;
+            parameters.MaxDeviationRadius = 0.5f;
         }
 
         /// <summary>
@@ -156,7 +164,7 @@ namespace KineSis
         /// <param name="e"></param>
         private void Window_Loaded(object sender, EventArgs e)
         {
-            Runtime.Kinects.StatusChanged += new EventHandler<StatusChangedEventArgs>(Kinects_StatusChanged);
+            KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(Kinects_StatusChanged);
 
             if (!ProfileManager.MinimalView)
             {
@@ -165,11 +173,14 @@ namespace KineSis
                 goMinimalView();
             }
 
-            nui = Runtime.Kinects[0];
-            if (nui != null && nui.Status == KinectStatus.Connected)
+            sensor = KinectSensor.KinectSensors[0];
+            if (sensor != null && sensor.Status == KinectStatus.Connected)
             {
-                nui.Initialize(RuntimeOptions.UseSkeletalTracking);
-                nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                
+                sensor.SkeletonStream.Enable(parameters);
+                sensor.DepthStream.Enable();
+                sensor.Start();
+                sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(nui_SkeletonFrameReady);
             }
         }
 
@@ -183,30 +194,32 @@ namespace KineSis
             switch (e.Status)
             {
                 case KinectStatus.Connected:
-                    if (nui != null)
+                    if (sensor != null)
                     {
-                        nui.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-                        nui.Uninitialize();
+                        sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(nui_SkeletonFrameReady);
+                        sensor.Stop();
                     }
-                    nui = e.KinectRuntime;
-                    if (nui != null)
+                    sensor = e.Sensor;
+                    if (sensor != null)
                     {
-                        nui.Initialize(RuntimeOptions.UseSkeletalTracking);
-                        nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                        sensor.SkeletonStream.Enable(parameters);
+                        sensor.DepthStream.Enable();
+                        sensor.Start();
+                        sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(nui_SkeletonFrameReady);
                     }
                     break;
                 case KinectStatus.Disconnected:
-                    nui.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-                    nui.Uninitialize();
-                    nui = null;
+                    sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(nui_SkeletonFrameReady);
+                    sensor.Stop();
+                    sensor = null;
                     CanvasUtil.DrawTextBlock(userCanvas, "Plug-In a Kinect Sensor!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
                     break;
                 default:
                     if (e.Status.HasFlag(KinectStatus.Error))
                     {
-                        nui.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-                        nui.Uninitialize();
-                        nui = null;
+                        sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(nui_SkeletonFrameReady);
+                        sensor.Stop();
+                        sensor = null;
                         CanvasUtil.DrawTextBlock(userCanvas, "Plug-In a Kinect Sensor!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
                         break;
                     }
@@ -218,7 +231,7 @@ namespace KineSis
         {
             try
             {
-                nui.Uninitialize();
+                sensor.Stop();
 
             }
             catch (Exception)
@@ -763,28 +776,21 @@ namespace KineSis
         /// </summary>
         /// <param name="joint"></param>
         /// <returns></returns>
-        private Point getDisplayPosition(Joint joint)
+        private Point getDisplayPosition(DepthImageFrame depthFrame, Joint joint)
         {
-            float depthX, depthY;
-            nui.SkeletonEngine.SkeletonToDepthImage(joint.Position, out depthX, out depthY);
-            depthX = Math.Max(0, Math.Min(depthX * 320, 320));  //convert to 320, 240 space
-            depthY = Math.Max(0, Math.Min(depthY * 240, 240));  //convert to 320, 240 space
-            int colorX, colorY;
-            ImageViewArea iv = new ImageViewArea();
-            // only ImageResolution.Resolution640x480 is supported at this point
-            nui.NuiCamera.GetColorPixelCoordinatesFromDepthPixel(ImageResolution.Resolution640x480, iv, (int)depthX, (int)depthY, (short)0, out colorX, out colorY);
+            DepthImagePoint depthPoint = depthFrame.MapFromSkeletonPoint(joint.Position);
 
-
-            // map back to skeleton.Width & skeleton.Height
-            return new Point((int)(userCanvas.Width * colorX / 640.0), (int)(userCanvas.Height * colorY / 480));
+            return new Point(
+                        (int)(userCanvas.Width * depthPoint.X / depthFrame.Width),
+                        (int)(userCanvas.Height * depthPoint.Y / depthFrame.Height));
         }
 
-        Polyline getBodySegment(Microsoft.Research.Kinect.Nui.JointsCollection joints, Brush brush, params JointID[] ids)
+        Polyline getBodySegment(DepthImageFrame depthFrame, JointCollection joints, Brush brush, params JointType[] ids)
         {
             PointCollection points = new PointCollection(ids.Length);
             for (int i = 0; i < ids.Length; ++i)
             {
-                points.Add(getDisplayPosition(joints[ids[i]]));
+                points.Add(getDisplayPosition(depthFrame, joints[ids[i]]));
             }
 
             Polyline polyline = new Polyline();
@@ -794,225 +800,252 @@ namespace KineSis
             return polyline;
         }
 
-        void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        Skeleton[] skeletons;
+
+        void nui_SkeletonFrameReady(object sender, AllFramesReadyEventArgs e)
         {
-            SkeletonFrame skeletonFrame = e.SkeletonFrame;
-
-            int iSkeleton = 0;
-
-            userCanvas.Children.Clear();
-
-            if (skeletonFrame == null)
+            if (!((KinectSensor)sender).SkeletonStream.IsEnabled)
             {
                 return;
             }
 
-            if (ProfileManager.MinimalView)
-            {
-                Ellipse ellipse = new Ellipse();
-                ellipse.Width = userCanvas.Width / 10;
-                ellipse.Height = userCanvas.Width / 10;
-                ellipse.Stroke = ProfileManager.ActiveProfile.PrimaryColor;
-                ellipse.StrokeThickness = 10;
-                ellipse.Fill = ProfileManager.ActiveProfile.SecondaryColor;
-                Canvas.SetBottom(ellipse, -ellipse.Width / 2);
-                Canvas.SetRight(ellipse, -ellipse.Height / 2);
-                userCanvas.Children.Add(ellipse);
-            }
+            bool haveSkeletonData = false;
 
-            double minZ = double.MaxValue;
-            int userID = -1;
+             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+             {
+                 if (skeletonFrame != null)
+                 {
+                     if (skeletons == null) //allocate the first time
+                     {
+                         skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
+                     }
+                     skeletonFrame.CopySkeletonDataTo(skeletons);
+                     haveSkeletonData = true;
+                 }
 
-            foreach (SkeletonData data in skeletonFrame.Skeletons)
-            {
-                if (SkeletonTrackingState.Tracked == data.TrackingState)
-                {
-                    if (data.Joints[JointID.Head].Position.Z < minZ)
-                    {
-                        minZ = data.Joints[JointID.Head].Position.Z;
-                        userID = data.TrackingID;
-                    }
-                }
-            }
+                 if (haveSkeletonData)
+                 {
 
-            foreach (SkeletonData data in skeletonFrame.Skeletons)
-            {
-                if (SkeletonTrackingState.Tracked == data.TrackingState)
-                {
-                    // Draw bones
-                    Brush brush = null; //brushes[iSkeleton % brushes.Length];
-                    if (data.TrackingID == userID)
-                    {
-                        if (UIManager.RightHandOnTop || UIManager.LeftHandOnTop)
-                        {
-                            brush = ProfileManager.ActiveProfile.PrimaryColor;
-                        }
-                        else
-                        {
-                            brush = skeleton_brush;
-                        }
-                    }
-                    else
-                    {
-                        brush = ProfileManager.ActiveProfile.SkeletonColor;
-                        brush.Opacity = 0.2;
-                    }
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.ShoulderCenter));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderLeft, JointID.ElbowLeft, JointID.WristLeft));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.ShoulderCenter, JointID.ShoulderRight, JointID.ElbowRight, JointID.WristRight));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.HipLeft, JointID.KneeLeft, JointID.AnkleLeft));
-                    userCanvas.Children.Add(getBodySegment(data.Joints, brush, JointID.HipCenter, JointID.HipRight, JointID.KneeRight, JointID.AnkleRight));
+                     using (DepthImageFrame depthImageFrame = e.OpenDepthImageFrame())
+                     {
+                         if (depthImageFrame != null)
+                         {
+                             userCanvas.Children.Clear();
 
-                    Joint leftShoulder = new Joint();
-                    Joint rightShoulder = new Joint();
-                    Joint leftWrist = new Joint();
-                    Joint rightWrist = new Joint();
-                    Joint centerShoulder = new Joint();
-                    Joint centerHip = new Joint();
-                    Joint head = new Joint();
+                             if (skeletonFrame == null)
+                             {
+                                 return;
+                             }
 
-                    // Draw joints
-                    foreach (Joint joint in data.Joints)
-                    {
-                        if (joint.ID != JointID.HandLeft && joint.ID != JointID.HandRight && joint.ID != JointID.Spine && joint.ID != JointID.Head && joint.ID != JointID.FootRight && joint.ID != JointID.FootLeft)
-                        {
-                            Point jointPos = getDisplayPosition(joint);
+                             if (ProfileManager.MinimalView)
+                             {
+                                 Ellipse ellipse = new Ellipse();
+                                 ellipse.Width = userCanvas.Width / 10;
+                                 ellipse.Height = userCanvas.Width / 10;
+                                 ellipse.Stroke = ProfileManager.ActiveProfile.PrimaryColor;
+                                 ellipse.StrokeThickness = 10;
+                                 ellipse.Fill = ProfileManager.ActiveProfile.SecondaryColor;
+                                 Canvas.SetBottom(ellipse, -ellipse.Width / 2);
+                                 Canvas.SetRight(ellipse, -ellipse.Height / 2);
+                                 userCanvas.Children.Add(ellipse);
+                             }
 
-                            Brush jointFill = ProfileManager.ActiveProfile.SecondaryColor;
-                            if (data.TrackingID != userID)
-                            {
-                                jointFill = ProfileManager.ActiveProfile.SkeletonColor;
-                                jointFill.Opacity = 0.2;
-                            }
+                             double minZ = double.MaxValue;
+                             int userID = -1;
 
-                            CanvasUtil.DrawEllipse(userCanvas, jointPos.X, jointPos.Y, 30, 30, brush, jointFill, null, 5);
+                             foreach (Skeleton data in skeletons)
+                             {
+                                 if (data.TrackingState == SkeletonTrackingState.Tracked)
+                                 {
+                                     if (data.Joints[JointType.Head].Position.Z < minZ)
+                                     {
+                                         minZ = data.Joints[JointType.Head].Position.Z;
+                                         userID = data.TrackingId;
+                                     }
+                                 }
+                             }
 
-                            if (joint.ID == JointID.ShoulderLeft)
-                            {
-                                leftShoulder = joint;
-                            }
-                            else if (joint.ID == JointID.ShoulderRight)
-                            {
-                                rightShoulder = joint;
-                            }
-                            else if (joint.ID == JointID.WristLeft)
-                            {
-                                leftWrist = joint;
-                            }
-                            else if (joint.ID == JointID.WristRight)
-                            {
-                                rightWrist = joint;
-                            }
-                            else if (joint.ID == JointID.ShoulderCenter)
-                            {
-                                centerShoulder = joint;
-                            }
-                            else if (joint.ID == JointID.HipCenter)
-                            {
-                                centerHip = joint;
-                            }
-                        }
-                        else if (joint.ID == JointID.Head)
-                        {
-                            head = joint;
-                            Point jointPos = getDisplayPosition(joint);
-                            Brush headFill = Brushes.LightYellow;
+                             foreach (Skeleton data in skeletons)
+                             {
+                                 if (data.TrackingState == SkeletonTrackingState.Tracked)
+                                 {
+                                     // Draw bones
+                                     Brush brush = null; //brushes[iSkeleton % brushes.Length];
+                                     if (data.TrackingId == userID)
+                                     {
+                                         if (UIManager.RightHandOnTop || UIManager.LeftHandOnTop)
+                                         {
+                                             brush = ProfileManager.ActiveProfile.PrimaryColor;
+                                         }
+                                         else
+                                         {
+                                             brush = skeleton_brush;
+                                         }
+                                     }
+                                     else
+                                     {
+                                         brush = ProfileManager.ActiveProfile.SkeletonColor;
+                                         brush.Opacity = 0.2;
+                                     }
+                                     userCanvas.Children.Add(getBodySegment(depthImageFrame, data.Joints, brush, JointType.HipCenter, JointType.ShoulderCenter));
+                                     userCanvas.Children.Add(getBodySegment(depthImageFrame, data.Joints, brush, JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft, JointType.WristLeft));
+                                     userCanvas.Children.Add(getBodySegment(depthImageFrame, data.Joints, brush, JointType.ShoulderCenter, JointType.ShoulderRight, JointType.ElbowRight, JointType.WristRight));
+                                     userCanvas.Children.Add(getBodySegment(depthImageFrame, data.Joints, brush, JointType.HipCenter, JointType.HipLeft, JointType.KneeLeft, JointType.AnkleLeft));
+                                     userCanvas.Children.Add(getBodySegment(depthImageFrame, data.Joints, brush, JointType.HipCenter, JointType.HipRight, JointType.KneeRight, JointType.AnkleRight));
 
-                            if (data.TrackingID != userID)
-                            {
-                                headFill = ColorUtil.FromHTML("#55FFFFE0");
-                                headFill.Opacity = 0.2;
-                            }
+                                     Joint leftShoulder = new Joint();
+                                     Joint rightShoulder = new Joint();
+                                     Joint leftWrist = new Joint();
+                                     Joint rightWrist = new Joint();
+                                     Joint centerShoulder = new Joint();
+                                     Joint centerHip = new Joint();
+                                     Joint head = new Joint();
 
-                            CanvasUtil.DrawEllipse(userCanvas, jointPos.X, jointPos.Y + 20, 80, 80, brush, headFill, null);
-                        }
-                    }
+                                     // Draw joints
+                                     foreach (Joint joint in data.Joints)
+                                     {
+                                         if (joint.JointType != JointType.HandLeft && joint.JointType != JointType.HandRight && joint.JointType != JointType.Spine && joint.JointType != JointType.Head && joint.JointType != JointType.FootRight && joint.JointType != JointType.FootLeft)
+                                         {
+                                             Point jointPos = getDisplayPosition(depthImageFrame, joint);
 
-                    if (data.TrackingID == userID)
-                    {
+                                             Brush jointFill = ProfileManager.ActiveProfile.SecondaryColor;
+                                             if (data.TrackingId != userID)
+                                             {
+                                                 jointFill = ProfileManager.ActiveProfile.SkeletonColor;
+                                                 jointFill.Opacity = 0.2;
+                                             }
 
-                        Double lDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(leftWrist.Position.X, leftWrist.Position.Z),
-                                                                                        new KineSis.Geometry.Point2D(leftShoulder.Position.X, leftShoulder.Position.Z));
-                        Double rDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(rightWrist.Position.X, rightWrist.Position.Z),
-                                                                                    new KineSis.Geometry.Point2D(rightShoulder.Position.X, rightShoulder.Position.Z));
+                                             CanvasUtil.DrawEllipse(userCanvas, jointPos.X, jointPos.Y, 30, 30, brush, jointFill, null, 5);
 
-                        UIManager.RightHandOnTop = rightWrist.Position.Y > head.Position.Y;
-                        UIManager.LeftHandOnTop = leftWrist.Position.Y > head.Position.Y;
+                                             if (joint.JointType == JointType.ShoulderLeft)
+                                             {
+                                                 leftShoulder = joint;
+                                             }
+                                             else if (joint.JointType == JointType.ShoulderRight)
+                                             {
+                                                 rightShoulder = joint;
+                                             }
+                                             else if (joint.JointType == JointType.WristLeft)
+                                             {
+                                                 leftWrist = joint;
+                                             }
+                                             else if (joint.JointType == JointType.WristRight)
+                                             {
+                                                 rightWrist = joint;
+                                             }
+                                             else if (joint.JointType == JointType.ShoulderCenter)
+                                             {
+                                                 centerShoulder = joint;
+                                             }
+                                             else if (joint.JointType == JointType.HipCenter)
+                                             {
+                                                 centerHip = joint;
+                                             }
+                                         }
+                                         else if (joint.JointType == JointType.Head)
+                                         {
+                                             head = joint;
+                                             Point jointPos = getDisplayPosition(depthImageFrame, joint);
+                                             Brush headFill = Brushes.LightYellow;
 
-                        if (!ProfileManager.MinimalView)
-                        {
-                            int ld = (int)(lDist * 100);
-                            String LD = (ld < 10) ? ("0" + ld) : ld.ToString();
+                                             if (data.TrackingId != userID)
+                                             {
+                                                 headFill = ColorUtil.FromHTML("#55FFFFE0");
+                                                 headFill.Opacity = 0.2;
+                                             }
 
-                            CanvasUtil.DrawEllipse(userCanvas, 50, 50, 100, 100, Brushes.Black, (leftHandSelected) ? ProfileManager.ActiveProfile.PrimaryColor : Brushes.Transparent, null);
+                                             CanvasUtil.DrawEllipse(userCanvas, jointPos.X, jointPos.Y + 20, 80, 80, brush, headFill, null);
+                                         }
+                                     }
 
-                            TextBlock tb1 = new TextBlock();
-                            tb1.Text = LD;
-                            tb1.Foreground = Brushes.Black;
-                            tb1.FontSize = 50;
-                            Canvas.SetTop(tb1, 15);
-                            Canvas.SetLeft(tb1, 25);
-                            userCanvas.Children.Add(tb1);
+                                     if (data.TrackingId == userID)
+                                     {
 
-                            int rd = (int)(rDist * 100);
-                            String RD = (rd < 10) ? ("0" + rd) : rd.ToString();
+                                         Double lDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(leftWrist.Position.X, leftWrist.Position.Z),
+                                                                                                         new KineSis.Geometry.Point2D(leftShoulder.Position.X, leftShoulder.Position.Z));
+                                         Double rDist = KineSis.Geometry.GeometryUtil.GetDistance2D(new KineSis.Geometry.Point2D(rightWrist.Position.X, rightWrist.Position.Z),
+                                                                                                     new KineSis.Geometry.Point2D(rightShoulder.Position.X, rightShoulder.Position.Z));
 
-                            CanvasUtil.DrawEllipse(userCanvas, userCanvas.Width - 50, 50, 100, 100, Brushes.Black, (rightHandSelected) ? ProfileManager.ActiveProfile.PrimaryColor : Brushes.Transparent, null);
+                                         UIManager.RightHandOnTop = rightWrist.Position.Y > head.Position.Y;
+                                         UIManager.LeftHandOnTop = leftWrist.Position.Y > head.Position.Y;
 
-                            TextBlock tb2 = new TextBlock();
-                            tb2.Text = RD;
-                            tb2.Foreground = Brushes.Black;
-                            tb2.FontSize = 50;
-                            Canvas.SetTop(tb2, 15);
-                            Canvas.SetRight(tb2, 25);
-                            userCanvas.Children.Add(tb2);
-                        }
+                                         if (!ProfileManager.MinimalView)
+                                         {
+                                             int ld = (int)(lDist * 100);
+                                             String LD = (ld < 10) ? ("0" + ld) : ld.ToString();
 
-                        if (lDist > ProfileManager.ActiveProfile.TouchDistance)
-                        {
-                            leftHandSelected = true;
-                        }
-                        else if (lDist < ProfileManager.ActiveProfile.UntouchDistance)
-                        {
-                            leftHandSelected = false;
-                        }
+                                             CanvasUtil.DrawEllipse(userCanvas, 50, 50, 100, 100, Brushes.Black, (leftHandSelected) ? ProfileManager.ActiveProfile.PrimaryColor : Brushes.Transparent, null);
 
-                        if (rDist > ProfileManager.ActiveProfile.TouchDistance)
-                        {
-                            rightHandSelected = true;
-                        }
-                        else if (rDist < ProfileManager.ActiveProfile.UntouchDistance)
-                        {
-                            rightHandSelected = false;
-                        }
+                                             TextBlock tb1 = new TextBlock();
+                                             tb1.Text = LD;
+                                             tb1.Foreground = Brushes.Black;
+                                             tb1.FontSize = 50;
+                                             Canvas.SetTop(tb1, 15);
+                                             Canvas.SetLeft(tb1, 25);
+                                             userCanvas.Children.Add(tb1);
 
-                        Hand leftHand = new Hand();
-                        leftHand.X = getDisplayPosition(leftWrist).X;
-                        leftHand.Y = getDisplayPosition(leftWrist).Y;
-                        leftHand.IsSelected = leftHandSelected;
+                                             int rd = (int)(rDist * 100);
+                                             String RD = (rd < 10) ? ("0" + rd) : rd.ToString();
 
-                        Hand rightHand = new Hand();
-                        rightHand.X = getDisplayPosition(rightWrist).X;
-                        rightHand.Y = getDisplayPosition(rightWrist).Y;
-                        rightHand.IsSelected = rightHandSelected;
+                                             CanvasUtil.DrawEllipse(userCanvas, userCanvas.Width - 50, 50, 100, 100, Brushes.Black, (rightHandSelected) ? ProfileManager.ActiveProfile.PrimaryColor : Brushes.Transparent, null);
 
-                        UIManager.LeftHand = leftHand;
-                        UIManager.RightHand = rightHand;
+                                             TextBlock tb2 = new TextBlock();
+                                             tb2.Text = RD;
+                                             tb2.Foreground = Brushes.Black;
+                                             tb2.FontSize = 50;
+                                             Canvas.SetTop(tb2, 15);
+                                             Canvas.SetRight(tb2, 25);
+                                             userCanvas.Children.Add(tb2);
+                                         }
 
-                        if (head.Position.Z < 1.7)
-                        {
-                            CanvasUtil.DrawTextBlock(userCanvas, "You are too close!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
-                        }
-                        else if (head.Position.Z > 3)
-                        {
-                            CanvasUtil.DrawTextBlock(userCanvas, "You are too far!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
-                        }
-                        UIManager.Process(this);
-                        CanvasUtil.DrawHand(userCanvas);
-                    }
-                }
-                iSkeleton++;
-            } // for each skeleton
+                                         if (lDist > ProfileManager.ActiveProfile.TouchDistance)
+                                         {
+                                             leftHandSelected = true;
+                                         }
+                                         else if (lDist < ProfileManager.ActiveProfile.UntouchDistance)
+                                         {
+                                             leftHandSelected = false;
+                                         }
+
+                                         if (rDist > ProfileManager.ActiveProfile.TouchDistance)
+                                         {
+                                             rightHandSelected = true;
+                                         }
+                                         else if (rDist < ProfileManager.ActiveProfile.UntouchDistance)
+                                         {
+                                             rightHandSelected = false;
+                                         }
+
+                                         Hand leftHand = new Hand();
+                                         leftHand.X = getDisplayPosition(depthImageFrame, leftWrist).X;
+                                         leftHand.Y = getDisplayPosition(depthImageFrame, leftWrist).Y;
+                                         leftHand.IsSelected = leftHandSelected;
+
+                                         Hand rightHand = new Hand();
+                                         rightHand.X = getDisplayPosition(depthImageFrame, rightWrist).X;
+                                         rightHand.Y = getDisplayPosition(depthImageFrame, rightWrist).Y;
+                                         rightHand.IsSelected = rightHandSelected;
+
+                                         UIManager.LeftHand = leftHand;
+                                         UIManager.RightHand = rightHand;
+
+                                         if (head.Position.Z < 1.7)
+                                         {
+                                             CanvasUtil.DrawTextBlock(userCanvas, "You are too close!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
+                                         }
+                                         else if (head.Position.Z > 3)
+                                         {
+                                             CanvasUtil.DrawTextBlock(userCanvas, "You are too far!", 50, Brushes.White, ProfileManager.ActiveProfile.PrimaryColor, userCanvas.Width / 2, 50);
+                                         }
+                                         UIManager.Process(this);
+                                         CanvasUtil.DrawHand(userCanvas);
+                                     }
+                                 }
+                             } // for each skeleton
+                         }
+                     }
+                 }
+             }
 
             userCanvas.Refresh();
         }
